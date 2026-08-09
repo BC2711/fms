@@ -99,3 +99,28 @@ def test_station_payload_extensions_relationships_statistics_and_document_file(c
     assert document.status_code == 201
     assert document.json()["data"]["station"]["name"] == "Airport Station"
     assert document.json()["data"]["file"].startswith("data:application/pdf;base64,")
+
+
+def test_administration_users_roles_and_permissions_end_to_end(client, auth_headers):
+    permissions = client.get("/api/administration/permissions?pageSize=100", headers=auth_headers)
+    assert permissions.status_code == 200
+    permission_id = permissions.json()["data"]["items"][0]["id"]
+
+    role = client.post("/api/administration/roles", headers=auth_headers, json={"name": "station-operator", "permission_ids": [permission_id]})
+    assert role.status_code == 201
+    role_id = role.json()["data"]["id"]
+    assert role.json()["data"]["permission_ids"] == [permission_id]
+
+    user = client.post("/api/administration/all-users", headers=auth_headers, json={"full_name": "Station Operator", "email": "operator@example.com", "password": "SecurePass123!", "role_id": role_id, "status": "active"})
+    assert user.status_code == 201
+    user_id = user.json()["data"]["id"]
+    assert user.json()["data"]["roles"][0]["name"] == "station-operator"
+    assert client.post("/api/auth/login", json={"email": "operator@example.com", "password": "SecurePass123!"}).status_code == 200
+
+    listing = client.get("/api/administration/all-users?search=operator&status=active", headers=auth_headers)
+    assert listing.status_code == 200
+    assert listing.json()["data"]["total"] == 1
+    assert client.delete(f"/api/administration/roles/{role_id}", headers=auth_headers).status_code == 409
+    assert client.put(f"/api/administration/all-users/{user_id}", headers=auth_headers, json={"full_name": "Updated Operator", "status": "suspended"}).status_code == 200
+    assert client.delete(f"/api/administration/all-users/{user_id}", headers=auth_headers).status_code == 200
+    assert client.delete(f"/api/administration/roles/{role_id}", headers=auth_headers).status_code == 200

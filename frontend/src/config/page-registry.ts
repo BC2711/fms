@@ -23,6 +23,7 @@ import { stationTypesCreateConfig, stationTypesDetailsConfig, stationTypesEditCo
 import { stationGroupsListConfig } from './modules/stations/station-groups.config'
 import { usersListConfig } from '@/config/modules/administrations/users/user.config'
 import { rolesListConfig } from '@/config/modules/administrations/permissions/roles.config'
+import { permissionsListConfig } from '@/config/modules/administrations/permissions/permissions.config'
 import { menuPermissionsListConfig } from '@/config/modules/administrations/permissions/menu.config'
 import { routePermissionsListConfig } from '@/config/modules/administrations/permissions/route-permissions.config'
 import { countriesListConfig } from '@/config/modules/administrations/location/countries.config'
@@ -99,6 +100,7 @@ export const pageRegistry: Record<string, PageConfig> = {
   // ADMINISTRATION MODULE
   'administration-all-users': usersListConfig,
   'administration-roles': rolesListConfig,
+  'administration-permissions': permissionsListConfig,
   'administration-menu-permissions': menuPermissionsListConfig,
   'administration-route-permissions': routePermissionsListConfig,
   'administration-countries': countriesListConfig,

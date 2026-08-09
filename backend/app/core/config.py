@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     environment: str = "development"
     api_prefix: str = "/api"
     database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/fms"
-    jwt_secret: str = Field(default="change-me-in-production", min_length=16)
+    jwt_secret: str = Field(default="development-only-change-me-before-production-2026", min_length=32)
     jwt_algorithm: str = "HS256"
     access_token_minutes: int = 60
     api_token: str = "development-token"
