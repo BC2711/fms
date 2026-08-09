@@ -20,7 +20,10 @@ class BaseRepository:
             conditions.append(or_(*(getattr(self.model, field).ilike(f"%{search}%") for field in self.config.searchable_fields)))
         for field, value in filters.items():
             if field in self.config.filterable_fields and value not in (None, ""):
-                conditions.append(getattr(self.model, field) == value)
+                if hasattr(self.model, field):
+                    conditions.append(getattr(self.model, field) == value)
+                elif hasattr(self.model, "details"):
+                    conditions.append(self.model.details[field].as_string() == str(value))
         return conditions
 
     def list(self, *, page: int, page_size: int, search: str | None, filters: dict[str, Any], sort_by: str, sort_direction: str):

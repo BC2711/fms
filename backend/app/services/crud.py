@@ -1,10 +1,12 @@
 from typing import Any
+from uuid import uuid4
 
 from pydantic import BaseModel
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.configuration.resource import ResourceConfig
-from app.core.errors import NotFoundError
+from app.core.errors import AppError, NotFoundError
 from app.models.resources import Account
 from app.repositories.base import BaseRepository
 from app.services.audit import AuditService
@@ -29,6 +31,8 @@ class CRUDService:
     def create(self, payload: BaseModel, actor_id: int | None):
         values = payload.model_dump(exclude_unset=True)
         values = self._normalize_values(values)
+        if self.config.model is Account and self.session.scalar(select(Account.id).where(Account.account_number == values.get("account_number"))):
+            raise AppError("Account number already exists", 409)
         obj = self.repository.create(values, actor_id)
         self.audit.record(actor_id=actor_id, action="create", resource=self.config.name, resource_id=obj.id, changes=values)
         self.session.commit()
@@ -39,6 +43,8 @@ class CRUDService:
         obj = self.get(item_id)
         values = payload.model_dump(exclude_unset=True, exclude_none=True)
         values = self._normalize_values(values, obj)
+        if self.config.model is Account and values.get("account_number") and self.session.scalar(select(Account.id).where(Account.account_number == values["account_number"], Account.id != item_id)):
+            raise AppError("Account number already exists", 409)
         self.repository.update(obj, values, actor_id)
         self.audit.record(actor_id=actor_id, action="update", resource=self.config.name, resource_id=obj.id, changes=values)
         self.session.commit()
@@ -54,6 +60,7 @@ class CRUDService:
         normalized = {key: value for key, value in values.items() if key in columns}
         normalized["details"] = details
         if obj is None and self.config.model is Account:
+            normalized["account_number"] = normalized.get("account_number") or f"FMS-{str(normalized.get('account_type') or self.config.fixed_values.get('account_type') or 'ACCOUNT').upper()[:6]}-{uuid4().hex[:8].upper()}"
             normalized["name"] = normalized.get("name") or " ".join(filter(None, (details.get("first_name"), details.get("middle_name"), details.get("last_name")))) or normalized["account_number"]
             normalized["email"] = str(normalized.get("email") or "")
         return normalized

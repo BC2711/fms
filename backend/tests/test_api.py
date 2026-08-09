@@ -124,3 +124,33 @@ def test_administration_users_roles_and_permissions_end_to_end(client, auth_head
     assert client.put(f"/api/administration/all-users/{user_id}", headers=auth_headers, json={"full_name": "Updated Operator", "status": "suspended"}).status_code == 200
     assert client.delete(f"/api/administration/all-users/{user_id}", headers=auth_headers).status_code == 200
     assert client.delete(f"/api/administration/roles/{role_id}", headers=auth_headers).status_code == 200
+
+
+def test_accounts_module_crud_filters_generated_numbers_and_balance_service(client, auth_headers):
+    created = client.post("/api/accounts/corporate-companies", headers=auth_headers, json={
+        "name": "Copperbelt Haulage", "email": "finance@haulage.example.com", "sector": "transport",
+        "province": "Copperbelt", "credit_limit": 5000, "status": "active",
+    })
+    assert created.status_code == 201
+    account = created.json()["data"]
+    assert account["account_type"] == "corporate"
+    assert account["account_number"].startswith("FMS-CORPOR-")
+    assert account["sector"] == "transport"
+
+    filtered = client.get("/api/accounts/corporate-companies?sector=transport&status=active", headers=auth_headers)
+    assert filtered.status_code == 200
+    assert filtered.json()["data"]["total"] == 1
+    account_id = account["id"]
+
+    credit = client.post(f"/api/accounts/{account_id}/balance-adjustments", headers=auth_headers, json={"operation": "credit", "amount": 1000, "reason": "Opening deposit", "reference": "DEP-001"})
+    assert credit.status_code == 200
+    assert credit.json()["data"]["balance"] == 1000.0
+    debit = client.post(f"/api/accounts/{account_id}/balance-adjustments", headers=auth_headers, json={"operation": "debit", "amount": 250, "reason": "Fuel purchase", "reference": "SALE-001"})
+    assert debit.status_code == 200
+    assert debit.json()["data"]["balance"] == 750.0
+    assert client.post(f"/api/accounts/{account_id}/balance-adjustments", headers=auth_headers, json={"operation": "debit", "amount": 9999, "reason": "Invalid overdraft"}).status_code == 409
+
+    duplicate = client.post("/api/accounts", headers=auth_headers, json={"account_number": account["account_number"], "name": "Duplicate", "account_type": "corporate"})
+    assert duplicate.status_code == 409
+    assert client.put(f"/api/accounts/{account_id}", headers=auth_headers, json={"phone": "+260977000000", "verification_status": "verified"}).status_code == 200
+    assert client.delete(f"/api/accounts/{account_id}", headers=auth_headers).status_code == 200

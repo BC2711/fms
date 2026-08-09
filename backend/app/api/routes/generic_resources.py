@@ -19,9 +19,14 @@ AuthenticatedUser = Annotated[User, Depends(get_current_user)]
 
 
 def authorize(user: User, resource: str, operation: str) -> None:
-    if not resource.startswith("administration/") or user.is_superuser:
+    if user.is_superuser:
         return
-    code = f"administration.{resource.split('/')[-1]}.{operation}"
+    if resource.startswith("administration/"):
+        code = f"administration.{resource.split('/')[-1]}.{operation}"
+    elif resource.startswith("settings-"):
+        code = f"settings.{operation}"
+    else:
+        return
     if code not in user.permission_codes:
         raise AppError(f"Missing permission: {code}", 403)
 

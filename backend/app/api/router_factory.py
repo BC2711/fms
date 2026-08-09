@@ -30,7 +30,10 @@ def _serialized(config: ResourceConfig, obj, db: Session) -> dict[str, Any]:
     if isinstance(data.get("details"), dict):
         data.update(data["details"])
     if isinstance(obj, Account):
-        data.setdefault("account_balance", data.get("balance", 0)); data.setdefault("available_credit", data.get("credit_limit", 0)); data.setdefault("total_vehicles", 0); data.setdefault("total_cards", 0); data.setdefault("total_stations", 0); data.setdefault("total_managed_accounts", 0)
+        balance = data.get("balance", 0) or 0; credit_limit = data.get("credit_limit", 0) or 0
+        data.setdefault("account_balance", balance); data["available_credit"] = max(float(credit_limit) - float(balance), 0)
+        data.setdefault("total_vehicles", 0); data.setdefault("total_cards", 0); data.setdefault("total_stations", 0); data.setdefault("total_managed_accounts", 0)
+        data.setdefault("vehicle_count", data["total_vehicles"]); data.setdefault("cards_count", data["total_cards"]); data.setdefault("driver_count", 0)
     if isinstance(obj, Station):
         data["station_type"] = _lookup(db, StationType, obj.station_type_id)
         data["station_group"] = _lookup(db, StationGroup, obj.station_group_id); data["oil_marketing_company"] = _lookup(db, Account, obj.oil_marketing_company_id)

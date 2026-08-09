@@ -8,7 +8,7 @@ def permissions(name: str) -> dict:
 
 
 def account_resource(name: str, path: str, account_type: str) -> ResourceConfig:
-    return ResourceConfig(name=name, model=Account, create_schema=AccountCreate, update_schema=AccountUpdate, response_schema=AccountResponse, route_prefix=path, permissions=permissions("accounts"), searchable_fields=("name", "account_number", "email"), filterable_fields=("status", "verification_status"), sortable_fields=("name", "account_number", "balance", "created_at"), fixed_values={"account_type": account_type})
+    return ResourceConfig(name=name, model=Account, create_schema=AccountCreate, update_schema=AccountUpdate, response_schema=AccountResponse, route_prefix=path, permissions=permissions("accounts"), searchable_fields=("name", "account_number", "email"), filterable_fields=("status", "verification_status", "sector", "province", "institution_type", "ngo_type", "aggregator_type"), sortable_fields=("name", "account_number", "balance", "created_at"), fixed_values={"account_type": account_type})
 
 
 ACCOUNT_RESOURCES = [

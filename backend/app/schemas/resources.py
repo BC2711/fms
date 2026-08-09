@@ -31,7 +31,7 @@ class TestItemResponse(ResourceResponse, TestItemCreate): pass
 
 class AccountCreate(BaseModel):
     model_config = ConfigDict(extra="allow")
-    account_number: str = Field(min_length=3, max_length=40)
+    account_number: str | None = Field(default=None, max_length=40)
     name: str | None = Field(default=None, min_length=2, max_length=180)
     account_type: str = "corporate"
     email: EmailStr | None = None

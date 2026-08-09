@@ -33,6 +33,7 @@ import { townsListConfig } from '@/config/modules/administrations/location/town.
 import { regionsListConfig } from '@/config/modules/administrations/location/region.config'
 import { menuConfig } from '@/config/menu.config'
 import { missingMenuPages } from '@/config/generated-page-factory'
+import { settingsPageRegistry } from '@/config/modules/settings/settings-pages'
 
 export const pageRegistry: Record<string, PageConfig> = {
   login: loginConfig,
@@ -108,6 +109,8 @@ export const pageRegistry: Record<string, PageConfig> = {
   'administration-districts': districtsListConfig,
   'administration-cities-and-towns': townsListConfig,
   'administration-station-regions': regionsListConfig,
+
+  ...settingsPageRegistry,
 
   'test-items': testItemsListConfig,
   'test-items-create': testItemsCreateConfig,
