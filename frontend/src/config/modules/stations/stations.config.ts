@@ -21,33 +21,33 @@ const api: ApiConfig = {
 
     endpoints: {
         list: {
-            path: 'stations/stations',
+            path: '/stations',
             method: 'GET',
         },
         item: {
-            path: 'stations/stations/{id}',
+            path: '/stations/{id}',
             method: 'GET',
             responseMappingPath: 'data',
         },
         create: {
-            path: 'stations/stations',
+            path: '/stations',
             method: 'POST',
             responseMappingPath: 'data',
         },
         update: {
-            path: 'stations/stations/{id}',
+            path: '/stations/{id}',
             method: 'PUT',
             responseMappingPath: 'data',
         },
         delete: {
-            path: 'stations/stations/{id}',
+            path: '/stations/{id}',
             method: 'DELETE',
         },
     },
 }
 
 const form: FormConfig = {
-    cancelPath: 'stations/stations',
+    cancelPath: '/stations/stations',
     resetEnabled: true,
 
     layout: {
@@ -236,8 +236,8 @@ const raw: PageConfig = {
     type: 'list',
     page_type: 'list',
 
-    path: 'stations/stations',
-    route: 'stations/stations',
+    path: '/stations/stations',
+    route: '/stations/stations',
 
     api,
 
@@ -456,21 +456,21 @@ const raw: PageConfig = {
                         type: 'navigate',
                         label: 'Price Board',
                         icon: 'BadgeDollarSign',
-                        path: 'stations/stations/{id}/price-board',
+                        path: '/stations/station-price-boards?station_id={id}',
                     },
                     {
                         id: 'inspections',
                         type: 'navigate',
                         label: 'Inspections',
                         icon: 'ClipboardCheck',
-                        path: 'stations/stations/{id}/inspections',
+                        path: '/stations/station-inspections?station_id={id}',
                     },
                     {
                         id: 'documents',
                         type: 'navigate',
                         label: 'Documents',
                         icon: 'Files',
-                        path: 'stations/stations/{id}/documents',
+                        path: '/stations/station-documents?station_id={id}',
                     },
                     {
                         id: 'delete',
@@ -498,7 +498,7 @@ const raw: PageConfig = {
             type: 'navigate',
             label: 'Add Station',
             icon: 'Plus',
-            path: 'stations/stations/create',
+            path: '/stations/stations/create',
         },
     ],
 
@@ -510,8 +510,8 @@ const raw: PageConfig = {
             page_title: 'Add Station',
             type: 'create',
             page_type: 'create',
-            path: 'stations/stations/create',
-            route: 'stations/stations/create',
+            path: '/stations/stations/create',
+            route: '/stations/stations/create',
             api,
             form: {
                 ...form,
@@ -525,8 +525,8 @@ const raw: PageConfig = {
             page_title: 'Station Details',
             type: 'details',
             page_type: 'details',
-            path: 'stations/stations/:id',
-            route: 'stations/stations/:id',
+            path: '/stations/stations/:id',
+            route: '/stations/stations/:id',
             api,
             recordIdParam: 'id',
 
@@ -687,8 +687,8 @@ const raw: PageConfig = {
             page_title: 'Edit Station',
             type: 'edit',
             page_type: 'edit',
-            path: 'stations/stations/:id/edit',
-            route: 'stations/stations/:id/edit',
+            path: '/stations/stations/:id/edit',
+            route: '/stations/stations/:id/edit',
             authentication: {
                 required: true,
             },

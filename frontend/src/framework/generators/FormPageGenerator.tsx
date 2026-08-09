@@ -18,6 +18,20 @@ interface FormPageGeneratorProps {
   routeParams: Readonly<Params<string>>
 }
 
+function readFile(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result))
+    reader.onerror = () => reject(new Error(`Unable to read ${file.name}.`))
+    reader.readAsDataURL(file)
+  })
+}
+
+async function serializeFiles(values: FormValues): Promise<FormValues> {
+  const entries = await Promise.all(Object.entries(values).map(async ([key, value]) => [key, value instanceof FileList ? (value.length ? await readFile(value[0]) : undefined) : value] as const))
+  return Object.fromEntries(entries)
+}
+
 export function FormPageGenerator({ config, mode, routeParams }: FormPageGeneratorProps) {
   const navigate = useNavigate()
   const location = useLocation()
@@ -57,7 +71,7 @@ export function FormPageGenerator({ config, mode, routeParams }: FormPageGenerat
       }
       return
     }
-    await mutation.mutateAsync({ data: values })
+    await mutation.mutateAsync({ data: await serializeFiles(values) })
     navigate(config.form.successPath ?? config.form.cancelPath ?? config.path.split('/:')[0])
   }
 

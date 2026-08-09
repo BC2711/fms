@@ -28,6 +28,5 @@ export function DynamicSelectInput({ field, ...props }: { field: FormFieldConfig
   const labelKey = field.option_label ?? 'name'
   const valueKey = field.option_value ?? 'id'
   const remoteOptions: SelectOptionConfig[] = query.data?.data.items.map((item) => ({ label: String(item[labelKey] ?? item.name ?? item.code ?? item[valueKey]), value: String(item[valueKey] ?? '') })) ?? []
-  return <SelectInput {...props} disabled={props.disabled || query.isLoading} options={endpoint ? remoteOptions : (field.options ?? [])}>
-  </SelectInput>
+  return <SelectInput {...props} placeholder={query.isError ? 'Unable to load options' : props.placeholder} disabled={props.disabled || query.isLoading || query.isError} options={endpoint ? remoteOptions : (field.options ?? [])} />
 }

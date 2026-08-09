@@ -498,6 +498,11 @@ const raw: PageConfig = {
                             label: 'Issued By',
                             type: 'text',
                         },
+                        {
+                            key: 'file',
+                            label: 'Document File',
+                            type: 'file',
+                        },
                     ],
                 },
                 {

@@ -55,7 +55,7 @@ export function buildFormSchema(formConfig: FormConfig) {
 }
 
 function defaults(formConfig: FormConfig, initialData?: FormValues): FormValues {
-  return Object.fromEntries(formConfig.fields.map((field) => [field.name, initialData?.[field.name] ?? field.default_value ?? field.defaultValue ?? (field.type === 'checkbox' ? false : '')]))
+  return Object.fromEntries(formConfig.fields.map((field) => [field.name, field.type === 'file' ? '' : initialData?.[field.name] ?? field.default_value ?? field.defaultValue ?? (field.type === 'checkbox' ? false : '')]))
 }
 
 export function FormGenerator({ formConfig, mode, initialData, onSubmit, isSubmitting, serverErrors, serverError }: FormGeneratorProps) {

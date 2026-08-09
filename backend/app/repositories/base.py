@@ -39,6 +39,28 @@ class BaseRepository:
         counts = {str(status): count for status, count in rows}
         return {state: counts.get(state, 0) for state in ("active", "inactive", "pending", "suspended", "draft", "verified", "rejected")}
 
+    def statistics(self, search: str | None, filters: dict[str, Any]) -> dict[str, Any]:
+        objects = list(self.session.scalars(select(self.model).where(*self._conditions(search, filters))).all())
+        stats: dict[str, Any] = {"total": len(objects)}
+        for state in ("active", "inactive", "pending", "suspended", "draft", "verified", "rejected", "under_maintenance", "valid", "expired", "expiring_soon", "scheduled"):
+            stats[state] = sum(getattr(obj, "status", None) == state for obj in objects)
+        def value(obj, key, default=0):
+            return getattr(obj, key, None) if getattr(obj, key, None) is not None else (getattr(obj, "details", {}) or {}).get(key, default)
+        stats["passed"] = sum(value(obj, "result", "") == "passed" for obj in objects)
+        stats["failed"] = sum(value(obj, "result", "") == "failed" for obj in objects)
+        stats["follow_up_required"] = sum(bool(value(obj, "follow_up_required", False)) for obj in objects)
+        stats["pending_approval"] = sum(value(obj, "approval_status", "") == "pending" for obj in objects)
+        stats["stations"] = sum(int(value(obj, "total_stations", 0) or 0) for obj in objects)
+        stats["ungrouped"] = sum(int(value(obj, "ungrouped", 0) or 0) for obj in objects)
+        stats["vehicles"] = sum(int(value(obj, "total_vehicles", 0) or 0) for obj in objects)
+        stats["managed_accounts"] = sum(int(value(obj, "total_managed_accounts", 0) or 0) for obj in objects)
+        stats["total_sales"] = float(sum((value(obj, "revenue", 0) or 0) for obj in objects))
+        stats["total_volume"] = float(sum((value(obj, "sales_volume", 0) or 0) for obj in objects))
+        stats["total_transactions"] = sum(int(value(obj, "transactions", 0) or 0) for obj in objects)
+        scores = [float(value(obj, "score", 0) or 0) for obj in objects if value(obj, "score", None) is not None]
+        stats["average_score"] = sum(scores) / len(scores) if scores else 0
+        return stats
+
     def create(self, values: dict[str, Any], actor_id: int | None):
         values.update(self.config.fixed_values)
         obj = self.model(**values, created_by=actor_id, updated_by=actor_id)

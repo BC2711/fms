@@ -105,7 +105,7 @@ class StationDocument(ResourceMixin, Base):
     issued_by: Mapped[str] = mapped_column(String(160), default="")
     issue_date: Mapped[date | None] = mapped_column(Date)
     expiry_date: Mapped[date | None] = mapped_column(Date, index=True)
-    file: Mapped[str] = mapped_column(String(500))
+    file: Mapped[str] = mapped_column(Text)
     verification_status: Mapped[str] = mapped_column(String(32), default="pending", index=True)
     notes: Mapped[str] = mapped_column(Text, default="")
     details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)

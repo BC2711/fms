@@ -66,3 +66,36 @@ def test_permissions_are_enforced_for_non_superusers(client):
     response = client.get("/api/stations", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 403
     assert response.json()["message"] == "Missing permission: stations.view"
+
+
+def test_generic_menu_resource_end_to_end(client, auth_headers):
+    created = client.post("/api/fuel-operations/fuel-products", headers=auth_headers, json={"name": "Unleaded Petrol", "code": "ULP", "status": "active", "octane": 95})
+    assert created.status_code == 201
+    item = created.json()["data"]
+    assert item["octane"] == 95
+    listing = client.get("/api/fuel-operations/fuel-products?search=petrol&status=active&page=1&pageSize=10&sortBy=name&sortDirection=asc", headers=auth_headers)
+    assert listing.status_code == 200
+    assert listing.json()["data"].keys() >= {"items", "total", "page", "pageSize", "active"}
+    assert listing.json()["data"]["total"] == 1
+    viewed = client.get(f"/api/fuel-operations/fuel-products/{item['id']}", headers=auth_headers)
+    assert viewed.json()["data"]["code"] == "ULP"
+    updated = client.put(f"/api/fuel-operations/fuel-products/{item['id']}", headers=auth_headers, json={"name": "Premium Petrol", "octane": 97})
+    assert updated.json()["data"] == {**updated.json()["data"], "name": "Premium Petrol", "octane": 97}
+    assert client.delete(f"/api/fuel-operations/fuel-products/{item['id']}", headers=auth_headers).status_code == 200
+    assert client.get(f"/api/fuel-operations/fuel-products/{item['id']}", headers=auth_headers).status_code == 404
+
+
+def test_station_payload_extensions_relationships_statistics_and_document_file(client, auth_headers):
+    station_type = client.post("/api/stations/station-types", headers=auth_headers, json={"name": "Retail Station", "code": "RETAIL", "is_public": True}).json()["data"]
+    station = client.post("/api/stations", headers=auth_headers, json={"name": "Airport Station", "code": "AIR01", "station_type_id": station_type["id"], "license_number": "ERB-123", "manager_email": "manager@example.com"})
+    assert station.status_code == 201
+    station_data = station.json()["data"]
+    assert station_data["station_type"]["name"] == "Retail Station"
+    assert station_data["license_number"] == "ERB-123"
+    assert station_data["manager_email"] == "manager@example.com"
+    listing = client.get("/api/stations?status=active&pageSize=100", headers=auth_headers).json()["data"]
+    assert listing["active"] >= 1
+    document = client.post("/api/stations/station-documents", headers=auth_headers, json={"station_id": station_data["id"], "document_type": "erb_license", "document_name": "ERB Licence", "file": "data:application/pdf;base64,JVBERi0xLjQ=", "verification_status": "pending", "notes": "Uploaded from the configured file field"})
+    assert document.status_code == 201
+    assert document.json()["data"]["station"]["name"] == "Airport Station"
+    assert document.json()["data"]["file"].startswith("data:application/pdf;base64,")

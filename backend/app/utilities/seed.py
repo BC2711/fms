@@ -9,6 +9,8 @@ from app.models.resources import Account, Bank, Station, StationType, TestItem
 
 def permission_codes() -> list[str]:
     codes = {config.permission_for(operation) for config in RESOURCES for operation in config.allowed_operations}
+    for resource in ("all-users", "roles", "menu-permissions", "route-permissions", "countries", "provinces", "districts", "cities-and-towns", "station-regions"):
+        codes.update(f"administration.{resource}.{operation}" for operation in ("view", "create", "update", "delete"))
     return sorted(codes)
 
 

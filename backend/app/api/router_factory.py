@@ -59,7 +59,8 @@ def generate_crud_router(config: ResourceConfig) -> APIRouter:
             del user
             filters = {field: request.query_params.get(field) for field in config.filterable_fields}
             rows, total = CRUDService(db, config).list(page=page, page_size=page_size, search=search or q, filters=filters, sort_by=sort_by, sort_direction=sort_direction)
-            data = {"items": [_serialized(config, row, db) for row in rows], "total": total, "page": page, "pageSize": page_size, **CRUDService(db, config).repository.status_counts(search or q, filters)}
+            statistics = CRUDService(db, config).repository.statistics(search or q, filters)
+            data = {"items": [_serialized(config, row, db) for row in rows], "total": total, "page": page, "pageSize": page_size, **statistics, "statistics": statistics}
             return response(f"{config.name.replace('-', ' ').title()} retrieved successfully", data)
 
     if "view" in config.allowed_operations:

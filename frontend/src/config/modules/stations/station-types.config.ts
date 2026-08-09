@@ -290,8 +290,8 @@ const raw: PageConfig = {
             page_title: 'Station Type Details',
             type: 'details',
             page_type: 'details',
-            path: 'stations/station-types/:id',
-            route: 'stations/station-types/:id',
+            path: '/stations/station-types/:id',
+            route: '/stations/station-types/:id',
             api,
             recordIdParam: 'id',
             fields: [

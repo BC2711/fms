@@ -18,6 +18,14 @@ Db = Annotated[Session, Depends(get_db)]
 AuthenticatedUser = Annotated[User, Depends(get_current_user)]
 
 
+def authorize(user: User, resource: str, operation: str) -> None:
+    if not resource.startswith("administration/") or user.is_superuser:
+        return
+    code = f"administration.{resource.split('/')[-1]}.{operation}"
+    if code not in user.permission_codes:
+        raise AppError(f"Missing permission: {code}", 403)
+
+
 def split_path(resource_path: str) -> tuple[str, int | None]:
     parts = resource_path.strip("/").split("/")
     if parts and parts[-1].isdigit():
@@ -42,8 +50,8 @@ def audit(db: Session, user: User, action: str, resource: str, record: GenericRe
 
 @router.get("/{resource_path:path}")
 def list_or_view(resource_path: str, request: Request, user: AuthenticatedUser, db: Db, page: int = Query(1, ge=1), page_size: int = Query(10, alias="pageSize", ge=1, le=100), search: str = "", q: str = "", sort_by: str = Query("created_at", alias="sortBy"), sort_direction: str = Query("desc", alias="sortDirection")):
-    del user
     resource, item_id = split_path(resource_path)
+    authorize(user, resource, "view")
     if item_id is not None:
         return response("Record retrieved successfully", serialized(get_record(db, resource, item_id)))
     records = list(db.scalars(select(GenericRecord).where(GenericRecord.resource_path == resource, GenericRecord.deleted_at.is_(None))).all())
@@ -59,12 +67,14 @@ def list_or_view(resource_path: str, request: Request, user: AuthenticatedUser, 
     total = len(records)
     items = records[(page - 1) * page_size:page * page_size]
     counts = {state: sum(record.status == state for record in records) for state in ("active", "inactive", "pending", "suspended", "draft")}
-    return response("Records retrieved successfully", {"items": [serialized(record) for record in items], "total": total, "page": page, "pageSize": page_size, **counts})
+    statistics = {"total": total, **counts}
+    return response("Records retrieved successfully", {"items": [serialized(record) for record in items], "total": total, "page": page, "pageSize": page_size, **counts, "statistics": statistics})
 
 
 @router.post("/{resource_path:path}", status_code=201)
 async def create_record(resource_path: str, request: Request, user: AuthenticatedUser, db: Db):
     resource, item_id = split_path(resource_path)
+    authorize(user, resource, "create")
     if item_id is not None:
         raise AppError("Create requests must target a collection", 405)
     payload = await request.json()
@@ -77,6 +87,7 @@ async def create_record(resource_path: str, request: Request, user: Authenticate
 @router.put("/{resource_path:path}")
 async def update_record(resource_path: str, request: Request, user: AuthenticatedUser, db: Db):
     resource, item_id = split_path(resource_path)
+    authorize(user, resource, "update")
     if item_id is None:
         raise AppError("Update requests require a record id", 405)
     record = get_record(db, resource, item_id)
@@ -91,6 +102,7 @@ async def update_record(resource_path: str, request: Request, user: Authenticate
 @router.delete("/{resource_path:path}")
 def delete_record(resource_path: str, user: AuthenticatedUser, db: Db):
     resource, item_id = split_path(resource_path)
+    authorize(user, resource, "delete")
     if item_id is None:
         raise AppError("Delete requests require a record id", 405)
     record = get_record(db, resource, item_id); record.deleted_at = datetime.now(timezone.utc); record.updated_by = user.id

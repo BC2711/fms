@@ -25,6 +25,7 @@ export interface PaginatedResponse<T> {
   total: number
   page: number
   pageSize: number
+  [key: string]: unknown
 }
 
 export interface PaginationMappingPaths {
@@ -36,6 +37,7 @@ export interface PaginationMappingPaths {
 
 export function mapPaginatedResponse<T>(response: unknown, paths: PaginationMappingPaths = {}): PaginatedResponse<T> {
   return {
+    ...(getValueByPath<Record<string, unknown>>(response, 'data') ?? {}),
     items: getValueByPath<T[]>(response, paths.items ?? 'data.items') ?? [],
     total: getValueByPath<number>(response, paths.total ?? 'data.total') ?? 0,
     page: getValueByPath<number>(response, paths.page ?? 'data.page') ?? 1,
