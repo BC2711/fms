@@ -17,7 +17,7 @@ const integrationFields: FormFieldConfig[] = [
   { name: 'name', type: 'text', label: 'Integration Name', required: true },
   { name: 'code', type: 'text', label: 'Provider Key', required: true },
   { name: 'endpoint_url', type: 'url', label: 'Endpoint URL' },
-  { name: 'api_key', type: 'password', label: 'API Key / Secret', description: 'Stored as a protected configuration value.' },
+  { name: 'credential_reference', type: 'text', label: 'Credential Reference', description: 'Reference a secret managed outside the application database; do not enter raw credentials here.' },
   { name: 'timeout_seconds', type: 'number', label: 'Timeout (seconds)', default_value: 30 },
   { name: 'environment', type: 'select', label: 'Environment', default_value: 'sandbox', options: [{ label: 'Sandbox', value: 'sandbox' }, { label: 'Production', value: 'production' }] },
   { name: 'status', type: 'select', label: 'Status', default_value: 'active', options: [{ label: 'Active', value: 'active' }, { label: 'Inactive', value: 'inactive' }] },

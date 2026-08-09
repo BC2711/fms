@@ -8,6 +8,7 @@ FastAPI, SQLAlchemy 2, Pydantic 2, PostgreSQL, Alembic, and JWT backend with con
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt -r requirements-dev.txt
 Copy-Item .env.example .env
+python -m app.utilities.bootstrap_database
 alembic upgrade head
 fastapi dev app/main.py
 ```

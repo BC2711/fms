@@ -38,7 +38,7 @@ describe('frontend/backend connectivity contract', () => {
     for (const page of pages.filter((candidate) => candidate.type !== 'dashboard')) {
       for (const endpoint of Object.values(page.api.endpoints)) {
         const dedicated = dedicatedPrefixes.some((prefix) => endpoint.path === prefix.replace(/\/$/, '') || endpoint.path.startsWith(prefix))
-        const generated = page.id.startsWith('generated-') || page.id.startsWith('administration-')
+        const generated = page.id.startsWith('generated-') || page.id.startsWith('administration-') || page.id.startsWith('settings-')
         expect(dedicated || generated, `${page.id}: ${endpoint.method} ${endpoint.path}`).toBe(true)
       }
     }

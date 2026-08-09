@@ -154,3 +154,37 @@ def test_accounts_module_crud_filters_generated_numbers_and_balance_service(clie
     assert duplicate.status_code == 409
     assert client.put(f"/api/accounts/{account_id}", headers=auth_headers, json={"phone": "+260977000000", "verification_status": "verified"}).status_code == 200
     assert client.delete(f"/api/accounts/{account_id}", headers=auth_headers).status_code == 200
+
+
+def test_settings_module_crud_audit_and_permissions(client, auth_headers):
+    created = client.post("/api/settings-general/system-information", headers=auth_headers, json={
+        "name": "System Name", "code": "system.name", "value": "Fuel Management System", "data_type": "string", "status": "active",
+    })
+    assert created.status_code == 201
+    setting = created.json()["data"]
+    assert setting["value"] == "Fuel Management System"
+    item_id = setting["id"]
+
+    listing = client.get("/api/settings-general/system-information?search=System&status=active", headers=auth_headers)
+    assert listing.status_code == 200
+    assert listing.json()["data"]["total"] == 1
+    assert listing.json()["data"]["statistics"]["active"] == 1
+    updated = client.put(f"/api/settings-general/system-information/{item_id}", headers=auth_headers, json={"value": "FMS Zambia"})
+    assert updated.status_code == 200
+    assert updated.json()["data"]["value"] == "FMS Zambia"
+
+    from app.core.security import create_access_token, hash_password
+    from app.database.session import SessionLocal
+    from app.models.identity import Permission, Role, User
+    from sqlalchemy import select
+    with SessionLocal() as session:
+        view_permission = session.scalar(select(Permission).where(Permission.code == "settings.view"))
+        role = Role(name="settings-viewer", permissions=[view_permission])
+        user = User(email="settings.viewer@example.com", full_name="Settings Viewer", password_hash=hash_password("Password123!"), roles=[role], status="active")
+        session.add_all([role, user]); session.commit(); user_id = user.id
+    viewer_headers = {"Authorization": f"Bearer {create_access_token(str(user_id), ['settings.view'])}"}
+    assert client.get("/api/settings-general/system-information", headers=viewer_headers).status_code == 200
+    assert client.post("/api/settings-general/system-information", headers=viewer_headers, json={"name": "Forbidden", "code": "forbidden"}).status_code == 403
+
+    assert client.delete(f"/api/settings-general/system-information/{item_id}", headers=auth_headers).status_code == 200
+    assert client.get(f"/api/settings-general/system-information/{item_id}", headers=auth_headers).status_code == 404
