@@ -185,4 +185,7 @@ class DocumentUpdate(FlexibleModel):
     issue_date: date | None = None
     expiry_date: date | None = None
     file: str | None = None
-    verification_status: str |
+    verification_status: str | None = None
+    notes: str | None = None
+    status: str | None = None
+class DocumentResponse(ResourceResponse, DocumentCreate): pass

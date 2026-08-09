@@ -61,4 +61,5 @@ class CRUDService:
     def delete(self, item_id: int, actor_id: int | None):
         obj = self.get(item_id)
         self.repository.soft_delete(obj, actor_id)
-        self.audit.record(actor_id=actor_id, action="delete", resource=self.
+        self.audit.record(actor_id=actor_id, action="delete", resource=self.config.name, resource_id=obj.id)
+        self.session.commit()

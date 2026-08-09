@@ -34,6 +34,11 @@ class BaseRepository:
     def get(self, item_id: int):
         return self.session.scalar(select(self.model).where(self.model.id == item_id, *self._conditions(None, {})))
 
+    def status_counts(self, search: str | None, filters: dict[str, Any]) -> dict[str, int]:
+        rows = self.session.execute(select(self.model.status, func.count()).where(*self._conditions(search, filters)).group_by(self.model.status)).all()
+        counts = {str(status): count for status, count in rows}
+        return {state: counts.get(state, 0) for state in ("active", "inactive", "pending", "suspended", "draft", "verified", "rejected")}
+
     def create(self, values: dict[str, Any], actor_id: int | None):
         values.update(self.config.fixed_values)
         obj = self.model(**values, created_by=actor_id, updated_by=actor_id)

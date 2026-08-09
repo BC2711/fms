@@ -8,6 +8,7 @@ import { z } from 'zod'
 import { DateInput } from '@/components/forms/DateInput'
 import { FormField } from '@/components/forms/FormField'
 import { SelectInput } from '@/components/forms/SelectInput'
+import { DynamicSelectInput } from '@/components/forms/DynamicSelectInput'
 import { TextareaInput } from '@/components/forms/TextareaInput'
 import { TextInput } from '@/components/forms/TextInput'
 import type { FormConfig, FormFieldConfig } from '@/types/configuration.types'
@@ -83,7 +84,8 @@ export function FormGenerator({ formConfig, mode, initialData, onSubmit, isSubmi
     const common = { id: field.name, placeholder: field.placeholder, disabled: field.disabled || isSubmitting, ...registration }
     let input
     if (field.type === 'textarea') input = <TextareaInput {...common} rows={field.rows ?? 4} />
-    else if (field.type === 'select' || field.type === 'radio') input = <SelectInput {...common} options={field.options ?? []} />
+    else if (field.type === 'select') input = <DynamicSelectInput {...common} field={field} />
+    else if (field.type === 'radio') input = <SelectInput {...common} options={field.options ?? []} />
     else if (field.type === 'date') input = <DateInput {...common} />
     else if (field.type === 'checkbox') input = <input id={field.name} type="checkbox" disabled={field.disabled || isSubmitting} {...registration} />
     else input = <TextInput {...common} type={field.type === 'datetime' ? 'datetime-local' : field.type === 'currency' ? 'number' : field.type} />

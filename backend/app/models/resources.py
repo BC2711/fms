@@ -111,4 +111,11 @@ class StationDocument(ResourceMixin, Base):
     details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
 
 
-class GenericRec
+class GenericRecord(ResourceMixin, Base):
+    __tablename__ = "generic_records"
+    __table_args__ = (UniqueConstraint("resource_path", "code", name="uq_generic_resource_code"),)
+    resource_path: Mapped[str] = mapped_column(String(255), index=True)
+    name: Mapped[str] = mapped_column(String(200), index=True)
+    code: Mapped[str] = mapped_column(String(80), default="", index=True)
+    description: Mapped[str] = mapped_column(Text, default="")
+    data: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)

@@ -36,6 +36,9 @@ export const formFieldConfigSchema = z
     rows: z.number().int().positive('Textarea rows must be positive').optional(),
     grid: z.object({ columns: z.number().int().min(1, 'Grid columns must be at least 1').max(12, 'Grid columns cannot exceed 12') }).strict('Field grid contains an unknown property').optional(),
     options: z.array(optionSchema).optional(),
+    options_endpoint: z.string().min(1).optional(),
+    option_label: z.string().min(1).optional(),
+    option_value: z.string().min(1).optional(),
     validation: validationRuleSchema.optional(),
   })
   .strict('Form field contains an unknown property')

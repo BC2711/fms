@@ -220,6 +220,9 @@ export interface FormFieldConfig {
     columns: number
   }
   options?: SelectOptionConfig[]
+  options_endpoint?: string
+  option_label?: string
+  option_value?: string
   validation?: {
     min?: number
     max?: number

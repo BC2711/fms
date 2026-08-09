@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any, Generic, TypeVar
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 T = TypeVar("T")
 
@@ -17,7 +17,7 @@ class ResourceResponse(ORMModel):
     updated_at: datetime
     created_by: int | None = None
     updated_by: int | None = None
-    details: dict[str, Any] = {}
+    details: dict[str, Any] = Field(default_factory=dict)
 
 
 class PageData(BaseModel, Generic[T]):
@@ -34,4 +34,4 @@ class APIResponse(BaseModel, Generic[T]):
 
 
 def response(message: str, data: Any = None, *, success: bool = True) -> dict[str, Any]:
-    return {"success": success, "
+    return {"success": success, "message": message, "data": data}
