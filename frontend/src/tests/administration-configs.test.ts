@@ -29,4 +29,20 @@ describe('administration configurations', () => {
     const administrationPages = Object.values(pageRegistry).filter((page) => page.path.startsWith('/administration/'))
     expect(administrationPages).toHaveLength(resources.length * 4)
   })
+
+  it.each([
+    ['provinces', 'country_id', '/administration/countries'],
+    ['districts', 'province_id', '/administration/provinces'],
+    ['cities-and-towns', 'district_id', '/administration/districts'],
+    ['station-regions', 'district_id', '/administration/districts'],
+  ] as const)('adds the parent selector to %s forms', (resource, fieldName, endpoint) => {
+    const page = getPageConfigByRoute(`/administration/${resource}`)
+    for (const type of ['create', 'edit']) {
+      const subPage = page?.sub_pages?.find((candidate) => candidate.type === type)
+      if (!subPage || (subPage.type !== 'create' && subPage.type !== 'edit')) throw new Error(`Missing ${type} page`)
+      expect(subPage.form.fields).toEqual(expect.arrayContaining([
+        expect.objectContaining({ name: fieldName, required: true, options_endpoint: endpoint }),
+      ]))
+    }
+  })
 })

@@ -17,6 +17,13 @@ router = APIRouter(tags=["generated resources"])
 Db = Annotated[Session, Depends(get_db)]
 AuthenticatedUser = Annotated[User, Depends(get_current_user)]
 
+LOCATION_PARENTS = {
+    "administration/provinces": ("country_id", "administration/countries"),
+    "administration/districts": ("province_id", "administration/provinces"),
+    "administration/cities-and-towns": ("district_id", "administration/districts"),
+    "administration/station-regions": ("district_id", "administration/districts"),
+}
+
 
 def authorize(user: User, resource: str, operation: str) -> None:
     if user.is_superuser:
@@ -39,7 +46,7 @@ def split_path(resource_path: str) -> tuple[str, int | None]:
 
 
 def serialized(record: GenericRecord) -> dict[str, Any]:
-    return {"id": record.id, "name": record.name, "code": record.code, "description": record.description, "status": record.status, "created_at": record.created_at.isoformat(), "updated_at": record.updated_at.isoformat(), **(record.data or {})}
+    return {"id": record.id, "name": record.name, "code": record.code, "description": record.description, "status": record.status, "country_id": record.country_id, "province_id": record.province_id, "district_id": record.district_id, "created_at": record.created_at.isoformat(), "updated_at": record.updated_at.isoformat(), **(record.data or {})}
 
 
 def get_record(db: Session, resource: str, item_id: int) -> GenericRecord:
@@ -51,6 +58,26 @@ def get_record(db: Session, resource: str, item_id: int) -> GenericRecord:
 
 def audit(db: Session, user: User, action: str, resource: str, record: GenericRecord, changes: dict[str, Any] | None = None):
     db.add(AuditLog(actor_id=user.id, action=action, resource=resource, resource_id=str(record.id), changes=changes or {}))
+
+
+def location_parent(db: Session, resource: str, payload: dict[str, Any], *, required: bool) -> dict[str, int]:
+    relation = LOCATION_PARENTS.get(resource)
+    if relation is None:
+        return {}
+    field, parent_resource = relation
+    raw_id = payload.pop(field, None)
+    if raw_id in (None, ""):
+        if required:
+            raise AppError(f"{field} is required", 422)
+        return {}
+    try:
+        parent_id = int(raw_id)
+    except (TypeError, ValueError) as exc:
+        raise AppError(f"{field} must be an integer", 422) from exc
+    parent = db.scalar(select(GenericRecord).where(GenericRecord.id == parent_id, GenericRecord.resource_path == parent_resource, GenericRecord.deleted_at.is_(None)))
+    if parent is None:
+        raise AppError(f"Invalid {field}: matching parent record was not found", 422)
+    return {field: parent_id}
 
 
 @router.get("/{resource_path:path}")
@@ -84,8 +111,9 @@ async def create_record(resource_path: str, request: Request, user: Authenticate
         raise AppError("Create requests must target a collection", 405)
     payload = await request.json()
     known = {key: payload.pop(key) for key in list(payload) if key in {"name", "code", "description", "status"}}
-    record = GenericRecord(resource_path=resource, name=str(known.get("name") or known.get("code") or "Untitled"), code=str(known.get("code") or ""), description=str(known.get("description") or ""), status=str(known.get("status") or "active"), data=payload, created_by=user.id, updated_by=user.id)
-    db.add(record); db.flush(); audit(db, user, "create", resource, record, {**known, **payload}); db.commit(); db.refresh(record)
+    parent = location_parent(db, resource, payload, required=resource in LOCATION_PARENTS)
+    record = GenericRecord(resource_path=resource, name=str(known.get("name") or known.get("code") or "Untitled"), code=str(known.get("code") or ""), description=str(known.get("description") or ""), status=str(known.get("status") or "active"), data=payload, created_by=user.id, updated_by=user.id, **parent)
+    db.add(record); db.flush(); audit(db, user, "create", resource, record, {**known, **parent, **payload}); db.commit(); db.refresh(record)
     return response("Record created successfully", serialized(record))
 
 
@@ -97,10 +125,13 @@ async def update_record(resource_path: str, request: Request, user: Authenticate
         raise AppError("Update requests require a record id", 405)
     record = get_record(db, resource, item_id)
     payload = await request.json()
+    parent = location_parent(db, resource, payload, required=False)
     for key in ("name", "code", "description", "status"):
         if key in payload: setattr(record, key, str(payload.pop(key)))
+    for key, value in parent.items():
+        setattr(record, key, value)
     record.data = {**(record.data or {}), **payload}; record.updated_by = user.id
-    audit(db, user, "update", resource, record, payload); db.commit(); db.refresh(record)
+    audit(db, user, "update", resource, record, {**parent, **payload}); db.commit(); db.refresh(record)
     return response("Record updated successfully", serialized(record))
 
 

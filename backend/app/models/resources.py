@@ -118,4 +118,7 @@ class GenericRecord(ResourceMixin, Base):
     name: Mapped[str] = mapped_column(String(200), index=True)
     code: Mapped[str] = mapped_column(String(80), default="", index=True)
     description: Mapped[str] = mapped_column(Text, default="")
+    country_id: Mapped[int | None] = mapped_column(ForeignKey("generic_records.id"), index=True)
+    province_id: Mapped[int | None] = mapped_column(ForeignKey("generic_records.id"), index=True)
+    district_id: Mapped[int | None] = mapped_column(ForeignKey("generic_records.id"), index=True)
     data: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)

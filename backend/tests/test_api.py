@@ -85,6 +85,29 @@ def test_generic_menu_resource_end_to_end(client, auth_headers):
     assert client.get(f"/api/fuel-operations/fuel-products/{item['id']}", headers=auth_headers).status_code == 404
 
 
+def test_location_records_enforce_parent_foreign_key_chain(client, auth_headers):
+    country = client.post("/api/administration/countries", headers=auth_headers, json={"name": "Zambia", "code": "ZM"}).json()["data"]
+    province_response = client.post("/api/administration/provinces", headers=auth_headers, json={"name": "Lusaka", "code": "LSK", "country_id": country["id"]})
+    assert province_response.status_code == 201
+    province = province_response.json()["data"]
+    assert province["country_id"] == country["id"]
+
+    district_response = client.post("/api/administration/districts", headers=auth_headers, json={"name": "Lusaka District", "code": "LSK-D", "province_id": province["id"]})
+    assert district_response.status_code == 201
+    district = district_response.json()["data"]
+    assert district["province_id"] == province["id"]
+
+    for resource in ("cities-and-towns", "station-regions"):
+        child = client.post(f"/api/administration/{resource}", headers=auth_headers, json={"name": resource, "code": resource, "district_id": district["id"]})
+        assert child.status_code == 201
+        assert child.json()["data"]["district_id"] == district["id"]
+
+    missing_parent = client.post("/api/administration/provinces", headers=auth_headers, json={"name": "Invalid", "code": "INVALID"})
+    assert missing_parent.status_code == 422
+    wrong_parent_type = client.post("/api/administration/districts", headers=auth_headers, json={"name": "Invalid", "code": "WRONG", "province_id": country["id"]})
+    assert wrong_parent_type.status_code == 422
+
+
 def test_station_payload_extensions_relationships_statistics_and_document_file(client, auth_headers):
     station_type = client.post("/api/stations/station-types", headers=auth_headers, json={"name": "Retail Station", "code": "RETAIL", "is_public": True}).json()["data"]
     station = client.post("/api/stations", headers=auth_headers, json={"name": "Airport Station", "code": "AIR01", "station_type_id": station_type["id"], "license_number": "ERB-123", "manager_email": "manager@example.com"})
@@ -152,7 +175,11 @@ def test_accounts_module_crud_filters_generated_numbers_and_balance_service(clie
 
     duplicate = client.post("/api/accounts", headers=auth_headers, json={"account_number": account["account_number"], "name": "Duplicate", "account_type": "corporate"})
     assert duplicate.status_code == 409
-    assert client.put(f"/api/accounts/{account_id}", headers=auth_headers, json={"phone": "+260977000000", "verification_status": "verified"}).status_code == 200
+    updated = client.put(f"/api/accounts/{account_id}", headers=auth_headers, json={
+        "phone": "+260977000000", "verification_status": "verified", "balance": 125.50,
+    })
+    assert updated.status_code == 200
+    assert updated.json()["data"]["balance"] == "125.50"
     assert client.delete(f"/api/accounts/{account_id}", headers=auth_headers).status_code == 200
 
 

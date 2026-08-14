@@ -11,6 +11,7 @@ const inferredEndpoints: Record<string, string> = {
   station_group_id: '/stations/station-groups',
   oil_marketing_company_id: '/accounts/oil-marketing-companies',
   product_id: '/fuel-operations/fuel-products',
+  country_id: '/administration/countries',
   province_id: '/administration/provinces',
   district_id: '/administration/districts',
 }
