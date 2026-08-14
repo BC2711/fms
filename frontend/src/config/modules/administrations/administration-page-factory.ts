@@ -11,6 +11,7 @@ interface ParentReference {
 
 export function createAdministrationPage(resource: string, title: string, parent?: ParentReference): ListPageConfig {
   const page = createGeneratedResourcePage(`/administration/${resource}`, title)
+  const parentPath = parent?.field.replace(/_id$/, '')
   page.id = `administration-${resource}`
   const permission = `administration.${resource}`
   page.permissions = { any: [`${permission}.view`] }
@@ -19,8 +20,8 @@ export function createAdministrationPage(resource: string, title: string, parent
     subPage.parentId = page.id
     const operation = subPage.type === 'details' ? 'view' : subPage.type
     subPage.permissions = { any: [`${permission}.${operation}`] }
-    if (parent && (subPage.type === 'create' || subPage.type === 'edit')) {
-      subPage.form.fields.splice(2, 0, {
+    if (parent && (subPage.type === 'create' || subPage.type === 'edit') && !subPage.form.fields.some((field) => field.name === parent.field)) {
+      subPage.form.fields.splice(1, 0, {
         name: parent.field,
         type: 'select',
         label: parent.label,
@@ -32,12 +33,16 @@ export function createAdministrationPage(resource: string, title: string, parent
       })
     }
     if (parent && subPage.type === 'details') {
-      subPage.fields.splice(2, 0, parent.field)
-      subPage.sections[0]?.fields.splice(2, 0, { key: parent.field, label: parent.label, type: 'text' })
+      const displayPath = `${parentPath}.name`
+      if (!subPage.fields.includes(displayPath)) subPage.fields.splice(2, 0, displayPath)
+      const sectionFields = subPage.sections?.[0]?.fields
+      if (sectionFields && !sectionFields.some((field) => field.key === displayPath)) {
+        sectionFields.splice(2, 0, { key: displayPath, label: parent.label, type: 'text' })
+      }
     }
   })
-  if (parent) {
-    page.table.columns.splice(2, 0, { id: parent.field, type: 'text', header: parent.label, accessor: parent.field, sortable: false })
+  if (parent && !page.table.columns.some((column) => column.id === parent.field)) {
+    page.table.columns.splice(2, 0, { id: parent.field, type: 'text', header: parent.label, accessor: `${parentPath}.name`, sortable: false })
   }
   return validateConfig(`${title} list page`, pageConfigSchema, page) as ListPageConfig
 }

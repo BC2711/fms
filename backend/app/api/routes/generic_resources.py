@@ -45,8 +45,12 @@ def split_path(resource_path: str) -> tuple[str, int | None]:
     return "/".join(parts), None
 
 
-def serialized(record: GenericRecord) -> dict[str, Any]:
-    return {"id": record.id, "name": record.name, "code": record.code, "description": record.description, "status": record.status, "country_id": record.country_id, "province_id": record.province_id, "district_id": record.district_id, "created_at": record.created_at.isoformat(), "updated_at": record.updated_at.isoformat(), **(record.data or {})}
+def serialized(record: GenericRecord, db: Session) -> dict[str, Any]:
+    data = {"id": record.id, "name": record.name, "code": record.code, "description": record.description, "status": record.status, "country_id": record.country_id, "province_id": record.province_id, "district_id": record.district_id, "created_at": record.created_at.isoformat(), "updated_at": record.updated_at.isoformat(), **(record.data or {})}
+    for relation, parent_id in (("country", record.country_id), ("province", record.province_id), ("district", record.district_id)):
+        parent = db.get(GenericRecord, parent_id) if parent_id else None
+        data[relation] = {"id": parent.id, "name": parent.name, "code": parent.code} if parent and parent.deleted_at is None else None
+    return data
 
 
 def get_record(db: Session, resource: str, item_id: int) -> GenericRecord:
@@ -85,7 +89,7 @@ def list_or_view(resource_path: str, request: Request, user: AuthenticatedUser, 
     resource, item_id = split_path(resource_path)
     authorize(user, resource, "view")
     if item_id is not None:
-        return response("Record retrieved successfully", serialized(get_record(db, resource, item_id)))
+        return response("Record retrieved successfully", serialized(get_record(db, resource, item_id), db))
     records = list(db.scalars(select(GenericRecord).where(GenericRecord.resource_path == resource, GenericRecord.deleted_at.is_(None))).all())
     reserved = {"page", "pageSize", "search", "q", "sortBy", "sortDirection"}
     filters = {key: value for key, value in request.query_params.items() if key not in reserved and value != ""}
@@ -100,7 +104,7 @@ def list_or_view(resource_path: str, request: Request, user: AuthenticatedUser, 
     items = records[(page - 1) * page_size:page * page_size]
     counts = {state: sum(record.status == state for record in records) for state in ("active", "inactive", "pending", "suspended", "draft")}
     statistics = {"total": total, **counts}
-    return response("Records retrieved successfully", {"items": [serialized(record) for record in items], "total": total, "page": page, "pageSize": page_size, **counts, "statistics": statistics})
+    return response("Records retrieved successfully", {"items": [serialized(record, db) for record in items], "total": total, "page": page, "pageSize": page_size, **counts, "statistics": statistics})
 
 
 @router.post("/{resource_path:path}", status_code=201)
@@ -114,7 +118,7 @@ async def create_record(resource_path: str, request: Request, user: Authenticate
     parent = location_parent(db, resource, payload, required=resource in LOCATION_PARENTS)
     record = GenericRecord(resource_path=resource, name=str(known.get("name") or known.get("code") or "Untitled"), code=str(known.get("code") or ""), description=str(known.get("description") or ""), status=str(known.get("status") or "active"), data=payload, created_by=user.id, updated_by=user.id, **parent)
     db.add(record); db.flush(); audit(db, user, "create", resource, record, {**known, **parent, **payload}); db.commit(); db.refresh(record)
-    return response("Record created successfully", serialized(record))
+    return response("Record created successfully", serialized(record, db))
 
 
 @router.put("/{resource_path:path}")
@@ -132,7 +136,7 @@ async def update_record(resource_path: str, request: Request, user: Authenticate
         setattr(record, key, value)
     record.data = {**(record.data or {}), **payload}; record.updated_by = user.id
     audit(db, user, "update", resource, record, {**parent, **payload}); db.commit(); db.refresh(record)
-    return response("Record updated successfully", serialized(record))
+    return response("Record updated successfully", serialized(record, db))
 
 
 @router.delete("/{resource_path:path}")

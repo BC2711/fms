@@ -91,16 +91,19 @@ def test_location_records_enforce_parent_foreign_key_chain(client, auth_headers)
     assert province_response.status_code == 201
     province = province_response.json()["data"]
     assert province["country_id"] == country["id"]
+    assert province["country"]["name"] == "Zambia"
 
     district_response = client.post("/api/administration/districts", headers=auth_headers, json={"name": "Lusaka District", "code": "LSK-D", "province_id": province["id"]})
     assert district_response.status_code == 201
     district = district_response.json()["data"]
     assert district["province_id"] == province["id"]
+    assert district["province"]["name"] == "Lusaka"
 
     for resource in ("cities-and-towns", "station-regions"):
         child = client.post(f"/api/administration/{resource}", headers=auth_headers, json={"name": resource, "code": resource, "district_id": district["id"]})
         assert child.status_code == 201
         assert child.json()["data"]["district_id"] == district["id"]
+        assert child.json()["data"]["district"]["name"] == "Lusaka District"
 
     missing_parent = client.post("/api/administration/provinces", headers=auth_headers, json={"name": "Invalid", "code": "INVALID"})
     assert missing_parent.status_code == 422
