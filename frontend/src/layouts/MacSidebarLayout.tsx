@@ -1,6 +1,7 @@
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { Menu, X, Command } from 'lucide-react'
+import { Menu, X, PanelLeft, Search } from 'lucide-react'
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { useLocation } from 'react-router-dom'
 
 import type { User } from '@/auth/auth.types'
 import type { LayoutType } from '@/hooks/useLayoutPreference'
@@ -104,28 +105,36 @@ function TopBar({
   onLayoutChange: (layout: LayoutType) => void
   onMenuClick: () => void
 }) {
+  const { pathname } = useLocation()
+  const segments = pathname.split('/').filter(Boolean)
+  const current = (segments.at(-1) ?? 'dashboard').replaceAll('-', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase())
+  const section = segments.length > 1 ? segments[0].replaceAll('-', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase()) : 'Workspace'
+
   return (
-    <header className="relative mb-4 flex h-12 shrink-0 items-center gap-3 rounded-2xl border border-gray-200/30 bg-white/70 px-4 shadow-sm backdrop-blur-2xl backdrop-saturate-150 dark:border-gray-800/30 dark:bg-gray-950/70">
+    <header className="relative flex h-[72px] shrink-0 items-center gap-3 border-b border-slate-200/80 bg-white/90 px-4 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/90 sm:px-6">
       {/* Mobile Menu Button */}
       <button
         type="button"
         aria-label="Open navigation menu"
         onClick={onMenuClick}
-        className="flex h-8 w-8 items-center justify-center rounded-xl text-gray-600 transition-all hover:bg-gray-100 hover:text-gray-900 active:scale-95 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white md:hidden"
+        className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition hover:bg-slate-100 dark:border-white/10 dark:text-slate-300 dark:hover:bg-white/10 md:hidden"
       >
         <Menu size={18} aria-hidden="true" />
       </button>
 
       {/* Breadcrumb / Page Title Area */}
-      <div className="hidden items-center gap-2 text-sm sm:flex">
-        <Command size={14} className="text-gray-400" />
-        <span className="font-medium text-gray-900 dark:text-white">Dashboard</span>
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="hidden h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400 sm:flex"><PanelLeft size={17} /></div>
+        <div className="min-w-0">
+          <p className="truncate text-[11px] font-semibold uppercase tracking-[.14em] text-slate-400">{section}</p>
+          <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">{current}</p>
+        </div>
       </div>
 
       {/* Actions - No overflow hidden */}
-      <div className="ml-auto flex items-center gap-1">
+      <div className="ml-auto flex items-center gap-1.5">
+        <button type="button" aria-label="Search" className="hidden h-10 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-400 transition hover:border-blue-300 hover:bg-white sm:flex dark:border-white/10 dark:bg-white/5 dark:hover:border-blue-400/40"><Search size={15} /><span className="hidden lg:inline">Quick search</span><kbd className="ml-2 text-[10px]">Ctrl K</kbd></button>
         <ThemeSwitcher />
-        <div className="mx-1 h-5 w-px bg-gray-200 dark:bg-gray-800" />
         <LayoutSwitcher layout={layout} onChange={onLayoutChange} />
       </div>
     </header>
@@ -137,27 +146,12 @@ function MainContent({ children }: { children: ReactNode }) {
     <main
       id="main-content"
       tabIndex={-1}
-      className="min-h-0 flex-1 overflow-y-auto rounded-2xl border border-gray-200/30 bg-white/80 shadow-[0_8px_40px_-12px_rgba(0,0,0,.08)] backdrop-blur-2xl backdrop-saturate-150 dark:border-gray-800/30 dark:bg-gray-950/80 dark:shadow-[0_8px_40px_-12px_rgba(0,0,0,.3)]"
+      className="min-h-0 flex-1 overflow-y-auto bg-slate-50/80 dark:bg-slate-950"
     >
-      <div className="p-6 pb-24 md:p-8">
+      <div className="mx-auto w-full max-w-[1600px] p-4 pb-24 sm:p-6 lg:p-8">
         {children}
       </div>
     </main>
-  )
-}
-
-function KeyboardShortcut({ keys }: { keys: string[] }) {
-  return (
-    <div className="hidden items-center gap-1 md:flex">
-      {keys.map((key, index) => (
-        <kbd
-          key={index}
-          className="rounded-lg border border-gray-300 bg-gray-50 px-2 py-0.5 text-xs font-medium text-gray-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400"
-        >
-          {key}
-        </kbd>
-      ))}
-    </div>
   )
 }
 
@@ -191,11 +185,7 @@ export function MacSidebarLayout({
   }, [drawerOpen, handleCloseDrawer])
 
   return (
-    <div className="relative flex h-dvh overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100 p-2 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 md:p-4">
-      {/* Subtle background pattern */}
-      <div className="pointer-events-none fixed inset-0 opacity-[0.015] dark:opacity-[0.02]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,currentColor_1px,transparent_0)] bg-[size:24px_24px]" />
-      </div>
+    <div className="relative flex h-dvh overflow-hidden bg-slate-50 dark:bg-slate-950">
 
       {/* Desktop Sidebar */}
       <div className="hidden md:block">
@@ -221,7 +211,7 @@ export function MacSidebarLayout({
       </AnimatePresence>
 
       {/* Main Content Area */}
-      <div className="relative z-10 ml-0 flex min-w-0 flex-1 flex-col md:ml-5">
+      <div className="relative z-10 ml-0 flex min-w-0 flex-1 flex-col">
         <TopBar
           layout={layout}
           onLayoutChange={onLayoutChange}
@@ -233,18 +223,6 @@ export function MacSidebarLayout({
       {/* Mobile Bottom Navigation */}
       <MobileNavigation items={items} />
 
-      {/* Keyboard shortcut hint */}
-      <div className="pointer-events-none fixed bottom-6 left-1/2 z-50 hidden -translate-x-1/2 md:block">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 2, duration: 0.3 }}
-          className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white/80 px-4 py-2.5 text-sm shadow-lg backdrop-blur-xl dark:border-gray-800 dark:bg-gray-950/80"
-        >
-          <span className="text-gray-500 dark:text-gray-400">Open menu</span>
-          <KeyboardShortcut keys={['⌘', 'K']} />
-        </motion.div>
-      </div>
     </div>
   )
 }

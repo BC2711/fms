@@ -14,8 +14,8 @@ interface SidebarProps {
 }
 
 const SIDEBAR_WIDTHS = {
-  expanded: 280,
-  collapsed: 80,
+  expanded: 288,
+  collapsed: 76,
 } as const
 
 const ANIMATION_CONFIG = {
@@ -53,7 +53,7 @@ function UserInfo({ user, isCollapsed }: { user: User | null; isCollapsed: boole
   }
 
   return (
-    <div className="flex items-center gap-3 rounded-2xl p-2 transition-colors hover:bg-gray-100/50 dark:hover:bg-gray-800/50">
+    <div className="flex items-center gap-3 rounded-xl border border-slate-200/70 bg-slate-50 p-2.5 dark:border-white/10 dark:bg-white/5">
       <UserAvatar name={avatarChar} />
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold text-gray-900 dark:text-white">
@@ -71,19 +71,19 @@ function UserInfo({ user, isCollapsed }: { user: User | null; isCollapsed: boole
 function SidebarHeader({ isCollapsed }: { isCollapsed: boolean }) {
   return (
     <div
-      className={`flex h-[72px] shrink-0 items-center border-b border-gray-100/50 dark:border-gray-800/50 ${isCollapsed ? 'justify-center px-3' : 'px-5'
+      className={`flex h-[72px] shrink-0 items-center border-b border-slate-200/80 dark:border-white/10 ${isCollapsed ? 'justify-center px-3' : 'px-5'
         }`}
     >
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 text-lg font-bold text-white shadow-lg shadow-blue-500/20 ring-1 ring-black/5">
-        F
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-sm font-extrabold text-white shadow-lg shadow-blue-500/20 ring-1 ring-blue-400/30">
+        FM
       </div>
       {!isCollapsed && (
         <div className="ml-3 min-w-0">
           <h2 className="truncate text-base font-bold tracking-tight text-gray-900 dark:text-white">
-            FMS
+            FMS Console
           </h2>
           <p className="text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
-            Workspace
+            Operations workspace
           </p>
         </div>
       )}
@@ -99,13 +99,13 @@ function CollapseButton({
   onToggle: () => void
 }) {
   return (
-    <div className="px-4 py-3">
+    <div className="px-3 py-3">
       <button
         type="button"
         onClick={onToggle}
         aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         aria-expanded={!isCollapsed}
-        className="group flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-gray-200/60 bg-gray-50/50 text-sm font-medium text-gray-600 transition-all hover:border-gray-300 hover:bg-gray-100 hover:text-gray-900 active:scale-[0.98] dark:border-gray-800 dark:bg-gray-900/50 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-white"
+        className="group flex h-9 w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-500 transition hover:border-blue-200 hover:text-blue-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-400 dark:hover:border-blue-400/30 dark:hover:text-blue-400"
       >
         {isCollapsed ? (
           <ChevronRight size={16} className="transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
@@ -184,7 +184,7 @@ export function Sidebar({ items, user, mobile = false, onNavigate }: SidebarProp
         duration: transitionDuration,
         ease: ANIMATION_CONFIG.ease,
       }}
-      className="relative flex h-full shrink-0 flex-col overflow-hidden rounded-3xl border border-gray-200/30 bg-white/80 shadow-[0_8px_40px_-12px_rgba(0,0,0,.1)] backdrop-blur-2xl backdrop-saturate-150 dark:border-gray-800/30 dark:bg-gray-950/80 dark:shadow-[0_8px_40px_-12px_rgba(0,0,0,.3)]"
+      className="relative flex h-full shrink-0 flex-col overflow-hidden border-r border-slate-200 bg-white shadow-[8px_0_30px_-24px_rgba(15,23,42,.35)] dark:border-white/10 dark:bg-slate-950"
     >
       <SidebarHeader isCollapsed={isCollapsed} />
 
@@ -196,7 +196,7 @@ export function Sidebar({ items, user, mobile = false, onNavigate }: SidebarProp
       )}
 
       <nav
-        className="custom-scrollbar min-h-0 flex-1 overflow-y-auto overflow-x-visible px-3 py-2"
+        className="mac-sidebar-scroll min-h-0 flex-1 overflow-y-auto overflow-x-visible px-3 py-1"
         aria-label="Navigation menu"
       >
         <NavigationGenerator

@@ -233,12 +233,14 @@ const raw: PageConfig = {
                         type: 'navigate',
                         label: 'View',
                         icon: 'Eye',
+                        path: '/stations/station-types/{id}',
                     },
                     {
                         id: 'edit',
                         type: 'edit',
                         label: 'Edit',
                         icon: 'Pencil',
+                        path: '/stations/station-types/{id}/edit',
                     },
                     {
                         id: 'delete',

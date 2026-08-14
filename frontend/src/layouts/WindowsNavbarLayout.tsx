@@ -127,29 +127,12 @@ function MainContent({ children }: { children: ReactNode }) {
     <main
       id="main-content"
       tabIndex={-1}
-      className="min-h-0 flex-1 overflow-y-auto rounded-2xl border border-gray-200/30 bg-white/80 shadow-[0_8px_40px_-12px_rgba(0,0,0,.08)] backdrop-blur-2xl backdrop-saturate-150 dark:border-gray-800/30 dark:bg-gray-950/80 dark:shadow-[0_8px_40px_-12px_rgba(0,0,0,.3)]"
+      className="min-h-0 flex-1 overflow-y-auto bg-slate-50/80 dark:bg-slate-950"
     >
-      <div className="mx-auto max-w-7xl p-6 pb-24 md:p-8 lg:p-10">
+      <div className="mx-auto w-full max-w-[1600px] p-4 pb-24 sm:p-6 lg:p-8">
         {children}
       </div>
     </main>
-  )
-}
-
-function StatusBar() {
-  return (
-    <div className="hidden h-8 items-center justify-between border-t border-gray-200 bg-white/80 px-4 text-xs text-gray-500 backdrop-blur-xl dark:border-gray-800 dark:bg-gray-950/80 dark:text-gray-400 md:flex">
-      <div className="flex items-center gap-4">
-        <span>Ready</span>
-        <span className="h-3 w-px bg-gray-200 dark:bg-gray-800" />
-        <span>UTF-8</span>
-      </div>
-      <div className="flex items-center gap-4">
-        <span>Ln 1, Col 1</span>
-        <span className="h-3 w-px bg-gray-200 dark:bg-gray-800" />
-        <span>Spaces: 2</span>
-      </div>
-    </div>
   )
 }
 
@@ -182,7 +165,7 @@ export function WindowsNavbarLayout({
   }, [drawerOpen, handleCloseDrawer])
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden bg-white dark:bg-gray-950">
+    <div className="flex h-dvh flex-col overflow-hidden bg-slate-50 dark:bg-slate-950">
       {/* Navbar */}
       <Navbar
         items={items}
@@ -211,9 +194,6 @@ export function WindowsNavbarLayout({
 
       {/* Main Content */}
       <MainContent>{children}</MainContent>
-
-      {/* Status Bar (Desktop) */}
-      <StatusBar />
 
       {/* Mobile Navigation */}
       <MobileNavigation items={items} />

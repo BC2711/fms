@@ -1,5 +1,5 @@
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
-import { useEffect, useState, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 
 import { useAuthStore } from '@/auth/auth.store'
@@ -64,29 +64,6 @@ function SkipToContent() {
   )
 }
 
-function LayoutLoader() {
-  return (
-    <div className="flex h-dvh items-center justify-center bg-gray-50 dark:bg-gray-950">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.3, ease: 'easeOut' }}
-        className="flex flex-col items-center gap-4"
-      >
-        <div className="relative">
-          <div className="h-12 w-12 animate-spin rounded-full border-3 border-gray-200 border-t-blue-600 dark:border-gray-800 dark:border-t-blue-400" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="h-6 w-6 rounded-full bg-white/80 backdrop-blur-sm dark:bg-gray-900/80" />
-          </div>
-        </div>
-        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-          Loading workspace...
-        </p>
-      </motion.div>
-    </div>
-  )
-}
-
 function LayoutContainer({
   layout,
   children,
@@ -133,8 +110,6 @@ function PageTransition({ children }: { children: React.ReactNode }) {
 export function AppShell({ layoutType }: AppShellProps) {
   const [preferredLayout, setPreferredLayout] = useLayoutPreference()
   const user = useAuthStore((state) => state.user)
-  const [isLoading, setIsLoading] = useState(true)
-
   const layout = layoutType ?? preferredLayout
 
   const handleLayoutChange = useCallback(
@@ -144,21 +119,11 @@ export function AppShell({ layoutType }: AppShellProps) {
     [setPreferredLayout]
   )
 
-  // Simulate initial loading (remove in production)
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1000)
-    return () => clearTimeout(timer)
-  }, [])
-
   const sharedProps = {
     items: menuConfig,
     user,
     layout,
     onLayoutChange: handleLayoutChange,
-  }
-
-  if (isLoading) {
-    return <LayoutLoader />
   }
 
   return (

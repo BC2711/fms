@@ -1248,7 +1248,7 @@ const raw: PageConfig = {
 
             authentication: {
                 required: true,
-            },
+            }, 
 
             permissions: {
                 any: ['oil_marketing_companies.update'],
