@@ -221,37 +221,10 @@ class User(ResourceMixin, Base):
     full_name: Mapped[str] = mapped_column(String(160), index=True)
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     password_hash: Mapped[str] = mapped_column(String(255))
-    phone: Mapped[str | None] = mapped_column(String(20), unique=True, nullable=True, index=True)
-    nrc: Mapped[str] = mapped_column(String(50), unique=True, nullable=True, index=True)
-    nrc_front: Mapped[str] = mapped_column(Text, nullable=True)
-    nrc_back: Mapped[str] = mapped_column(Text, nullable=True)
     is_super_user: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
-    date_of_birth: Mapped[date | None] = mapped_column(Date, nullable=True)
-    profile_picture: Mapped[str] = mapped_column(Text, nullable=True)
-    current_address: Mapped[str] = mapped_column(Text, default="")
 
     # Foreign Keys
     user_type_id: Mapped[int | None] = mapped_column(ForeignKey("user_types.id"), nullable=True, index=True)
-    province_id: Mapped[int | None] = mapped_column(
-        ForeignKey("provinces.id"), nullable=True, index=True
-    )
-    district_id: Mapped[int | None] = mapped_column(
-        ForeignKey("districts.id"), nullable=True, index=True
-    )
-    town_city_id: Mapped[int | None] = mapped_column(
-        ForeignKey("town_cities.id"), nullable=True, index=True
-    )
-
-    # Next of Kin
-    next_of_kin_first_name: Mapped[str] = mapped_column(String(100), default="")
-    next_of_kin_last_name: Mapped[str] = mapped_column(String(100), default="")
-    next_of_kin_phone: Mapped[str] = mapped_column(String(20), default="")
-    next_of_kin_relationship: Mapped[str] = mapped_column(String(50), default="")
-
-    # Security and Status
-    login_attempts: Mapped[int] = mapped_column(Integer, default=0)
-    status: Mapped[str] = mapped_column(String(20), default="active", index=True)
-    last_login_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     # Relationships
     user_type: Mapped["UserType"] = relationship(

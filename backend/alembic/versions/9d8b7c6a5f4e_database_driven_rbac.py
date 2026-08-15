@@ -34,14 +34,16 @@ def upgrade() -> None:
         batch.add_column(sa.Column("is_active", sa.Boolean(), nullable=False, server_default=sa.true()))
         for column in audit_columns(): batch.add_column(column)
     with op.batch_alter_table("roles") as batch:
-        batch.add_column(sa.Column("code", sa.String(64), nullable=False, server_default="role"))
+        batch.add_column(sa.Column("code", sa.String(64), nullable=True))
         batch.add_column(sa.Column("description", sa.Text(), nullable=False, server_default=""))
         batch.add_column(sa.Column("parent_id", sa.Integer(), nullable=True))
         batch.add_column(sa.Column("is_active", sa.Boolean(), nullable=False, server_default=sa.true()))
         for column in audit_columns(): batch.add_column(column)
+    op.execute("UPDATE roles SET code = lower(replace(name, ' ', '-'))")
+    with op.batch_alter_table("roles") as batch:
+        batch.alter_column("code", existing_type=sa.String(64), nullable=False)
         batch.create_foreign_key("fk_roles_parent", "roles", ["parent_id"], ["id"])
         batch.create_unique_constraint("uq_roles_code", ["code"])
-    op.execute("UPDATE roles SET code = lower(replace(name, ' ', '-'))")
 
     op.create_table("user_types", sa.Column("name", sa.String(50), nullable=False), sa.Column("code", sa.String(30), nullable=False), sa.Column("description", sa.Text(), nullable=False, server_default=""), sa.Column("is_active", sa.Boolean(), nullable=False, server_default=sa.true()), sa.Column("id", sa.Integer(), primary_key=True), *audit_columns(), sa.UniqueConstraint("name"), sa.UniqueConstraint("code"))
     with op.batch_alter_table("users") as batch:
