@@ -1,9 +1,13 @@
+import type { MenuItem } from '@/types/configuration.types'
+
 export interface User {
   id: string
   name: string
   email: string
   role: string
   permissions: string[]
+  menus?: MenuItem[]
+  isSuperUser?: boolean
 }
 
 export interface AuthState {

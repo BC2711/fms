@@ -31,9 +31,6 @@ import { provincesListConfig } from '@/config/modules/administrations/location/p
 import { districtsListConfig } from '@/config/modules/administrations/location/district.config'
 import { townsListConfig } from '@/config/modules/administrations/location/town.config'
 import { regionsListConfig } from '@/config/modules/administrations/location/region.config'
-import { menuConfig } from '@/config/menu.config'
-import { missingMenuPages } from '@/config/generated-page-factory'
-import { settingsPageRegistry } from '@/config/modules/settings/settings-pages'
 
 export const pageRegistry: Record<string, PageConfig> = {
   login: loginConfig,
@@ -110,8 +107,6 @@ export const pageRegistry: Record<string, PageConfig> = {
   'administration-cities-and-towns': townsListConfig,
   'administration-station-regions': regionsListConfig,
 
-  ...settingsPageRegistry,
-
   'test-items': testItemsListConfig,
   'test-items-create': testItemsCreateConfig,
   'test-items-details': testItemsDetailsConfig,
@@ -136,9 +131,6 @@ Object.values(pageRegistry).filter((config) => !config.parentId).forEach((config
 })
 
 export const generatedMenuPageRegistry: Record<string, PageConfig> = {}
-missingMenuPages(menuConfig, configuredPaths).forEach((config) => {
-  visitPages(config, (page) => { generatedMenuPageRegistry[page.id] = page })
-})
 
 export function getPageConfig(key: string): PageConfig | undefined { return pageRegistry[key] ?? generatedMenuPageRegistry[key] }
 export function getAllPageConfigs(): PageConfig[] { return Object.values(pageRegistry).filter((config) => !config.parentId) }

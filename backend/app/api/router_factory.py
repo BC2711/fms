@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.configuration.resource import Operation, ResourceConfig
 from app.database.session import get_db
-from app.models.identity import User
+from app.models.resources import User
 from app.models.resources import Account, GenericRecord, Station, StationDocument, StationGroup, StationInspection, StationPerformance, StationPriceBoard, StationType
 from app.permissions.dependencies import require_permission
 from app.schemas.common import response

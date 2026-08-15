@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 import type { User } from '@/auth/auth.types'
+import type { MenuItem } from '@/types/configuration.types'
 import { get, post } from '@/services/api-client'
 
 interface BackendUser {
@@ -10,6 +11,8 @@ interface BackendUser {
   roles?: string[]
   permissions: string[]
   is_superuser?: boolean
+  is_super_user?: boolean
+  menus?: MenuItem[]
 }
 
 interface Envelope<T> {
@@ -23,6 +26,7 @@ interface LoginData {
   token_type: 'bearer'
   expires_in: number
   permissions: string[]
+  menus: MenuItem[]
   user: BackendUser
 }
 
@@ -31,8 +35,10 @@ function frontendUser(user: BackendUser): User {
     id: String(user.id),
     name: user.full_name,
     email: user.email,
-    role: user.is_superuser ? 'super_admin' : (user.roles?.[0] ?? 'user'),
-    permissions: user.is_superuser ? ['*'] : user.permissions,
+    role: (user.is_super_user ?? user.is_superuser) ? 'super_admin' : (user.roles?.[0] ?? 'user'),
+    permissions: (user.is_super_user ?? user.is_superuser) ? ['*'] : user.permissions,
+    menus: user.menus ?? [],
+    isSuperUser: Boolean(user.is_super_user ?? user.is_superuser),
   }
 }
 
@@ -47,7 +53,7 @@ function authError(error: unknown): Error {
 export async function authenticate(email: string, password: string): Promise<{ token: string; user: User }> {
   try {
     const result = await post<Envelope<LoginData>, { email: string; password: string }>('/auth/login', { email, password })
-    return { token: result.data.access_token, user: frontendUser({ ...result.data.user, permissions: result.data.permissions }) }
+    return { token: result.data.access_token, user: frontendUser({ ...result.data.user, permissions: result.data.permissions, menus: result.data.menus }) }
   } catch (error) {
     throw authError(error)
   }

@@ -15,8 +15,10 @@ from sqlalchemy import (
     Integer,
     Enum as SQLEnum,
     Index,
+    Table,
+    Column,
 )
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship, synonym
 
 from app.database.base import Base
 from app.database.mixins import ResourceMixin
@@ -84,77 +86,100 @@ class TownCity(ResourceMixin, Base):
     )
 
 
+role_menus = Table(
+    "role_menus", Base.metadata,
+    Column("role_id", ForeignKey("roles.id", ondelete="CASCADE"), primary_key=True),
+    Column("menu_id", ForeignKey("menus.id", ondelete="CASCADE"), primary_key=True),
+    Index("ix_role_menus_menu_id", "menu_id"),
+)
+role_permissions = Table(
+    "role_permissions", Base.metadata,
+    Column("role_id", ForeignKey("roles.id", ondelete="CASCADE"), primary_key=True),
+    Column("permission_id", ForeignKey("permissions.id", ondelete="CASCADE"), primary_key=True),
+    Index("ix_role_permissions_permission_id", "permission_id"),
+)
+user_type_menus = Table(
+    "user_type_menus", Base.metadata,
+    Column("user_type_id", ForeignKey("user_types.id", ondelete="CASCADE"), primary_key=True),
+    Column("menu_id", ForeignKey("menus.id", ondelete="CASCADE"), primary_key=True),
+    Index("ix_user_type_menus_menu_id", "menu_id"),
+)
+user_type_permissions = Table(
+    "user_type_permissions", Base.metadata,
+    Column("user_type_id", ForeignKey("user_types.id", ondelete="CASCADE"), primary_key=True),
+    Column("permission_id", ForeignKey("permissions.id", ondelete="CASCADE"), primary_key=True),
+    Index("ix_user_type_permissions_permission_id", "permission_id"),
+)
+user_roles = Table(
+    "user_roles", Base.metadata,
+    Column("user_id", ForeignKey("users.id", ondelete="CASCADE"), primary_key=True),
+    Column("role_id", ForeignKey("roles.id", ondelete="CASCADE"), primary_key=True),
+    Index("ix_user_roles_role_id", "role_id"),
+)
+
+
 class UserType(ResourceMixin, Base):
     __tablename__ = "user_types"
 
     name: Mapped[str] = mapped_column(String(50), unique=True, index=True)
     code: Mapped[str] = mapped_column(String(30), unique=True, index=True)
     description: Mapped[str] = mapped_column(Text, default="")
-    permissions: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
 
     # Relationships
     users: Mapped[list["User"]] = relationship(
         back_populates="user_type", foreign_keys="User.user_type_id"
     )
-    menus: Mapped[list["Menu"]] = relationship(
-        secondary="assigned_menus_and_permissions", back_populates="user_types", viewonly=True
-    )
-    assigned_permissions: Mapped[list["Permissions"]] = relationship(
-        secondary="assigned_menus_and_permissions", back_populates="user_types", viewonly=True
-    )
+    menus: Mapped[list["Menu"]] = relationship(secondary=user_type_menus, back_populates="user_types")
+    permissions: Mapped[list["Permission"]] = relationship(secondary=user_type_permissions, back_populates="user_types")
 
 
 class Role(ResourceMixin, Base):
     __tablename__ = "roles"
 
-    name: Mapped[str] = mapped_column(String(100), unique=True, index=True)
+    name: Mapped[str] = mapped_column(String(100), index=True)
     description: Mapped[str] = mapped_column(Text, default="")
-    permissions: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    code: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    parent_id: Mapped[int | None] = mapped_column(ForeignKey("roles.id"), nullable=True, index=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
 
     # Relationships
-    users: Mapped[list["User"]] = relationship(
-        back_populates="role", foreign_keys="User.role_id"
-    )
-    menus: Mapped[list["Menu"]] = relationship(
-        secondary="assigned_menus_and_permissions", back_populates="roles", viewonly=True
-    )
-    assigned_permissions: Mapped[list["Permissions"]] = relationship(
-        secondary="assigned_menus_and_permissions", back_populates="roles", viewonly=True
-    )
+    parent: Mapped[Optional["Role"]] = relationship(remote_side="Role.id", back_populates="children")
+    children: Mapped[list["Role"]] = relationship(back_populates="parent")
+    users: Mapped[list["User"]] = relationship(secondary=user_roles, back_populates="roles")
+    menus: Mapped[list["Menu"]] = relationship(secondary=role_menus, back_populates="roles")
+    permissions: Mapped[list["Permission"]] = relationship(secondary=role_permissions, back_populates="roles")
 
 
-class Permissions(ResourceMixin, Base):
+class Permission(ResourceMixin, Base):
     __tablename__ = "permissions"
 
-    name: Mapped[str] = mapped_column(String(100), unique=True, index=True)
-    code: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    name: Mapped[str] = mapped_column(String(100), index=True)
+    code: Mapped[str] = mapped_column(String(100), unique=True, index=True)
     description: Mapped[str] = mapped_column(Text, default="")
     module: Mapped[str] = mapped_column(
         String(50), index=True
     )  # e.g., users, stations, products
+    action: Mapped[str] = mapped_column(String(32), index=True)
+    metadata_: Mapped[dict[str, Any]] = mapped_column("metadata", JSON, default=dict)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
 
     # Relationships
-    menus: Mapped[list["Menu"]] = relationship(
-        secondary="assigned_menus_and_permissions", back_populates="permissions", viewonly=True
-    )
-    roles: Mapped[list["Role"]] = relationship(
-        secondary="assigned_menus_and_permissions", back_populates="assigned_permissions", viewonly=True
-    )
-    user_types: Mapped[list["UserType"]] = relationship(
-        secondary="assigned_menus_and_permissions", back_populates="assigned_permissions", viewonly=True
-    )
+    menus: Mapped[list["Menu"]] = relationship(back_populates="permission")
+    roles: Mapped[list["Role"]] = relationship(secondary=role_permissions, back_populates="permissions")
+    user_types: Mapped[list["UserType"]] = relationship(secondary=user_type_permissions, back_populates="permissions")
 
 
 class Menu(ResourceMixin, Base):
     __tablename__ = "menus"
 
-    name: Mapped[str] = mapped_column(String(100), unique=True, index=True)
+    name: Mapped[str] = mapped_column(String(100), index=True)
     code: Mapped[str] = mapped_column(String(50), unique=True, index=True)
     icon: Mapped[str] = mapped_column(String(50), default="")
     route: Mapped[str] = mapped_column(String(200), default="")
+    component: Mapped[str] = mapped_column(String(160), default="")
+    metadata_: Mapped[dict[str, Any]] = mapped_column("metadata", JSON, default=dict)
+    permission_id: Mapped[int | None] = mapped_column(ForeignKey("permissions.id"), nullable=True, index=True)
     parent_id: Mapped[int | None] = mapped_column(
         ForeignKey("menus.id"), nullable=True, index=True
     )
@@ -163,64 +188,40 @@ class Menu(ResourceMixin, Base):
     description: Mapped[str] = mapped_column(Text, default="")
 
     # Relationships
-    parent: Mapped["Menu"] = relationship(remote_side="Menu.id", backref="children")
-    permissions: Mapped[list["Permissions"]] = relationship(
-        secondary="assigned_menus_and_permissions", back_populates="menus", viewonly=True
-    )
-    roles: Mapped[list["Role"]] = relationship(
-        secondary="assigned_menus_and_permissions", back_populates="menus", viewonly=True
-    )
-    user_types: Mapped[list["UserType"]] = relationship(
-        secondary="assigned_menus_and_permissions", back_populates="menus", viewonly=True
-    )
+    parent: Mapped[Optional["Menu"]] = relationship(remote_side="Menu.id", back_populates="children")
+    children: Mapped[list["Menu"]] = relationship(back_populates="parent", order_by="Menu.sort_order")
+    permission: Mapped[Optional["Permission"]] = relationship(back_populates="menus", foreign_keys=[permission_id])
+    roles: Mapped[list["Role"]] = relationship(secondary=role_menus, back_populates="menus")
+    user_types: Mapped[list["UserType"]] = relationship(secondary=user_type_menus, back_populates="menus")
 
 
-class AssignedMenusAndPermissions(ResourceMixin, Base):
-    __tablename__ = "assigned_menus_and_permissions"
-
-    menu_id: Mapped[int | None] = mapped_column(
-        ForeignKey("menus.id"), nullable=True, index=True
-    )
-    permission_id: Mapped[int | None] = mapped_column(
-        ForeignKey("permissions.id"), nullable=True, index=True
-    )
-    role_id: Mapped[int | None] = mapped_column(
-        ForeignKey("roles.id"), nullable=True, index=True
-    )
-    user_type_id: Mapped[int | None] = mapped_column(
-        ForeignKey("user_types.id"), nullable=True, index=True
-    )
-    user_id: Mapped[int | None] = mapped_column(
-        ForeignKey("users.id"), nullable=True, index=True
-    )
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
-
-    # Relationships
+class UserMenuOverride(ResourceMixin, Base):
+    __tablename__ = "user_menu_overrides"
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    menu_id: Mapped[int] = mapped_column(ForeignKey("menus.id", ondelete="CASCADE"), index=True)
+    is_granted: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
+    user: Mapped["User"] = relationship(back_populates="menu_overrides", foreign_keys=[user_id])
     menu: Mapped["Menu"] = relationship()
-    permission: Mapped["Permissions"] = relationship()
-    role: Mapped["Role"] = relationship()
-    user_type: Mapped["UserType"] = relationship()
-    user: Mapped["User"] = relationship(foreign_keys=[user_id])
+    __table_args__ = (UniqueConstraint("user_id", "menu_id", name="uq_user_menu_override"),)
 
-    __table_args__ = (
-        Index(
-            "idx_assigned_menu_permission",
-            "menu_id",
-            "permission_id",
-            "role_id",
-            "user_type_id",
-            "user_id",
-        ),
-    )
+
+class UserPermissionOverride(ResourceMixin, Base):
+    __tablename__ = "user_permission_overrides"
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    permission_id: Mapped[int] = mapped_column(ForeignKey("permissions.id", ondelete="CASCADE"), index=True)
+    is_granted: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
+    user: Mapped["User"] = relationship(back_populates="permission_overrides", foreign_keys=[user_id])
+    permission: Mapped["Permission"] = relationship()
+    __table_args__ = (UniqueConstraint("user_id", "permission_id", name="uq_user_permission_override"),)
 
 
 class User(ResourceMixin, Base):
     __tablename__ = "users"
 
-    first_name: Mapped[str] = mapped_column(String(100), index=True)
-    last_name: Mapped[str] = mapped_column(String(100), index=True)
+    full_name: Mapped[str] = mapped_column(String(160), index=True)
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
-    phone: Mapped[str] = mapped_column(String(20), unique=True, index=True)
+    password_hash: Mapped[str] = mapped_column(String(255))
+    phone: Mapped[str | None] = mapped_column(String(20), unique=True, nullable=True, index=True)
     nrc: Mapped[str] = mapped_column(String(50), unique=True, nullable=True, index=True)
     nrc_front: Mapped[str] = mapped_column(Text, nullable=True)
     nrc_back: Mapped[str] = mapped_column(Text, nullable=True)
@@ -230,10 +231,7 @@ class User(ResourceMixin, Base):
     current_address: Mapped[str] = mapped_column(Text, default="")
 
     # Foreign Keys
-    user_type_id: Mapped[int] = mapped_column(ForeignKey("user_types.id"), index=True)
-    role_id: Mapped[int | None] = mapped_column(
-        ForeignKey("roles.id"), nullable=True, index=True
-    )
+    user_type_id: Mapped[int | None] = mapped_column(ForeignKey("user_types.id"), nullable=True, index=True)
     province_id: Mapped[int | None] = mapped_column(
         ForeignKey("provinces.id"), nullable=True, index=True
     )
@@ -259,15 +257,37 @@ class User(ResourceMixin, Base):
     user_type: Mapped["UserType"] = relationship(
         back_populates="users", foreign_keys=[user_type_id]
     )
-    role: Mapped["Role"] = relationship(back_populates="users", foreign_keys=[role_id])
+    roles: Mapped[list["Role"]] = relationship(secondary=user_roles, back_populates="users")
+    menu_overrides: Mapped[list["UserMenuOverride"]] = relationship(back_populates="user", foreign_keys="UserMenuOverride.user_id", cascade="all, delete-orphan")
+    permission_overrides: Mapped[list["UserPermissionOverride"]] = relationship(back_populates="user", foreign_keys="UserPermissionOverride.user_id", cascade="all, delete-orphan")
     accounts: Mapped[list["Account"]] = relationship(
         back_populates="user", foreign_keys="Account.user_id"
     )
 
     __table_args__ = (
-        Index("idx_user_name", "first_name", "last_name"),
+        Index("idx_user_name", "full_name"),
         Index("idx_user_status_type", "status", "user_type_id"),
     )
+
+    is_superuser = synonym("is_super_user")
+
+    @property
+    def permission_codes(self) -> set[str]:
+        if self.is_super_user:
+            return {"*"}
+        permissions = {permission.code for role in self.roles if role.is_active for permission in role.permissions if permission.is_active}
+        if self.user_type and self.user_type.is_active:
+            permissions.update(permission.code for permission in self.user_type.permissions if permission.is_active)
+        for override in self.permission_overrides:
+            if override.is_granted and override.permission.is_active:
+                permissions.add(override.permission.code)
+            else:
+                permissions.discard(override.permission.code)
+        return permissions
+
+
+# Transitional import compatibility for older modules.
+Permissions = Permission
 
 
 class Account(ResourceMixin, Base):

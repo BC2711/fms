@@ -10,7 +10,7 @@ from app.core.errors import AppError, NotFoundError
 from app.core.security import hash_password
 from app.database.session import get_db
 from app.models.audit import AuditLog
-from app.models.identity import Permission, Role, User
+from app.models.resources import Permission, Role, User
 from app.permissions.dependencies import require_permission
 from app.schemas.common import response
 
@@ -52,6 +52,9 @@ class UserUpdate(BaseModel):
 
 class RolePayload(BaseModel):
     name: str = Field(min_length=2, max_length=64)
+    code: str | None = None
+    description: str = ""
+    menu_ids: list[int] | str = Field(default_factory=list)
     permission_ids: list[int] | str = Field(default_factory=list)
     status: str = "active"
 
@@ -59,6 +62,9 @@ class RolePayload(BaseModel):
 class PermissionPayload(BaseModel):
     code: str = Field(min_length=3, max_length=100, pattern=r"^[a-z0-9_.-]+$")
     description: str = ""
+    name: str | None = None
+    module: str | None = None
+    action: str | None = None
     status: str = "active"
 
 
@@ -79,11 +85,11 @@ def serialize_user(user: User) -> dict[str, Any]:
 
 
 def serialize_role(role: Role) -> dict[str, Any]:
-    return {"id": role.id, "name": role.name, "code": role.name, "status": "active", "permission_ids": [item.id for item in role.permissions], "permissions": [{"id": item.id, "code": item.code} for item in role.permissions]}
+    return {"id": role.id, "name": role.name, "code": role.code, "description": role.description, "status": role.status, "permission_ids": [item.id for item in role.permissions], "menu_ids": [item.id for item in role.menus], "permissions": [{"id": item.id, "code": item.code} for item in role.permissions]}
 
 
 def serialize_permission(item: Permission) -> dict[str, Any]:
-    return {"id": item.id, "name": item.code, "code": item.code, "description": "", "status": "active"}
+    return {"id": item.id, "name": item.name, "code": item.code, "description": item.description, "module": item.module, "action": item.action, "status": item.status}
 
 
 def page_data(items: list[Any], total: int, page: int, page_size: int, serializer) -> dict[str, Any]:
@@ -180,13 +186,13 @@ def set_role_permissions(db: Session, item: Role, ids: list[int]) -> None:
 @router.post("/roles", status_code=201)
 def create_role(payload: RolePayload, actor: admin_role("create"), db: Db):
     if db.scalar(select(Role).where(Role.name == payload.name)): raise AppError("Role name already exists", 409)
-    item = Role(name=payload.name); set_role_permissions(db, item, permission_ids(payload.permission_ids)); db.add(item); db.flush(); audit(db, actor, "create", "administration/roles", item.id); db.commit(); db.refresh(item)
+    item = Role(name=payload.name, code=payload.code or payload.name.lower().replace(" ", "-"), description=payload.description); set_role_permissions(db, item, permission_ids(payload.permission_ids)); db.add(item); db.flush(); audit(db, actor, "create", "administration/roles", item.id); db.commit(); db.refresh(item)
     return response("Role created successfully", serialize_role(item))
 
 
 @router.put("/roles/{item_id}")
 def update_role(item_id: int, payload: RolePayload, actor: admin_role("update"), db: Db):
-    item = role_by_id(db, item_id); item.name = payload.name; set_role_permissions(db, item, permission_ids(payload.permission_ids)); audit(db, actor, "update", "administration/roles", item.id); db.commit(); db.refresh(item)
+    item = role_by_id(db, item_id); item.name = payload.name; item.code = payload.code or item.code; item.description = payload.description; set_role_permissions(db, item, permission_ids(payload.permission_ids)); audit(db, actor, "update", "administration/roles", item.id); db.commit(); db.refresh(item)
     return response("Role updated successfully", serialize_role(item))
 
 
@@ -215,14 +221,16 @@ def view_permission(item_id: int, _: admin_permission("view"), db: Db):
 @router.post("/permissions", status_code=201)
 def create_permission(payload: PermissionPayload, actor: admin_permission("create"), db: Db):
     if db.scalar(select(Permission).where(Permission.code == payload.code)): raise AppError("Permission code already exists", 409)
-    item = Permission(code=payload.code); db.add(item); db.flush(); audit(db, actor, "create", "administration/permissions", item.id); db.commit(); return response("Permission created successfully", serialize_permission(item))
+    module, _, action = payload.code.rpartition(".")
+    item = Permission(code=payload.code, name=payload.name or payload.code.replace(".", " ").title(), description=payload.description, module=payload.module or module, action=payload.action or action); db.add(item); db.flush(); audit(db, actor, "create", "administration/permissions", item.id); db.commit(); return response("Permission created successfully", serialize_permission(item))
 
 
 @router.put("/permissions/{item_id}")
 def update_permission(item_id: int, payload: PermissionPayload, actor: admin_permission("update"), db: Db):
     item = db.get(Permission, item_id)
     if not item: raise NotFoundError("Permission not found")
-    item.code = payload.code; audit(db, actor, "update", "administration/permissions", item.id); db.commit(); return response("Permission updated successfully", serialize_permission(item))
+    module, _, action = payload.code.rpartition(".")
+    item.code = payload.code; item.name = payload.name or item.name; item.description = payload.description; item.module = payload.module or module; item.action = payload.action or action; audit(db, actor, "update", "administration/permissions", item.id); db.commit(); return response("Permission updated successfully", serialize_permission(item))
 
 
 @router.delete("/permissions/{item_id}")

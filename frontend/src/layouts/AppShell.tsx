@@ -3,7 +3,6 @@ import { useCallback, useEffect, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 
 import { useAuthStore } from '@/auth/auth.store'
-import { menuConfig } from '@/config/menu.config'
 import { useLayoutPreference, type LayoutType } from '@/hooks/useLayoutPreference'
 import { MacSidebarLayout } from '@/layouts/MacSidebarLayout'
 import { WindowsNavbarLayout } from '@/layouts/WindowsNavbarLayout'
@@ -120,7 +119,7 @@ export function AppShell({ layoutType }: AppShellProps) {
   )
 
   const sharedProps = {
-    items: menuConfig,
+    items: user?.menus ?? [],
     user,
     layout,
     onLayoutChange: handleLayoutChange,

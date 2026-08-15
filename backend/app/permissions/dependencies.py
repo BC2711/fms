@@ -11,6 +11,7 @@ from app.core.errors import AppError
 from app.core.security import decode_access_token
 from app.database.session import get_db
 from app.models.resources import User
+from app.services.rbac import permission_codes
 
 bearer = HTTPBearer(auto_error=False)
 
@@ -20,7 +21,7 @@ def get_current_user(credentials: Annotated[HTTPAuthorizationCredentials | None,
         raise AppError("Authentication required", 401)
     token = credentials.credentials
     if token == get_settings().api_token:
-        user = db.scalar(select(User).where(User.is_superuser.is_(True), User.deleted_at.is_(None)))
+        user = db.scalar(select(User).where(User.is_super_user.is_(True), User.deleted_at.is_(None)))
     else:
         try:
             subject = decode_access_token(token)["sub"]
@@ -37,7 +38,7 @@ CurrentUser = Annotated[User, Depends(get_current_user)]
 
 def require_permission(permission: str):
     def dependency(user: CurrentUser) -> User:
-        if not user.is_superuser and permission not in user.permission_codes:
+        if not user.is_super_user and permission not in permission_codes(user):
             raise AppError(f"Missing permission: {permission}", 403)
         return user
     return dependency

@@ -6,12 +6,24 @@ import { FormPageGenerator } from '@/framework/generators/FormPageGenerator'
 import { ListPageGenerator } from '@/framework/generators/ListPageGenerator'
 import { NotFoundPage } from '@/framework/generators/RouteGenerator'
 import { useAuthStore } from '@/auth/auth.store'
+import { createGeneratedResourcePage } from '@/config/generated-page-factory'
+import type { MenuItem } from '@/types/configuration.types'
+
+function findMenu(items: MenuItem[], path: string): MenuItem | undefined {
+  for (const item of items) {
+    if (item.path && (item.path === path || path.startsWith(`${item.path}/`))) return item
+    const nested = findMenu(item.children ?? [], path)
+    if (nested) return nested
+  }
+}
 
 export function GeneratedMenuPage() {
   const location = useLocation()
   const { pathname } = location
-  const { isAuthenticated, isLoading } = useAuthStore()
-  const config = getGeneratedRootPageByRoute(pathname)
+  const { isAuthenticated, isLoading, user } = useAuthStore()
+  const configured = getGeneratedRootPageByRoute(pathname)
+  const menu = findMenu(user?.menus ?? [], pathname)
+  const config = configured ?? (menu?.path ? createGeneratedResourcePage(menu.path, menu.label) : undefined)
   if (!config) return <NotFoundPage />
   if (isLoading) return <div role="status" className="p-8 text-center text-sm text-slate-500">Restoring your session…</div>
   if (!isAuthenticated) return <Navigate to="/login" state={{ from: location.pathname, reason: 'authentication' }} replace />

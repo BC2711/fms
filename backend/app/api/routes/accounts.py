@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from app.core.errors import NotFoundError
 from app.database.session import get_db
 from app.models.audit import AuditLog
-from app.models.identity import User
+from app.models.resources import User
 from app.models.resources import Account
 from app.permissions.dependencies import require_permission
 from app.schemas.common import response

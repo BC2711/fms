@@ -1,0 +1,2190 @@
+[
+  {
+    "id": "dashboard",
+    "label": "Dashboard",
+    "icon": "LayoutDashboard",
+    "children": [
+      {
+        "id": "dashboard-overview",
+        "label": "Overview",
+        "path": "/dashboard",
+        "icon": "LayoutDashboard"
+      },
+      {
+        "id": "dashboard-executive-dashboard",
+        "label": "Executive Dashboard",
+        "path": "/dashboard/executive-dashboard",
+        "icon": "Circle"
+      },
+      {
+        "id": "dashboard-operations-dashboard",
+        "label": "Operations Dashboard",
+        "path": "/dashboard/operations-dashboard",
+        "icon": "Circle"
+      },
+      {
+        "id": "dashboard-sales-dashboard",
+        "label": "Sales Dashboard",
+        "path": "/dashboard/sales-dashboard",
+        "icon": "Circle"
+      },
+      {
+        "id": "dashboard-inventory-dashboard",
+        "label": "Inventory Dashboard",
+        "path": "/dashboard/inventory-dashboard",
+        "icon": "Circle"
+      },
+      {
+        "id": "dashboard-finance-dashboard",
+        "label": "Finance Dashboard",
+        "path": "/dashboard/finance-dashboard",
+        "icon": "Circle"
+      },
+      {
+        "id": "dashboard-fleet-dashboard",
+        "label": "Fleet Dashboard",
+        "path": "/dashboard/fleet-dashboard",
+        "icon": "Circle"
+      },
+      {
+        "id": "dashboard-station-performance",
+        "label": "Station Performance",
+        "path": "/dashboard/station-performance",
+        "icon": "Circle"
+      },
+      {
+        "id": "dashboard-compliance-dashboard",
+        "label": "Compliance Dashboard",
+        "path": "/dashboard/compliance-dashboard",
+        "icon": "Circle"
+      }
+    ]
+  },
+  {
+    "id": "accounts",
+    "label": "Accounts",
+    "icon": "Users",
+    "children": [
+      {
+        "id": "accounts-all",
+        "label": "All Account Holders",
+        "path": "/accounts",
+        "icon": "Users"
+      },
+      {
+        "id": "accounts-oil-marketing-companies",
+        "label": "Oil Marketing Companies",
+        "path": "/accounts/oil-marketing-companies",
+        "icon": "Circle"
+      },
+      {
+        "id": "accounts-corporate-companies",
+        "label": "Corporate Companies",
+        "path": "/accounts/corporate-companies",
+        "icon": "Circle"
+      },
+      {
+        "id": "accounts-government-institutions",
+        "label": "Government Institutions",
+        "path": "/accounts/government-institutions",
+        "icon": "Circle"
+      },
+      {
+        "id": "accounts-ngos",
+        "label": "NGOs",
+        "path": "/accounts/ngos",
+        "icon": "Circle"
+      },
+      {
+        "id": "accounts-individuals",
+        "label": "Individuals",
+        "path": "/accounts/individuals",
+        "icon": "Circle"
+      },
+      {
+        "id": "accounts-aggregators",
+        "label": "Aggregators",
+        "path": "/accounts/aggregators",
+        "icon": "Circle"
+      }
+    ]
+  },
+  {
+    "id": "stations",
+    "label": "Stations",
+    "icon": "Fuel",
+    "children": [
+      {
+        "id": "stations-stations",
+        "label": "Stations",
+        "path": "/stations/stations",
+        "icon": "Circle"
+      },
+      {
+        "id": "stations-station-types",
+        "label": "Station Types",
+        "path": "/stations/station-types",
+        "icon": "Circle"
+      },
+      {
+        "id": "stations-station-groups",
+        "label": "Station Groups",
+        "path": "/stations/station-groups",
+        "icon": "Circle"
+      },
+      {
+        "id": "stations-station-attendants",
+        "label": "Station Attendants",
+        "path": "/stations/station-attendants",
+        "icon": "Circle"
+      },
+      {
+        "id": "stations-station-price-boards",
+        "label": "Station Price Boards",
+        "path": "/stations/station-price-boards",
+        "icon": "Circle"
+      },
+      {
+        "id": "stations-station-inspections",
+        "label": "Station Inspections",
+        "path": "/stations/station-inspections",
+        "icon": "Circle"
+      },
+      {
+        "id": "stations-station-documents",
+        "label": "Station Documents",
+        "path": "/stations/station-documents",
+        "icon": "Circle"
+      },
+      {
+        "id": "stations-station-performance",
+        "label": "Station Performance",
+        "path": "/stations/station-performance",
+        "icon": "Circle"
+      }
+    ]
+  },
+  {
+    "id": "fuel-operations",
+    "label": "Fuel Operations",
+    "icon": "Droplets",
+    "children": [
+      {
+        "id": "fuel-operations-fuel-products",
+        "label": "Fuel Products",
+        "path": "/fuel-operations/fuel-products",
+        "icon": "Circle"
+      },
+      {
+        "id": "fuel-operations-product-categories",
+        "label": "Product Categories",
+        "path": "/fuel-operations/product-categories",
+        "icon": "Circle"
+      },
+      {
+        "id": "fuel-operations-fuel-pricing",
+        "label": "Fuel Pricing",
+        "path": "/fuel-operations/fuel-pricing",
+        "icon": "Circle"
+      },
+      {
+        "id": "fuel-operations-inventory-overview",
+        "label": "Inventory Overview",
+        "path": "/fuel-operations/inventory-overview",
+        "icon": "Circle"
+      },
+      {
+        "id": "fuel-operations-station-stock",
+        "label": "Station Stock",
+        "path": "/fuel-operations/station-stock",
+        "icon": "Circle"
+      },
+      {
+        "id": "fuel-operations-depot-stock",
+        "label": "Depot Stock",
+        "path": "/fuel-operations/depot-stock",
+        "icon": "Circle"
+      },
+      {
+        "id": "fuel-operations-tank-stock",
+        "label": "Tank Stock",
+        "path": "/fuel-operations/tank-stock",
+        "icon": "Circle"
+      },
+      {
+        "id": "fuel-operations-stock-receipts",
+        "label": "Stock Receipts",
+        "path": "/fuel-operations/stock-receipts",
+        "icon": "Circle"
+      },
+      {
+        "id": "fuel-operations-stock-issues",
+        "label": "Stock Issues",
+        "path": "/fuel-operations/stock-issues",
+        "icon": "Circle"
+      },
+      {
+        "id": "fuel-operations-stock-transfers",
+        "label": "Stock Transfers",
+        "path": "/fuel-operations/stock-transfers",
+        "icon": "Circle"
+      },
+      {
+        "id": "fuel-operations-stock-adjustments",
+        "label": "Stock Adjustments",
+        "path": "/fuel-operations/stock-adjustments",
+        "icon": "Circle"
+      },
+      {
+        "id": "fuel-operations-tank-readings",
+        "label": "Tank Readings",
+        "path": "/fuel-operations/tank-readings",
+        "icon": "Circle"
+      },
+      {
+        "id": "fuel-operations-dip-readings",
+        "label": "Dip Readings",
+        "path": "/fuel-operations/dip-readings",
+        "icon": "Circle"
+      },
+      {
+        "id": "fuel-operations-meter-readings",
+        "label": "Meter Readings",
+        "path": "/fuel-operations/meter-readings",
+        "icon": "Circle"
+      },
+      {
+        "id": "fuel-operations-physical-stock-counts",
+        "label": "Physical Stock Counts",
+        "path": "/fuel-operations/physical-stock-counts",
+        "icon": "Circle"
+      },
+      {
+        "id": "fuel-operations-stock-reconciliation",
+        "label": "Stock Reconciliation",
+        "path": "/fuel-operations/stock-reconciliation",
+        "icon": "Circle"
+      },
+      {
+        "id": "fuel-operations-fuel-losses-and-gains",
+        "label": "Fuel Losses and Gains",
+        "path": "/fuel-operations/fuel-losses-and-gains",
+        "icon": "Circle"
+      },
+      {
+        "id": "fuel-operations-low-stock-alerts",
+        "label": "Low-Stock Alerts",
+        "path": "/fuel-operations/low-stock-alerts",
+        "icon": "Circle"
+      },
+      {
+        "id": "fuel-operations-inventory-valuation",
+        "label": "Inventory Valuation",
+        "path": "/fuel-operations/inventory-valuation",
+        "icon": "Circle"
+      }
+    ]
+  },
+  {
+    "id": "requests-orders",
+    "label": "Requests & Orders",
+    "icon": "ShoppingCart",
+    "children": [
+      {
+        "id": "requests-orders-all-fuel-requests",
+        "label": "All Fuel Requests",
+        "path": "/requests-orders/all-fuel-requests",
+        "icon": "Circle"
+      },
+      {
+        "id": "requests-orders-create-fuel-request",
+        "label": "Create Fuel Request",
+        "path": "/requests-orders/create-fuel-request",
+        "icon": "Circle"
+      },
+      {
+        "id": "requests-orders-draft-requests",
+        "label": "Draft Requests",
+        "path": "/requests-orders/draft-requests",
+        "icon": "Circle"
+      },
+      {
+        "id": "requests-orders-pending-requests",
+        "label": "Pending Requests",
+        "path": "/requests-orders/pending-requests",
+        "icon": "Circle"
+      },
+      {
+        "id": "requests-orders-approved-requests",
+        "label": "Approved Requests",
+        "path": "/requests-orders/approved-requests",
+        "icon": "Circle"
+      },
+      {
+        "id": "requests-orders-rejected-requests",
+        "label": "Rejected Requests",
+        "path": "/requests-orders/rejected-requests",
+        "icon": "Circle"
+      },
+      {
+        "id": "requests-orders-fulfilled-requests",
+        "label": "Fulfilled Requests",
+        "path": "/requests-orders/fulfilled-requests",
+        "icon": "Circle"
+      },
+      {
+        "id": "requests-orders-all-orders",
+        "label": "All Orders",
+        "path": "/requests-orders/all-orders",
+        "icon": "Circle"
+      },
+      {
+        "id": "requests-orders-create-order",
+        "label": "Create Order",
+        "path": "/requests-orders/create-order",
+        "icon": "Circle"
+      },
+      {
+        "id": "requests-orders-pending-orders",
+        "label": "Pending Orders",
+        "path": "/requests-orders/pending-orders",
+        "icon": "Circle"
+      },
+      {
+        "id": "requests-orders-processing-orders",
+        "label": "Processing Orders",
+        "path": "/requests-orders/processing-orders",
+        "icon": "Circle"
+      },
+      {
+        "id": "requests-orders-dispatched-orders",
+        "label": "Dispatched Orders",
+        "path": "/requests-orders/dispatched-orders",
+        "icon": "Circle"
+      },
+      {
+        "id": "requests-orders-delivered-orders",
+        "label": "Delivered Orders",
+        "path": "/requests-orders/delivered-orders",
+        "icon": "Circle"
+      },
+      {
+        "id": "requests-orders-cancelled-orders",
+        "label": "Cancelled Orders",
+        "path": "/requests-orders/cancelled-orders",
+        "icon": "Circle"
+      },
+      {
+        "id": "requests-orders-order-approvals",
+        "label": "Order Approvals",
+        "path": "/requests-orders/order-approvals",
+        "icon": "Circle"
+      },
+      {
+        "id": "requests-orders-fuel-allocations",
+        "label": "Fuel Allocations",
+        "path": "/requests-orders/fuel-allocations",
+        "icon": "Circle"
+      },
+      {
+        "id": "requests-orders-allocation-balances",
+        "label": "Allocation Balances",
+        "path": "/requests-orders/allocation-balances",
+        "icon": "Circle"
+      },
+      {
+        "id": "requests-orders-allocation-usage",
+        "label": "Allocation Usage",
+        "path": "/requests-orders/allocation-usage",
+        "icon": "Circle"
+      }
+    ]
+  },
+  {
+    "id": "logistics",
+    "label": "Logistics",
+    "icon": "Truck",
+    "children": [
+      {
+        "id": "logistics-logistics-dashboard",
+        "label": "Logistics Dashboard",
+        "path": "/logistics/logistics-dashboard",
+        "icon": "Circle"
+      },
+      {
+        "id": "logistics-depots",
+        "label": "Depots",
+        "path": "/logistics/depots",
+        "icon": "Circle"
+      },
+      {
+        "id": "logistics-warehouses",
+        "label": "Warehouses",
+        "path": "/logistics/warehouses",
+        "icon": "Circle"
+      },
+      {
+        "id": "logistics-delivery-requests",
+        "label": "Delivery Requests",
+        "path": "/logistics/delivery-requests",
+        "icon": "Circle"
+      },
+      {
+        "id": "logistics-delivery-orders",
+        "label": "Delivery Orders",
+        "path": "/logistics/delivery-orders",
+        "icon": "Circle"
+      },
+      {
+        "id": "logistics-dispatch-planning",
+        "label": "Dispatch Planning",
+        "path": "/logistics/dispatch-planning",
+        "icon": "Circle"
+      },
+      {
+        "id": "logistics-delivery-schedule",
+        "label": "Delivery Schedule",
+        "path": "/logistics/delivery-schedule",
+        "icon": "Circle"
+      },
+      {
+        "id": "logistics-active-deliveries",
+        "label": "Active Deliveries",
+        "path": "/logistics/active-deliveries",
+        "icon": "Circle"
+      },
+      {
+        "id": "logistics-delivery-routes",
+        "label": "Delivery Routes",
+        "path": "/logistics/delivery-routes",
+        "icon": "Circle"
+      },
+      {
+        "id": "logistics-tanker-trucks",
+        "label": "Tanker Trucks",
+        "path": "/logistics/tanker-trucks",
+        "icon": "Circle"
+      },
+      {
+        "id": "logistics-delivery-drivers",
+        "label": "Delivery Drivers",
+        "path": "/logistics/delivery-drivers",
+        "icon": "Circle"
+      },
+      {
+        "id": "logistics-loading-records",
+        "label": "Loading Records",
+        "path": "/logistics/loading-records",
+        "icon": "Circle"
+      },
+      {
+        "id": "logistics-offloading-records",
+        "label": "Offloading Records",
+        "path": "/logistics/offloading-records",
+        "icon": "Circle"
+      },
+      {
+        "id": "logistics-delivery-tracking",
+        "label": "Delivery Tracking",
+        "path": "/logistics/delivery-tracking",
+        "icon": "Circle"
+      },
+      {
+        "id": "logistics-proof-of-delivery",
+        "label": "Proof of Delivery",
+        "path": "/logistics/proof-of-delivery",
+        "icon": "Circle"
+      },
+      {
+        "id": "logistics-delivery-exceptions",
+        "label": "Delivery Exceptions",
+        "path": "/logistics/delivery-exceptions",
+        "icon": "Circle"
+      },
+      {
+        "id": "logistics-failed-deliveries",
+        "label": "Failed Deliveries",
+        "path": "/logistics/failed-deliveries",
+        "icon": "Circle"
+      },
+      {
+        "id": "logistics-completed-deliveries",
+        "label": "Completed Deliveries",
+        "path": "/logistics/completed-deliveries",
+        "icon": "Circle"
+      },
+      {
+        "id": "logistics-delivery-reconciliation",
+        "label": "Delivery Reconciliation",
+        "path": "/logistics/delivery-reconciliation",
+        "icon": "Circle"
+      }
+    ]
+  },
+  {
+    "id": "fleet",
+    "label": "Fleet",
+    "icon": "Car",
+    "children": [
+      {
+        "id": "fleet-all-vehicles",
+        "label": "All Vehicles",
+        "path": "/fleet/all-vehicles",
+        "icon": "Circle"
+      },
+      {
+        "id": "fleet-add-vehicle",
+        "label": "Add Vehicle",
+        "path": "/fleet/add-vehicle",
+        "icon": "Circle"
+      },
+      {
+        "id": "fleet-vehicle-categories",
+        "label": "Vehicle Categories",
+        "path": "/fleet/vehicle-categories",
+        "icon": "Circle"
+      },
+      {
+        "id": "fleet-vehicle-groups",
+        "label": "Vehicle Groups",
+        "path": "/fleet/vehicle-groups",
+        "icon": "Circle"
+      },
+      {
+        "id": "fleet-customer-vehicles",
+        "label": "Customer Vehicles",
+        "path": "/fleet/customer-vehicles",
+        "icon": "Circle"
+      },
+      {
+        "id": "fleet-delivery-vehicles",
+        "label": "Delivery Vehicles",
+        "path": "/fleet/delivery-vehicles",
+        "icon": "Circle"
+      },
+      {
+        "id": "fleet-tanker-trucks",
+        "label": "Tanker Trucks",
+        "path": "/fleet/tanker-trucks",
+        "icon": "Circle"
+      },
+      {
+        "id": "fleet-vehicle-documents",
+        "label": "Vehicle Documents",
+        "path": "/fleet/vehicle-documents",
+        "icon": "Circle"
+      },
+      {
+        "id": "fleet-vehicle-fuel-limits",
+        "label": "Vehicle Fuel Limits",
+        "path": "/fleet/vehicle-fuel-limits",
+        "icon": "Circle"
+      },
+      {
+        "id": "fleet-vehicle-allocations",
+        "label": "Vehicle Allocations",
+        "path": "/fleet/vehicle-allocations",
+        "icon": "Circle"
+      },
+      {
+        "id": "fleet-vehicle-transactions",
+        "label": "Vehicle Transactions",
+        "path": "/fleet/vehicle-transactions",
+        "icon": "Circle"
+      },
+      {
+        "id": "fleet-vehicle-maintenance",
+        "label": "Vehicle Maintenance",
+        "path": "/fleet/vehicle-maintenance",
+        "icon": "Circle"
+      },
+      {
+        "id": "fleet-vehicle-inspections",
+        "label": "Vehicle Inspections",
+        "path": "/fleet/vehicle-inspections",
+        "icon": "Circle"
+      },
+      {
+        "id": "fleet-vehicle-tracking",
+        "label": "Vehicle Tracking",
+        "path": "/fleet/vehicle-tracking",
+        "icon": "Circle"
+      },
+      {
+        "id": "fleet-all-drivers",
+        "label": "All Drivers",
+        "path": "/fleet/all-drivers",
+        "icon": "Circle"
+      },
+      {
+        "id": "fleet-driver-documents",
+        "label": "Driver Documents",
+        "path": "/fleet/driver-documents",
+        "icon": "Circle"
+      },
+      {
+        "id": "fleet-driver-licences",
+        "label": "Driver Licences",
+        "path": "/fleet/driver-licences",
+        "icon": "Circle"
+      },
+      {
+        "id": "fleet-driver-assignments",
+        "label": "Driver Assignments",
+        "path": "/fleet/driver-assignments",
+        "icon": "Circle"
+      },
+      {
+        "id": "fleet-driver-fuel-limits",
+        "label": "Driver Fuel Limits",
+        "path": "/fleet/driver-fuel-limits",
+        "icon": "Circle"
+      },
+      {
+        "id": "fleet-driver-restrictions",
+        "label": "Driver Restrictions",
+        "path": "/fleet/driver-restrictions",
+        "icon": "Circle"
+      },
+      {
+        "id": "fleet-driver-pin-management",
+        "label": "Driver PIN Management",
+        "path": "/fleet/driver-pin-management",
+        "icon": "Circle"
+      },
+      {
+        "id": "fleet-driver-performance",
+        "label": "Driver Performance",
+        "path": "/fleet/driver-performance",
+        "icon": "Circle"
+      }
+    ]
+  },
+  {
+    "id": "cards-pos",
+    "label": "Cards & POS",
+    "icon": "CreditCard",
+    "children": [
+      {
+        "id": "cards-pos-fuel-cards",
+        "label": "Fuel Cards",
+        "path": "/cards-pos-fuel-cards",
+        "icon": "FolderTree",
+        "children": [
+          {
+            "id": "cards-pos-fuel-cards-card-dashboard",
+            "label": "Card Dashboard",
+            "path": "/cards-pos-fuel-cards/card-dashboard",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-fuel-cards-card-stock",
+            "label": "Card Stock",
+            "path": "/cards-pos-fuel-cards/card-stock",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-fuel-cards-issue-card",
+            "label": "Issue Card",
+            "path": "/cards-pos-fuel-cards/issue-card",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-fuel-cards-issued-cards",
+            "label": "Issued Cards",
+            "path": "/cards-pos-fuel-cards/issued-cards",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-fuel-cards-unassigned-cards",
+            "label": "Unassigned Cards",
+            "path": "/cards-pos-fuel-cards/unassigned-cards",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-fuel-cards-vehicle-cards",
+            "label": "Vehicle Cards",
+            "path": "/cards-pos-fuel-cards/vehicle-cards",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-fuel-cards-driver-cards",
+            "label": "Driver Cards",
+            "path": "/cards-pos-fuel-cards/driver-cards",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-fuel-cards-customer-cards",
+            "label": "Customer Cards",
+            "path": "/cards-pos-fuel-cards/customer-cards",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-fuel-cards-card-limits",
+            "label": "Card Limits",
+            "path": "/cards-pos-fuel-cards/card-limits",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-fuel-cards-card-restrictions",
+            "label": "Card Restrictions",
+            "path": "/cards-pos-fuel-cards/card-restrictions",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-fuel-cards-card-pin-management",
+            "label": "Card PIN Management",
+            "path": "/cards-pos-fuel-cards/card-pin-management",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-fuel-cards-activate-cards",
+            "label": "Activate Cards",
+            "path": "/cards-pos-fuel-cards/activate-cards",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-fuel-cards-blocked-cards",
+            "label": "Blocked Cards",
+            "path": "/cards-pos-fuel-cards/blocked-cards",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-fuel-cards-expired-cards",
+            "label": "Expired Cards",
+            "path": "/cards-pos-fuel-cards/expired-cards",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-fuel-cards-lost-or-stolen-cards",
+            "label": "Lost or Stolen Cards",
+            "path": "/cards-pos-fuel-cards/lost-or-stolen-cards",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-fuel-cards-card-replacements",
+            "label": "Card Replacements",
+            "path": "/cards-pos-fuel-cards/card-replacements",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-fuel-cards-card-transactions",
+            "label": "Card Transactions",
+            "path": "/cards-pos-fuel-cards/card-transactions",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-fuel-cards-card-reconciliation",
+            "label": "Card Reconciliation",
+            "path": "/cards-pos-fuel-cards/card-reconciliation",
+            "icon": "Circle"
+          }
+        ]
+      },
+      {
+        "id": "cards-pos-devices",
+        "label": "POS Devices",
+        "path": "/cards-pos-devices",
+        "icon": "FolderTree",
+        "children": [
+          {
+            "id": "cards-pos-devices-pos-dashboard",
+            "label": "POS Dashboard",
+            "path": "/cards-pos-devices/pos-dashboard",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-devices-pos-devices",
+            "label": "POS Devices",
+            "path": "/cards-pos-devices/pos-devices",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-devices-add-pos-device",
+            "label": "Add POS Device",
+            "path": "/cards-pos-devices/add-pos-device",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-devices-pos-inventory",
+            "label": "POS Inventory",
+            "path": "/cards-pos-devices/pos-inventory",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-devices-pos-assignments",
+            "label": "POS Assignments",
+            "path": "/cards-pos-devices/pos-assignments",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-devices-assign-device",
+            "label": "Assign Device",
+            "path": "/cards-pos-devices/assign-device",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-devices-unassign-device",
+            "label": "Unassign Device",
+            "path": "/cards-pos-devices/unassign-device",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-devices-station-pos-devices",
+            "label": "Station POS Devices",
+            "path": "/cards-pos-devices/station-pos-devices",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-devices-attendant-pos-devices",
+            "label": "Attendant POS Devices",
+            "path": "/cards-pos-devices/attendant-pos-devices",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-devices-pos-transactions",
+            "label": "POS Transactions",
+            "path": "/cards-pos-devices/pos-transactions",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-devices-pos-settlements",
+            "label": "POS Settlements",
+            "path": "/cards-pos-devices/pos-settlements",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-devices-pos-reconciliation",
+            "label": "POS Reconciliation",
+            "path": "/cards-pos-devices/pos-reconciliation",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-devices-pos-device-health",
+            "label": "POS Device Health",
+            "path": "/cards-pos-devices/pos-device-health",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-devices-pos-maintenance",
+            "label": "POS Maintenance",
+            "path": "/cards-pos-devices/pos-maintenance",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-devices-lost-or-damaged-devices",
+            "label": "Lost or Damaged Devices",
+            "path": "/cards-pos-devices/lost-or-damaged-devices",
+            "icon": "Circle"
+          }
+        ]
+      },
+      {
+        "id": "cards-pos-attendants",
+        "label": "Forecourt Attendants",
+        "path": "/cards-pos-attendants",
+        "icon": "FolderTree",
+        "children": [
+          {
+            "id": "cards-pos-attendants-all-attendants",
+            "label": "All Attendants",
+            "path": "/cards-pos-attendants/all-attendants",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-attendants-pending-activation",
+            "label": "Pending Activation",
+            "path": "/cards-pos-attendants/pending-activation",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-attendants-active-attendants",
+            "label": "Active Attendants",
+            "path": "/cards-pos-attendants/active-attendants",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-attendants-suspended-attendants",
+            "label": "Suspended Attendants",
+            "path": "/cards-pos-attendants/suspended-attendants",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-attendants-station-assignments",
+            "label": "Station Assignments",
+            "path": "/cards-pos-attendants/station-assignments",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-attendants-pump-assignments",
+            "label": "Pump Assignments",
+            "path": "/cards-pos-attendants/pump-assignments",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-attendants-shift-assignments",
+            "label": "Shift Assignments",
+            "path": "/cards-pos-attendants/shift-assignments",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-attendants-pos-assignments",
+            "label": "POS Assignments",
+            "path": "/cards-pos-attendants/pos-assignments",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-attendants-attendant-transactions",
+            "label": "Attendant Transactions",
+            "path": "/cards-pos-attendants/attendant-transactions",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-attendants-attendant-performance",
+            "label": "Attendant Performance",
+            "path": "/cards-pos-attendants/attendant-performance",
+            "icon": "Circle"
+          },
+          {
+            "id": "cards-pos-attendants-attendant-reconciliation",
+            "label": "Attendant Reconciliation",
+            "path": "/cards-pos-attendants/attendant-reconciliation",
+            "icon": "Circle"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "finance",
+    "label": "Finance",
+    "icon": "Landmark",
+    "children": [
+      {
+        "id": "finance-transactions",
+        "label": "Transactions",
+        "path": "/finance-transactions",
+        "icon": "FolderTree",
+        "children": [
+          {
+            "id": "finance-transactions-transaction-dashboard",
+            "label": "Transaction Dashboard",
+            "path": "/finance-transactions/transaction-dashboard",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-transactions-all-transactions",
+            "label": "All Transactions",
+            "path": "/finance-transactions/all-transactions",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-transactions-fuel-sales",
+            "label": "Fuel Sales",
+            "path": "/finance-transactions/fuel-sales",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-transactions-card-transactions",
+            "label": "Card Transactions",
+            "path": "/finance-transactions/card-transactions",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-transactions-pos-transactions",
+            "label": "POS Transactions",
+            "path": "/finance-transactions/pos-transactions",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-transactions-cash-transactions",
+            "label": "Cash Transactions",
+            "path": "/finance-transactions/cash-transactions",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-transactions-mobile-money-transactions",
+            "label": "Mobile Money Transactions",
+            "path": "/finance-transactions/mobile-money-transactions",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-transactions-bank-transactions",
+            "label": "Bank Transactions",
+            "path": "/finance-transactions/bank-transactions",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-transactions-credit-transactions",
+            "label": "Credit Transactions",
+            "path": "/finance-transactions/credit-transactions",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-transactions-debit-transactions",
+            "label": "Debit Transactions",
+            "path": "/finance-transactions/debit-transactions",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-transactions-failed-transactions",
+            "label": "Failed Transactions",
+            "path": "/finance-transactions/failed-transactions",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-transactions-refunds",
+            "label": "Refunds",
+            "path": "/finance-transactions/refunds",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-transactions-reversals",
+            "label": "Reversals",
+            "path": "/finance-transactions/reversals",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-transactions-transaction-approvals",
+            "label": "Transaction Approvals",
+            "path": "/finance-transactions/transaction-approvals",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-transactions-transaction-reconciliation",
+            "label": "Transaction Reconciliation",
+            "path": "/finance-transactions/transaction-reconciliation",
+            "icon": "Circle"
+          }
+        ]
+      },
+      {
+        "id": "finance-funding",
+        "label": "Account Funding",
+        "path": "/finance-funding",
+        "icon": "FolderTree",
+        "children": [
+          {
+            "id": "finance-funding-funding-dashboard",
+            "label": "Funding Dashboard",
+            "path": "/finance-funding/funding-dashboard",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-funding-top-up-account",
+            "label": "Top Up Account",
+            "path": "/finance-funding/top-up-account",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-funding-bulk-top-up",
+            "label": "Bulk Top Up",
+            "path": "/finance-funding/bulk-top-up",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-funding-debit-account",
+            "label": "Debit Account",
+            "path": "/finance-funding/debit-account",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-funding-bulk-debit",
+            "label": "Bulk Debit",
+            "path": "/finance-funding/bulk-debit",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-funding-credit-requests",
+            "label": "Credit Requests",
+            "path": "/finance-funding/credit-requests",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-funding-debit-requests",
+            "label": "Debit Requests",
+            "path": "/finance-funding/debit-requests",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-funding-funding-approvals",
+            "label": "Funding Approvals",
+            "path": "/finance-funding/funding-approvals",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-funding-balance-adjustments",
+            "label": "Balance Adjustments",
+            "path": "/finance-funding/balance-adjustments",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-funding-funding-history",
+            "label": "Funding History",
+            "path": "/finance-funding/funding-history",
+            "icon": "Circle"
+          }
+        ]
+      },
+      {
+        "id": "finance-payments",
+        "label": "Payments & Billing",
+        "path": "/finance-payments",
+        "icon": "FolderTree",
+        "children": [
+          {
+            "id": "finance-payments-all-payments",
+            "label": "All Payments",
+            "path": "/finance-payments/all-payments",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-payments-customer-payments",
+            "label": "Customer Payments",
+            "path": "/finance-payments/customer-payments",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-payments-supplier-payments",
+            "label": "Supplier Payments",
+            "path": "/finance-payments/supplier-payments",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-payments-payment-requests",
+            "label": "Payment Requests",
+            "path": "/finance-payments/payment-requests",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-payments-payment-approvals",
+            "label": "Payment Approvals",
+            "path": "/finance-payments/payment-approvals",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-payments-failed-payments",
+            "label": "Failed Payments",
+            "path": "/finance-payments/failed-payments",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-payments-payment-reconciliation",
+            "label": "Payment Reconciliation",
+            "path": "/finance-payments/payment-reconciliation",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-payments-invoices",
+            "label": "Invoices",
+            "path": "/finance-payments/invoices",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-payments-proforma-invoices",
+            "label": "Proforma Invoices",
+            "path": "/finance-payments/proforma-invoices",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-payments-receipts",
+            "label": "Receipts",
+            "path": "/finance-payments/receipts",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-payments-credit-notes",
+            "label": "Credit Notes",
+            "path": "/finance-payments/credit-notes",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-payments-debit-notes",
+            "label": "Debit Notes",
+            "path": "/finance-payments/debit-notes",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-payments-customer-statements",
+            "label": "Customer Statements",
+            "path": "/finance-payments/customer-statements",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-payments-outstanding-balances",
+            "label": "Outstanding Balances",
+            "path": "/finance-payments/outstanding-balances",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-payments-overdue-invoices",
+            "label": "Overdue Invoices",
+            "path": "/finance-payments/overdue-invoices",
+            "icon": "Circle"
+          }
+        ]
+      },
+      {
+        "id": "finance-banking",
+        "label": "Banking",
+        "path": "/finance-banking",
+        "icon": "Landmark",
+        "children": [
+          {
+            "id": "banks",
+            "label": "Banks",
+            "path": "/banks",
+            "icon": "Landmark"
+          },
+          {
+            "id": "finance-banking-bank-branches",
+            "label": "Bank Branches",
+            "path": "/finance-banking/bank-branches",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-banking-bank-accounts",
+            "label": "Bank Accounts",
+            "path": "/finance-banking/bank-accounts",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-banking-bank-deposits",
+            "label": "Bank Deposits",
+            "path": "/finance-banking/bank-deposits",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-banking-deposit-references",
+            "label": "Deposit References",
+            "path": "/finance-banking/deposit-references",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-banking-bank-transfers",
+            "label": "Bank Transfers",
+            "path": "/finance-banking/bank-transfers",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-banking-bank-statements",
+            "label": "Bank Statements",
+            "path": "/finance-banking/bank-statements",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-banking-bank-reconciliation",
+            "label": "Bank Reconciliation",
+            "path": "/finance-banking/bank-reconciliation",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-banking-payment-providers",
+            "label": "Payment Providers",
+            "path": "/finance-banking/payment-providers",
+            "icon": "Circle"
+          },
+          {
+            "id": "finance-banking-mobile-money-providers",
+            "label": "Mobile Money Providers",
+            "path": "/finance-banking/mobile-money-providers",
+            "icon": "Circle"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "compliance",
+    "label": "Compliance",
+    "icon": "ShieldCheck",
+    "children": [
+      {
+        "id": "compliance-compliance-dashboard",
+        "label": "Compliance Dashboard",
+        "path": "/compliance/compliance-dashboard",
+        "icon": "Circle"
+      },
+      {
+        "id": "compliance-kyc-verification",
+        "label": "KYC Verification",
+        "path": "/compliance/kyc-verification",
+        "icon": "Circle"
+      },
+      {
+        "id": "compliance-kyb-verification",
+        "label": "KYB Verification",
+        "path": "/compliance/kyb-verification",
+        "icon": "Circle"
+      },
+      {
+        "id": "compliance-customer-risk-profiles",
+        "label": "Customer Risk Profiles",
+        "path": "/compliance/customer-risk-profiles",
+        "icon": "Circle"
+      },
+      {
+        "id": "compliance-transaction-monitoring",
+        "label": "Transaction Monitoring",
+        "path": "/compliance/transaction-monitoring",
+        "icon": "Circle"
+      },
+      {
+        "id": "compliance-suspicious-transactions",
+        "label": "Suspicious Transactions",
+        "path": "/compliance/suspicious-transactions",
+        "icon": "Circle"
+      },
+      {
+        "id": "compliance-fuel-variance-investigations",
+        "label": "Fuel Variance Investigations",
+        "path": "/compliance/fuel-variance-investigations",
+        "icon": "Circle"
+      },
+      {
+        "id": "compliance-regulatory-reports",
+        "label": "Regulatory Reports",
+        "path": "/compliance/regulatory-reports",
+        "icon": "Circle"
+      },
+      {
+        "id": "compliance-licence-management",
+        "label": "Licence Management",
+        "path": "/compliance/licence-management",
+        "icon": "Circle"
+      },
+      {
+        "id": "compliance-insurance-management",
+        "label": "Insurance Management",
+        "path": "/compliance/insurance-management",
+        "icon": "Circle"
+      },
+      {
+        "id": "compliance-risk-register",
+        "label": "Risk Register",
+        "path": "/compliance/risk-register",
+        "icon": "Circle"
+      },
+      {
+        "id": "compliance-compliance-inspections",
+        "label": "Compliance Inspections",
+        "path": "/compliance/compliance-inspections",
+        "icon": "Circle"
+      },
+      {
+        "id": "compliance-compliance-incidents",
+        "label": "Compliance Incidents",
+        "path": "/compliance/compliance-incidents",
+        "icon": "Circle"
+      },
+      {
+        "id": "compliance-fraud-reports",
+        "label": "Fraud Reports",
+        "path": "/compliance/fraud-reports",
+        "icon": "Circle"
+      },
+      {
+        "id": "compliance-audit-logs",
+        "label": "Audit Logs",
+        "path": "/compliance/audit-logs",
+        "icon": "Circle"
+      },
+      {
+        "id": "compliance-user-activity-logs",
+        "label": "User Activity Logs",
+        "path": "/compliance/user-activity-logs",
+        "icon": "Circle"
+      },
+      {
+        "id": "compliance-security-events",
+        "label": "Security Events",
+        "path": "/compliance/security-events",
+        "icon": "Circle"
+      },
+      {
+        "id": "compliance-login-attempts",
+        "label": "Login Attempts",
+        "path": "/compliance/login-attempts",
+        "icon": "Circle"
+      }
+    ]
+  },
+  {
+    "id": "reports",
+    "label": "Reports",
+    "icon": "ChartNoAxesCombined",
+    "children": [
+      {
+        "id": "reports-reports-dashboard",
+        "label": "Reports Dashboard",
+        "path": "/reports/reports-dashboard",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-sales-reports",
+        "label": "Sales Reports",
+        "path": "/reports/sales-reports",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-transaction-reports",
+        "label": "Transaction Reports",
+        "path": "/reports/transaction-reports",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-fuel-consumption-reports",
+        "label": "Fuel Consumption Reports",
+        "path": "/reports/fuel-consumption-reports",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-inventory-reports",
+        "label": "Inventory Reports",
+        "path": "/reports/inventory-reports",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-station-reports",
+        "label": "Station Reports",
+        "path": "/reports/station-reports",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-customer-reports",
+        "label": "Customer Reports",
+        "path": "/reports/customer-reports",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-omc-reports",
+        "label": "OMC Reports",
+        "path": "/reports/omc-reports",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-vehicle-reports",
+        "label": "Vehicle Reports",
+        "path": "/reports/vehicle-reports",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-driver-reports",
+        "label": "Driver Reports",
+        "path": "/reports/driver-reports",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-card-reports",
+        "label": "Card Reports",
+        "path": "/reports/card-reports",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-pos-reports",
+        "label": "POS Reports",
+        "path": "/reports/pos-reports",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-delivery-reports",
+        "label": "Delivery Reports",
+        "path": "/reports/delivery-reports",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-payment-reports",
+        "label": "Payment Reports",
+        "path": "/reports/payment-reports",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-financial-reports",
+        "label": "Financial Reports",
+        "path": "/reports/financial-reports",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-reconciliation-reports",
+        "label": "Reconciliation Reports",
+        "path": "/reports/reconciliation-reports",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-variance-reports",
+        "label": "Variance Reports",
+        "path": "/reports/variance-reports",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-compliance-reports",
+        "label": "Compliance Reports",
+        "path": "/reports/compliance-reports",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-audit-reports",
+        "label": "Audit Reports",
+        "path": "/reports/audit-reports",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-performance-analytics",
+        "label": "Performance Analytics",
+        "path": "/reports/performance-analytics",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-forecasting",
+        "label": "Forecasting",
+        "path": "/reports/forecasting",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-kpi-dashboard",
+        "label": "KPI Dashboard",
+        "path": "/reports/kpi-dashboard",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-custom-report-builder",
+        "label": "Custom Report Builder",
+        "path": "/reports/custom-report-builder",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-scheduled-reports",
+        "label": "Scheduled Reports",
+        "path": "/reports/scheduled-reports",
+        "icon": "Circle"
+      },
+      {
+        "id": "reports-download-centre",
+        "label": "Download Centre",
+        "path": "/reports/download-centre",
+        "icon": "Circle"
+      }
+    ]
+  },
+  {
+    "id": "administration",
+    "label": "Administration",
+    "icon": "Settings",
+    "children": [
+      {
+        "id": "administration-all-users",
+        "label": "All Users",
+        "path": "/administration/all-users",
+        "icon": "Circle"
+      },
+      {
+        "id": "administration-roles",
+        "label": "Roles",
+        "path": "/administration/roles",
+        "icon": "Circle"
+      },
+      {
+        "id": "administration-permissions",
+        "label": "Permissions",
+        "path": "/administration/permissions",
+        "icon": "Circle"
+      },
+      {
+        "id": "administration-permission-groups",
+        "label": "Permission Groups",
+        "path": "/administration/permission-groups",
+        "icon": "Circle"
+      },
+      {
+        "id": "administration-menu-permissions",
+        "label": "Menu Permissions",
+        "path": "/administration/menu-permissions",
+        "icon": "Circle"
+      },
+      {
+        "id": "administration-page-permissions",
+        "label": "Page Permissions",
+        "path": "/administration/page-permissions",
+        "icon": "Circle"
+      },
+      {
+        "id": "administration-route-permissions",
+        "label": "Route Permissions",
+        "path": "/administration/route-permissions",
+        "icon": "Circle"
+      },
+      {
+        "id": "administration-data-scope-permissions",
+        "label": "Data-Scope Permissions",
+        "path": "/administration/data-scope-permissions",
+        "icon": "Circle"
+      },
+      {
+        "id": "administration-user-sessions",
+        "label": "User Sessions",
+        "path": "/administration/user-sessions",
+        "icon": "Circle"
+      },
+      {
+        "id": "administration-login-history",
+        "label": "Login History",
+        "path": "/administration/login-history",
+        "icon": "Circle"
+      },
+      {
+        "id": "administration-countries",
+        "label": "Countries",
+        "path": "/administration/countries",
+        "icon": "Circle"
+      },
+      {
+        "id": "administration-provinces",
+        "label": "Provinces",
+        "path": "/administration/provinces",
+        "icon": "Circle"
+      },
+      {
+        "id": "administration-districts",
+        "label": "Districts",
+        "path": "/administration/districts",
+        "icon": "Circle"
+      },
+      {
+        "id": "administration-cities-and-towns",
+        "label": "Cities and Towns",
+        "path": "/administration/cities-and-towns",
+        "icon": "Circle"
+      },
+      {
+        "id": "administration-station-regions",
+        "label": "Station Regions",
+        "path": "/administration/station-regions",
+        "icon": "Circle"
+      }
+    ]
+  },
+  {
+    "id": "settings",
+    "label": "Settings",
+    "icon": "SlidersHorizontal",
+    "children": [
+      {
+        "id": "settings-general",
+        "label": "General Settings",
+        "path": "/settings-general",
+        "icon": "FolderTree",
+        "children": [
+          {
+            "id": "settings-general-system-information",
+            "label": "System Information",
+            "path": "/settings-general/system-information",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-general-company-profile",
+            "label": "Company Profile",
+            "path": "/settings-general/company-profile",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-general-branding",
+            "label": "Branding",
+            "path": "/settings-general/branding",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-general-logo-and-favicon",
+            "label": "Logo and Favicon",
+            "path": "/settings-general/logo-and-favicon",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-general-languages",
+            "label": "Languages",
+            "path": "/settings-general/languages",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-general-currency",
+            "label": "Currency",
+            "path": "/settings-general/currency",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-general-date-and-time",
+            "label": "Date and Time",
+            "path": "/settings-general/date-and-time",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-general-numbering-sequences",
+            "label": "Numbering Sequences",
+            "path": "/settings-general/numbering-sequences",
+            "icon": "Circle"
+          }
+        ]
+      },
+      {
+        "id": "settings-interface",
+        "label": "Interface Settings",
+        "path": "/settings-interface",
+        "icon": "FolderTree",
+        "children": [
+          {
+            "id": "settings-interface-theme-settings",
+            "label": "Theme Settings",
+            "path": "/settings-interface/theme-settings",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-interface-layout-settings",
+            "label": "Layout Settings",
+            "path": "/settings-interface/layout-settings",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-interface-mac-sidebar-settings",
+            "label": "Mac Sidebar Settings",
+            "path": "/settings-interface/mac-sidebar-settings",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-interface-windows-navbar-settings",
+            "label": "Windows Navbar Settings",
+            "path": "/settings-interface/windows-navbar-settings",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-interface-default-layout",
+            "label": "Default Layout",
+            "path": "/settings-interface/default-layout",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-interface-sidebar-behaviour",
+            "label": "Sidebar Behaviour",
+            "path": "/settings-interface/sidebar-behaviour",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-interface-menu-appearance",
+            "label": "Menu Appearance",
+            "path": "/settings-interface/menu-appearance",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-interface-dashboard-preferences",
+            "label": "Dashboard Preferences",
+            "path": "/settings-interface/dashboard-preferences",
+            "icon": "Circle"
+          }
+        ]
+      },
+      {
+        "id": "settings-operational",
+        "label": "Operational Settings",
+        "path": "/settings-operational",
+        "icon": "FolderTree",
+        "children": [
+          {
+            "id": "settings-operational-fuel-settings",
+            "label": "Fuel Settings",
+            "path": "/settings-operational/fuel-settings",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-operational-inventory-settings",
+            "label": "Inventory Settings",
+            "path": "/settings-operational/inventory-settings",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-operational-station-settings",
+            "label": "Station Settings",
+            "path": "/settings-operational/station-settings",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-operational-transaction-settings",
+            "label": "Transaction Settings",
+            "path": "/settings-operational/transaction-settings",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-operational-payment-settings",
+            "label": "Payment Settings",
+            "path": "/settings-operational/payment-settings",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-operational-pricing-settings",
+            "label": "Pricing Settings",
+            "path": "/settings-operational/pricing-settings",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-operational-approval-workflows",
+            "label": "Approval Workflows",
+            "path": "/settings-operational/approval-workflows",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-operational-document-settings",
+            "label": "Document Settings",
+            "path": "/settings-operational/document-settings",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-operational-notification-settings",
+            "label": "Notification Settings",
+            "path": "/settings-operational/notification-settings",
+            "icon": "Circle"
+          }
+        ]
+      },
+      {
+        "id": "settings-security",
+        "label": "Security Settings",
+        "path": "/settings-security",
+        "icon": "FolderTree",
+        "children": [
+          {
+            "id": "settings-security-password-policies",
+            "label": "Password Policies",
+            "path": "/settings-security/password-policies",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-security-two-factor-authentication",
+            "label": "Two-Factor Authentication",
+            "path": "/settings-security/two-factor-authentication",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-security-session-settings",
+            "label": "Session Settings",
+            "path": "/settings-security/session-settings",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-security-login-restrictions",
+            "label": "Login Restrictions",
+            "path": "/settings-security/login-restrictions",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-security-api-security",
+            "label": "API Security",
+            "path": "/settings-security/api-security",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-security-rate-limits",
+            "label": "Rate Limits",
+            "path": "/settings-security/rate-limits",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-security-feature-flags",
+            "label": "Feature Flags",
+            "path": "/settings-security/feature-flags",
+            "icon": "Circle"
+          }
+        ]
+      },
+      {
+        "id": "settings-integrations",
+        "label": "Integrations",
+        "path": "/settings-integrations",
+        "icon": "FolderTree",
+        "children": [
+          {
+            "id": "settings-integrations-banking-integrations",
+            "label": "Banking Integrations",
+            "path": "/settings-integrations/banking-integrations",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-integrations-mobile-money-integrations",
+            "label": "Mobile Money Integrations",
+            "path": "/settings-integrations/mobile-money-integrations",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-integrations-payment-gateways",
+            "label": "Payment Gateways",
+            "path": "/settings-integrations/payment-gateways",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-integrations-pos-integrations",
+            "label": "POS Integrations",
+            "path": "/settings-integrations/pos-integrations",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-integrations-fuel-pump-integrations",
+            "label": "Fuel Pump Integrations",
+            "path": "/settings-integrations/fuel-pump-integrations",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-integrations-gps-integrations",
+            "label": "GPS Integrations",
+            "path": "/settings-integrations/gps-integrations",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-integrations-email-integration",
+            "label": "Email Integration",
+            "path": "/settings-integrations/email-integration",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-integrations-sms-integration",
+            "label": "SMS Integration",
+            "path": "/settings-integrations/sms-integration",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-integrations-accounting-integration",
+            "label": "Accounting Integration",
+            "path": "/settings-integrations/accounting-integration",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-integrations-api-clients",
+            "label": "API Clients",
+            "path": "/settings-integrations/api-clients",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-integrations-api-credentials",
+            "label": "API Credentials",
+            "path": "/settings-integrations/api-credentials",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-integrations-webhooks",
+            "label": "Webhooks",
+            "path": "/settings-integrations/webhooks",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-integrations-integration-logs",
+            "label": "Integration Logs",
+            "path": "/settings-integrations/integration-logs",
+            "icon": "Circle"
+          }
+        ]
+      },
+      {
+        "id": "settings-system",
+        "label": "System Management",
+        "path": "/settings-system",
+        "icon": "FolderTree",
+        "children": [
+          {
+            "id": "settings-system-system-health",
+            "label": "System Health",
+            "path": "/settings-system/system-health",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-system-service-status",
+            "label": "Service Status",
+            "path": "/settings-system/service-status",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-system-database-status",
+            "label": "Database Status",
+            "path": "/settings-system/database-status",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-system-cache-status",
+            "label": "Cache Status",
+            "path": "/settings-system/cache-status",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-system-background-jobs",
+            "label": "Background Jobs",
+            "path": "/settings-system/background-jobs",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-system-error-logs",
+            "label": "Error Logs",
+            "path": "/settings-system/error-logs",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-system-application-logs",
+            "label": "Application Logs",
+            "path": "/settings-system/application-logs",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-system-storage-usage",
+            "label": "Storage Usage",
+            "path": "/settings-system/storage-usage",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-system-data-imports",
+            "label": "Data Imports",
+            "path": "/settings-system/data-imports",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-system-data-exports",
+            "label": "Data Exports",
+            "path": "/settings-system/data-exports",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-system-backup-management",
+            "label": "Backup Management",
+            "path": "/settings-system/backup-management",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-system-restore-management",
+            "label": "Restore Management",
+            "path": "/settings-system/restore-management",
+            "icon": "Circle"
+          },
+          {
+            "id": "settings-system-seed-data",
+            "label": "Seed Data",
+            "path": "/settings-system/seed-data",
+            "icon": "Circle"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "my-account",
+    "label": "My Account",
+    "icon": "CircleUserRound",
+    "children": [
+      {
+        "id": "my-account-my-dashboard",
+        "label": "My Dashboard",
+        "path": "/my-account/my-dashboard",
+        "icon": "Circle"
+      },
+      {
+        "id": "my-account-my-profile",
+        "label": "My Profile",
+        "path": "/my-account/my-profile",
+        "icon": "Circle"
+      },
+      {
+        "id": "my-account-my-organization",
+        "label": "My Organization",
+        "path": "/my-account/my-organization",
+        "icon": "Circle"
+      },
+      {
+        "id": "my-account-my-vehicles",
+        "label": "My Vehicles",
+        "path": "/my-account/my-vehicles",
+        "icon": "Circle"
+      },
+      {
+        "id": "my-account-my-drivers",
+        "label": "My Drivers",
+        "path": "/my-account/my-drivers",
+        "icon": "Circle"
+      },
+      {
+        "id": "my-account-my-fuel-cards",
+        "label": "My Fuel Cards",
+        "path": "/my-account/my-fuel-cards",
+        "icon": "Circle"
+      },
+      {
+        "id": "my-account-my-fuel-requests",
+        "label": "My Fuel Requests",
+        "path": "/my-account/my-fuel-requests",
+        "icon": "Circle"
+      },
+      {
+        "id": "my-account-my-orders",
+        "label": "My Orders",
+        "path": "/my-account/my-orders",
+        "icon": "Circle"
+      },
+      {
+        "id": "my-account-my-deliveries",
+        "label": "My Deliveries",
+        "path": "/my-account/my-deliveries",
+        "icon": "Circle"
+      },
+      {
+        "id": "my-account-my-transactions",
+        "label": "My Transactions",
+        "path": "/my-account/my-transactions",
+        "icon": "Circle"
+      },
+      {
+        "id": "my-account-my-payments",
+        "label": "My Payments",
+        "path": "/my-account/my-payments",
+        "icon": "Circle"
+      },
+      {
+        "id": "my-account-my-invoices",
+        "label": "My Invoices",
+        "path": "/my-account/my-invoices",
+        "icon": "Circle"
+      },
+      {
+        "id": "my-account-my-statements",
+        "label": "My Statements",
+        "path": "/my-account/my-statements",
+        "icon": "Circle"
+      },
+      {
+        "id": "my-account-my-documents",
+        "label": "My Documents",
+        "path": "/my-account/my-documents",
+        "icon": "Circle"
+      },
+      {
+        "id": "my-account-my-notifications",
+        "label": "My Notifications",
+        "path": "/my-account/my-notifications",
+        "icon": "Circle"
+      },
+      {
+        "id": "my-account-my-support-tickets",
+        "label": "My Support Tickets",
+        "path": "/my-account/my-support-tickets",
+        "icon": "Circle"
+      },
+      {
+        "id": "my-account-change-password",
+        "label": "Change Password",
+        "path": "/my-account/change-password",
+        "icon": "Circle"
+      },
+      {
+        "id": "my-account-security-settings",
+        "label": "Security Settings",
+        "path": "/my-account/security-settings",
+        "icon": "Circle"
+      },
+      {
+        "id": "my-account-logout",
+        "label": "Logout",
+        "path": "/my-account/logout",
+        "icon": "Circle"
+      }
+    ]
+  }
+]

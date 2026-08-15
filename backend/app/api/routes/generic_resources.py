@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.core.errors import AppError, NotFoundError
 from app.database.session import get_db
 from app.models.audit import AuditLog
-from app.models.identity import User
+from app.models.resources import User
 from app.models.resources import GenericRecord
 from app.permissions.dependencies import get_current_user
 from app.schemas.common import response
@@ -26,7 +26,7 @@ LOCATION_PARENTS = {
 
 
 def authorize(user: User, resource: str, operation: str) -> None:
-    if user.is_superuser:
+    if user.is_super_user:
         return
     if resource.startswith("administration/"):
         code = f"administration.{resource.split('/')[-1]}.{operation}"

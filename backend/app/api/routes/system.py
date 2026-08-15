@@ -5,7 +5,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.database.session import get_db
-from app.models.identity import User
+from app.models.resources import User
 from app.models.resources import Account, GenericRecord, Station, TestItem
 from app.permissions.dependencies import get_current_user
 from app.schemas.common import response
