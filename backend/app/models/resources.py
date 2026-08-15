@@ -569,16 +569,10 @@ class GenericRecord(ResourceMixin, Base):
     name: Mapped[str] = mapped_column(String(200), index=True)
     code: Mapped[str] = mapped_column(String(80), default="", index=True)
     description: Mapped[str] = mapped_column(Text, default="")
-    parent_id: Mapped[int | None] = mapped_column(
-        ForeignKey("generic_records.id"), nullable=True, index=True
-    )
     data: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
-    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
-
-    parent: Mapped[Optional["GenericRecord"]] = relationship(
-        remote_side="GenericRecord.id", back_populates="children"
-    )
-    children: Mapped[list["GenericRecord"]] = relationship(back_populates="parent")
+    country_id: Mapped[int | None] = mapped_column(ForeignKey("generic_records.id"), nullable=True, index=True)
+    province_id: Mapped[int | None] = mapped_column(ForeignKey("generic_records.id"), nullable=True, index=True)
+    district_id: Mapped[int | None] = mapped_column(ForeignKey("generic_records.id"), nullable=True, index=True)
 
     __table_args__ = (
         UniqueConstraint("resource_path", "code", name="uq_generic_resource_code"),
