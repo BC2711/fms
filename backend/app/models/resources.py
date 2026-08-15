@@ -84,10 +84,6 @@ class TownCity(ResourceMixin, Base):
     )
 
 
-class Menu(ResourceMixin, Base):
-    __tablename__ = "menus"
-
-
 class UserType(ResourceMixin, Base):
     __tablename__ = "user_types"
 
@@ -98,12 +94,14 @@ class UserType(ResourceMixin, Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
 
     # Relationships
-    users: Mapped[list["User"]] = relationship(back_populates="user_type")
+    users: Mapped[list["User"]] = relationship(
+        back_populates="user_type", foreign_keys="User.user_type_id"
+    )
     menus: Mapped[list["Menu"]] = relationship(
-        secondary="assigned_menus_and_permissions", back_populates="user_types"
+        secondary="assigned_menus_and_permissions", back_populates="user_types", viewonly=True
     )
     assigned_permissions: Mapped[list["Permissions"]] = relationship(
-        secondary="assigned_menus_and_permissions", back_populates="user_types"
+        secondary="assigned_menus_and_permissions", back_populates="user_types", viewonly=True
     )
 
 
@@ -116,12 +114,14 @@ class Role(ResourceMixin, Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
 
     # Relationships
-    users: Mapped[list["User"]] = relationship(back_populates="role")
+    users: Mapped[list["User"]] = relationship(
+        back_populates="role", foreign_keys="User.role_id"
+    )
     menus: Mapped[list["Menu"]] = relationship(
-        secondary="assigned_menus_and_permissions", back_populates="roles"
+        secondary="assigned_menus_and_permissions", back_populates="roles", viewonly=True
     )
     assigned_permissions: Mapped[list["Permissions"]] = relationship(
-        secondary="assigned_menus_and_permissions", back_populates="roles"
+        secondary="assigned_menus_and_permissions", back_populates="roles", viewonly=True
     )
 
 
@@ -138,13 +138,13 @@ class Permissions(ResourceMixin, Base):
 
     # Relationships
     menus: Mapped[list["Menu"]] = relationship(
-        secondary="assigned_menus_and_permissions", back_populates="permissions"
+        secondary="assigned_menus_and_permissions", back_populates="permissions", viewonly=True
     )
     roles: Mapped[list["Role"]] = relationship(
-        secondary="assigned_menus_and_permissions", back_populates="permissions"
+        secondary="assigned_menus_and_permissions", back_populates="assigned_permissions", viewonly=True
     )
     user_types: Mapped[list["UserType"]] = relationship(
-        secondary="assigned_menus_and_permissions", back_populates="permissions"
+        secondary="assigned_menus_and_permissions", back_populates="assigned_permissions", viewonly=True
     )
 
 
@@ -165,13 +165,13 @@ class Menu(ResourceMixin, Base):
     # Relationships
     parent: Mapped["Menu"] = relationship(remote_side="Menu.id", backref="children")
     permissions: Mapped[list["Permissions"]] = relationship(
-        secondary="assigned_menus_and_permissions", back_populates="menus"
+        secondary="assigned_menus_and_permissions", back_populates="menus", viewonly=True
     )
     roles: Mapped[list["Role"]] = relationship(
-        secondary="assigned_menus_and_permissions", back_populates="menus"
+        secondary="assigned_menus_and_permissions", back_populates="menus", viewonly=True
     )
     user_types: Mapped[list["UserType"]] = relationship(
-        secondary="assigned_menus_and_permissions", back_populates="menus"
+        secondary="assigned_menus_and_permissions", back_populates="menus", viewonly=True
     )
 
 
@@ -200,7 +200,7 @@ class AssignedMenusAndPermissions(ResourceMixin, Base):
     permission: Mapped["Permissions"] = relationship()
     role: Mapped["Role"] = relationship()
     user_type: Mapped["UserType"] = relationship()
-    user: Mapped["User"] = relationship()
+    user: Mapped["User"] = relationship(foreign_keys=[user_id])
 
     __table_args__ = (
         Index(
@@ -256,9 +256,13 @@ class User(ResourceMixin, Base):
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     # Relationships
-    user_type: Mapped["UserType"] = relationship(back_populates="users")
-    role: Mapped["Role"] = relationship(back_populates="users")
-    accounts: Mapped[list["Account"]] = relationship(back_populates="user")
+    user_type: Mapped["UserType"] = relationship(
+        back_populates="users", foreign_keys=[user_type_id]
+    )
+    role: Mapped["Role"] = relationship(back_populates="users", foreign_keys=[role_id])
+    accounts: Mapped[list["Account"]] = relationship(
+        back_populates="user", foreign_keys="Account.user_id"
+    )
 
     __table_args__ = (
         Index("idx_user_name", "first_name", "last_name"),
@@ -283,7 +287,7 @@ class Account(ResourceMixin, Base):
     details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
 
     # Relationships
-    user: Mapped["User"] = relationship(back_populates="accounts")
+    user: Mapped["User"] = relationship(back_populates="accounts", foreign_keys=[user_id])
     station_groups: Mapped[list["StationGroup"]] = relationship(
         back_populates="oil_marketing_company"
     )
@@ -560,3 +564,1316 @@ class Stock(ResourceMixin, Base):
             "transaction_date",
         ),
     )
+
+
+# Generic records back configuration-driven CRUD pages which have not yet been
+# promoted to a strongly typed domain model.  Keeping the resource path in the
+# unique key prevents codes used by different screens from colliding.
+class GenericRecord(ResourceMixin, Base):
+    __tablename__ = "generic_records"
+
+    resource_path: Mapped[str] = mapped_column(String(160), index=True)
+    name: Mapped[str] = mapped_column(String(200), index=True)
+    code: Mapped[str] = mapped_column(String(80), default="", index=True)
+    description: Mapped[str] = mapped_column(Text, default="")
+    parent_id: Mapped[int | None] = mapped_column(
+        ForeignKey("generic_records.id"), nullable=True, index=True
+    )
+    data: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    parent: Mapped[Optional["GenericRecord"]] = relationship(
+        remote_side="GenericRecord.id", back_populates="children"
+    )
+    children: Mapped[list["GenericRecord"]] = relationship(back_populates="parent")
+
+    __table_args__ = (
+        UniqueConstraint("resource_path", "code", name="uq_generic_resource_code"),
+        Index("idx_generic_resource_status", "resource_path", "status"),
+    )
+
+
+class TestItem(ResourceMixin, Base):
+    """Small persisted resource used by the system readiness endpoint."""
+
+    __tablename__ = "test_items"
+
+    name: Mapped[str] = mapped_column(String(120), index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+
+class StationRegion(ResourceMixin, Base):
+    __tablename__ = "station_regions"
+
+    name: Mapped[str] = mapped_column(String(120), unique=True, index=True)
+    code: Mapped[str] = mapped_column(String(30), unique=True, index=True)
+    province_id: Mapped[int | None] = mapped_column(
+        ForeignKey("provinces.id"), nullable=True, index=True
+    )
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    province: Mapped[Optional["Province"]] = relationship()
+    stations: Mapped[list["StationRegionAssignment"]] = relationship(
+        back_populates="region"
+    )
+
+
+class StationRegionAssignment(ResourceMixin, Base):
+    __tablename__ = "station_region_assignments"
+
+    region_id: Mapped[int] = mapped_column(ForeignKey("station_regions.id"), index=True)
+    station_id: Mapped[int] = mapped_column(ForeignKey("stations.id"), index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    region: Mapped["StationRegion"] = relationship(back_populates="stations")
+    station: Mapped["Station"] = relationship()
+
+    __table_args__ = (
+        UniqueConstraint("region_id", "station_id", name="uq_region_station"),
+    )
+
+
+class StationAttendant(ResourceMixin, Base):
+    __tablename__ = "station_attendants"
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=True, index=True)
+    employee_number: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    verification_status: Mapped[str] = mapped_column(
+        String(32), default="pending", index=True
+    )
+    pin_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    user: Mapped["User"] = relationship(foreign_keys=[user_id])
+    assignments: Mapped[list["AttendantAssignment"]] = relationship(
+        back_populates="attendant"
+    )
+
+
+class AttendantAssignment(ResourceMixin, Base):
+    __tablename__ = "attendant_assignments"
+
+    attendant_id: Mapped[int] = mapped_column(
+        ForeignKey("station_attendants.id"), index=True
+    )
+    station_id: Mapped[int] = mapped_column(ForeignKey("stations.id"), index=True)
+    assignment_type: Mapped[str] = mapped_column(String(30), default="station", index=True)
+    pump_number: Mapped[str] = mapped_column(String(30), default="")
+    shift_name: Mapped[str] = mapped_column(String(80), default="")
+    starts_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, index=True)
+    ends_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    attendant: Mapped["StationAttendant"] = relationship(back_populates="assignments")
+    station: Mapped["Station"] = relationship()
+
+    __table_args__ = (
+        Index("idx_attendant_assignment_period", "attendant_id", "starts_at", "ends_at"),
+    )
+
+
+class Depot(ResourceMixin, Base):
+    __tablename__ = "depots"
+
+    name: Mapped[str] = mapped_column(String(160), index=True)
+    code: Mapped[str] = mapped_column(String(40), unique=True, index=True)
+    account_id: Mapped[int | None] = mapped_column(
+        ForeignKey("accounts.id"), nullable=True, index=True
+    )
+    province_id: Mapped[int | None] = mapped_column(
+        ForeignKey("provinces.id"), nullable=True, index=True
+    )
+    district_id: Mapped[int | None] = mapped_column(
+        ForeignKey("districts.id"), nullable=True, index=True
+    )
+    address: Mapped[str] = mapped_column(Text, default="")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    account: Mapped[Optional["Account"]] = relationship()
+    province: Mapped[Optional["Province"]] = relationship()
+    district: Mapped[Optional["District"]] = relationship()
+    tanks: Mapped[list["StorageTank"]] = relationship(back_populates="depot")
+
+
+class Warehouse(ResourceMixin, Base):
+    __tablename__ = "warehouses"
+
+    name: Mapped[str] = mapped_column(String(160), index=True)
+    code: Mapped[str] = mapped_column(String(40), unique=True, index=True)
+    depot_id: Mapped[int | None] = mapped_column(
+        ForeignKey("depots.id"), nullable=True, index=True
+    )
+    station_id: Mapped[int | None] = mapped_column(
+        ForeignKey("stations.id"), nullable=True, index=True
+    )
+    address: Mapped[str] = mapped_column(Text, default="")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    depot: Mapped[Optional["Depot"]] = relationship()
+    station: Mapped[Optional["Station"]] = relationship()
+
+
+class StorageTank(ResourceMixin, Base):
+    __tablename__ = "storage_tanks"
+
+    code: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    station_id: Mapped[int | None] = mapped_column(
+        ForeignKey("stations.id"), nullable=True, index=True
+    )
+    depot_id: Mapped[int | None] = mapped_column(
+        ForeignKey("depots.id"), nullable=True, index=True
+    )
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), index=True)
+    capacity: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    current_quantity: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    station: Mapped[Optional["Station"]] = relationship()
+    depot: Mapped[Optional["Depot"]] = relationship(back_populates="tanks")
+    product: Mapped["Product"] = relationship()
+    readings: Mapped[list["TankReading"]] = relationship(back_populates="tank")
+
+
+class StockMovement(ResourceMixin, Base):
+    __tablename__ = "stock_movements"
+
+    movement_type: Mapped[str] = mapped_column(String(30), index=True)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), index=True)
+    source_station_id: Mapped[int | None] = mapped_column(ForeignKey("stations.id"), nullable=True, index=True)
+    destination_station_id: Mapped[int | None] = mapped_column(ForeignKey("stations.id"), nullable=True, index=True)
+    source_depot_id: Mapped[int | None] = mapped_column(ForeignKey("depots.id"), nullable=True, index=True)
+    destination_depot_id: Mapped[int | None] = mapped_column(ForeignKey("depots.id"), nullable=True, index=True)
+    quantity: Mapped[Decimal] = mapped_column(Numeric(18, 2))
+    reference_number: Mapped[str] = mapped_column(String(80), default="", index=True)
+    occurred_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    reason: Mapped[str] = mapped_column(Text, default="")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    product: Mapped["Product"] = relationship()
+    source_station: Mapped[Optional["Station"]] = relationship(foreign_keys=[source_station_id])
+    destination_station: Mapped[Optional["Station"]] = relationship(foreign_keys=[destination_station_id])
+    source_depot: Mapped[Optional["Depot"]] = relationship(foreign_keys=[source_depot_id])
+    destination_depot: Mapped[Optional["Depot"]] = relationship(foreign_keys=[destination_depot_id])
+
+    __table_args__ = (Index("idx_stock_movement_product_date", "product_id", "occurred_at"),)
+
+
+class TankReading(ResourceMixin, Base):
+    __tablename__ = "tank_readings"
+
+    tank_id: Mapped[int] = mapped_column(ForeignKey("storage_tanks.id"), index=True)
+    reading_type: Mapped[str] = mapped_column(String(30), default="dip", index=True)
+    quantity: Mapped[Decimal] = mapped_column(Numeric(18, 2))
+    water_level: Mapped[Decimal | None] = mapped_column(Numeric(12, 2), nullable=True)
+    temperature: Mapped[Decimal | None] = mapped_column(Numeric(8, 2), nullable=True)
+    read_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    recorded_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    tank: Mapped["StorageTank"] = relationship(back_populates="readings")
+    recorded_by: Mapped[Optional["User"]] = relationship(foreign_keys=[recorded_by_id])
+
+
+class MeterReading(ResourceMixin, Base):
+    __tablename__ = "meter_readings"
+
+    station_id: Mapped[int] = mapped_column(ForeignKey("stations.id"), index=True)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), index=True)
+    pump_number: Mapped[str] = mapped_column(String(30), index=True)
+    reading: Mapped[Decimal] = mapped_column(Numeric(18, 2))
+    read_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    station: Mapped["Station"] = relationship()
+    product: Mapped["Product"] = relationship()
+
+
+class PhysicalStockCount(ResourceMixin, Base):
+    __tablename__ = "physical_stock_counts"
+
+    station_id: Mapped[int | None] = mapped_column(ForeignKey("stations.id"), nullable=True, index=True)
+    depot_id: Mapped[int | None] = mapped_column(ForeignKey("depots.id"), nullable=True, index=True)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), index=True)
+    counted_quantity: Mapped[Decimal] = mapped_column(Numeric(18, 2))
+    system_quantity: Mapped[Decimal] = mapped_column(Numeric(18, 2))
+    counted_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    counted_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    station: Mapped[Optional["Station"]] = relationship()
+    depot: Mapped[Optional["Depot"]] = relationship()
+    product: Mapped["Product"] = relationship()
+    counted_by: Mapped[Optional["User"]] = relationship(foreign_keys=[counted_by_id])
+
+
+class InventoryReconciliation(ResourceMixin, Base):
+    __tablename__ = "inventory_reconciliations"
+
+    station_id: Mapped[int | None] = mapped_column(ForeignKey("stations.id"), nullable=True, index=True)
+    depot_id: Mapped[int | None] = mapped_column(ForeignKey("depots.id"), nullable=True, index=True)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), index=True)
+    period_start: Mapped[date] = mapped_column(Date, index=True)
+    period_end: Mapped[date] = mapped_column(Date, index=True)
+    expected_quantity: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    actual_quantity: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    variance_quantity: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    variance_value: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    verification_status: Mapped[str] = mapped_column(String(32), default="pending", index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    station: Mapped[Optional["Station"]] = relationship()
+    depot: Mapped[Optional["Depot"]] = relationship()
+    product: Mapped["Product"] = relationship()
+
+
+class InventoryAlert(ResourceMixin, Base):
+    __tablename__ = "inventory_alerts"
+
+    inventory_id: Mapped[int] = mapped_column(ForeignKey("inventories.id"), index=True)
+    alert_type: Mapped[str] = mapped_column(String(40), default="low_stock", index=True)
+    threshold: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    observed_quantity: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    acknowledged_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    acknowledged_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    inventory: Mapped["Inventory"] = relationship()
+    acknowledged_by: Mapped[Optional["User"]] = relationship(foreign_keys=[acknowledged_by_id])
+
+
+class InventoryValuation(ResourceMixin, Base):
+    __tablename__ = "inventory_valuations"
+
+    station_id: Mapped[int | None] = mapped_column(ForeignKey("stations.id"), nullable=True, index=True)
+    depot_id: Mapped[int | None] = mapped_column(ForeignKey("depots.id"), nullable=True, index=True)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), index=True)
+    valuation_date: Mapped[date] = mapped_column(Date, index=True)
+    quantity: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    unit_cost: Mapped[Decimal] = mapped_column(Numeric(18, 4), default=0)
+    total_value: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    method: Mapped[str] = mapped_column(String(30), default="weighted_average", index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    station: Mapped[Optional["Station"]] = relationship()
+    depot: Mapped[Optional["Depot"]] = relationship()
+    product: Mapped["Product"] = relationship()
+
+    __table_args__ = (UniqueConstraint("station_id", "depot_id", "product_id", "valuation_date", name="uq_inventory_valuation_scope_date"),)
+
+
+class FuelRequest(ResourceMixin, Base):
+    __tablename__ = "fuel_requests"
+
+    request_number: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"), index=True)
+    requested_by_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    station_id: Mapped[int | None] = mapped_column(ForeignKey("stations.id"), nullable=True, index=True)
+    required_date: Mapped[date | None] = mapped_column(Date, nullable=True, index=True)
+    total_amount: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    currency: Mapped[str] = mapped_column(String(3), default="ZMW")
+    notes: Mapped[str] = mapped_column(Text, default="")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    account: Mapped["Account"] = relationship()
+    requested_by: Mapped["User"] = relationship(foreign_keys=[requested_by_id])
+    station: Mapped[Optional["Station"]] = relationship()
+    items: Mapped[list["FuelRequestItem"]] = relationship(back_populates="request")
+    approvals: Mapped[list["Approval"]] = relationship(back_populates="fuel_request")
+    orders: Mapped[list["FuelOrder"]] = relationship(back_populates="fuel_request")
+
+
+class FuelRequestItem(ResourceMixin, Base):
+    __tablename__ = "fuel_request_items"
+
+    request_id: Mapped[int] = mapped_column(ForeignKey("fuel_requests.id"), index=True)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), index=True)
+    quantity: Mapped[Decimal] = mapped_column(Numeric(18, 2))
+    unit_price: Mapped[Decimal | None] = mapped_column(Numeric(18, 4), nullable=True)
+    allocated_quantity: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    request: Mapped["FuelRequest"] = relationship(back_populates="items")
+    product: Mapped["Product"] = relationship()
+
+    __table_args__ = (UniqueConstraint("request_id", "product_id", name="uq_request_product"),)
+
+
+class FuelOrder(ResourceMixin, Base):
+    __tablename__ = "fuel_orders"
+
+    order_number: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    fuel_request_id: Mapped[int | None] = mapped_column(ForeignKey("fuel_requests.id"), nullable=True, index=True)
+    account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"), index=True)
+    station_id: Mapped[int | None] = mapped_column(ForeignKey("stations.id"), nullable=True, index=True)
+    order_date: Mapped[date] = mapped_column(Date, default=date.today, index=True)
+    expected_delivery_date: Mapped[date | None] = mapped_column(Date, nullable=True, index=True)
+    total_amount: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    currency: Mapped[str] = mapped_column(String(3), default="ZMW")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    fuel_request: Mapped[Optional["FuelRequest"]] = relationship(back_populates="orders")
+    account: Mapped["Account"] = relationship()
+    station: Mapped[Optional["Station"]] = relationship()
+    items: Mapped[list["FuelOrderItem"]] = relationship(back_populates="order")
+    approvals: Mapped[list["Approval"]] = relationship(back_populates="fuel_order")
+    deliveries: Mapped[list["Delivery"]] = relationship(back_populates="order")
+
+
+class FuelOrderItem(ResourceMixin, Base):
+    __tablename__ = "fuel_order_items"
+
+    order_id: Mapped[int] = mapped_column(ForeignKey("fuel_orders.id"), index=True)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), index=True)
+    quantity: Mapped[Decimal] = mapped_column(Numeric(18, 2))
+    unit_price: Mapped[Decimal] = mapped_column(Numeric(18, 4), default=0)
+    delivered_quantity: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    order: Mapped["FuelOrder"] = relationship(back_populates="items")
+    product: Mapped["Product"] = relationship()
+
+
+class Approval(ResourceMixin, Base):
+    __tablename__ = "approvals"
+
+    fuel_request_id: Mapped[int | None] = mapped_column(ForeignKey("fuel_requests.id"), nullable=True, index=True)
+    fuel_order_id: Mapped[int | None] = mapped_column(ForeignKey("fuel_orders.id"), nullable=True, index=True)
+    approver_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
+    approval_type: Mapped[str] = mapped_column(String(40), index=True)
+    sequence: Mapped[int] = mapped_column(Integer, default=1)
+    decision: Mapped[str] = mapped_column(String(30), default="pending", index=True)
+    decided_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    comments: Mapped[str] = mapped_column(Text, default="")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    fuel_request: Mapped[Optional["FuelRequest"]] = relationship(back_populates="approvals")
+    fuel_order: Mapped[Optional["FuelOrder"]] = relationship(back_populates="approvals")
+    approver: Mapped[Optional["User"]] = relationship(foreign_keys=[approver_id])
+
+
+class FuelAllocation(ResourceMixin, Base):
+    __tablename__ = "fuel_allocations"
+
+    allocation_number: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"), index=True)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), index=True)
+    vehicle_id: Mapped[int | None] = mapped_column(ForeignKey("vehicles.id"), nullable=True, index=True)
+    driver_id: Mapped[int | None] = mapped_column(ForeignKey("drivers.id"), nullable=True, index=True)
+    allocated_quantity: Mapped[Decimal] = mapped_column(Numeric(18, 2))
+    used_quantity: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    starts_on: Mapped[date | None] = mapped_column(Date, nullable=True, index=True)
+    expires_on: Mapped[date | None] = mapped_column(Date, nullable=True, index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    account: Mapped["Account"] = relationship()
+    product: Mapped["Product"] = relationship()
+    vehicle: Mapped[Optional["Vehicle"]] = relationship()
+    driver: Mapped[Optional["Driver"]] = relationship()
+    usage: Mapped[list["AllocationUsage"]] = relationship(back_populates="allocation")
+
+
+class AllocationUsage(ResourceMixin, Base):
+    __tablename__ = "allocation_usage"
+
+    allocation_id: Mapped[int] = mapped_column(ForeignKey("fuel_allocations.id"), index=True)
+    transaction_id: Mapped[int | None] = mapped_column(ForeignKey("transactions.id"), nullable=True, index=True)
+    quantity: Mapped[Decimal] = mapped_column(Numeric(18, 2))
+    used_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    allocation: Mapped["FuelAllocation"] = relationship(back_populates="usage")
+    transaction: Mapped[Optional["Transaction"]] = relationship()
+
+
+class VehicleCategory(ResourceMixin, Base):
+    __tablename__ = "vehicle_categories"
+
+    name: Mapped[str] = mapped_column(String(100), unique=True, index=True)
+    code: Mapped[str] = mapped_column(String(30), unique=True, index=True)
+    description: Mapped[str] = mapped_column(Text, default="")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+
+class VehicleGroup(ResourceMixin, Base):
+    __tablename__ = "vehicle_groups"
+
+    account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"), index=True)
+    name: Mapped[str] = mapped_column(String(120), index=True)
+    code: Mapped[str] = mapped_column(String(40), index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    account: Mapped["Account"] = relationship()
+    __table_args__ = (UniqueConstraint("account_id", "code", name="uq_vehicle_group_account_code"),)
+
+
+class Vehicle(ResourceMixin, Base):
+    __tablename__ = "vehicles"
+
+    account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"), index=True)
+    category_id: Mapped[int | None] = mapped_column(ForeignKey("vehicle_categories.id"), nullable=True, index=True)
+    group_id: Mapped[int | None] = mapped_column(ForeignKey("vehicle_groups.id"), nullable=True, index=True)
+    registration_number: Mapped[str] = mapped_column(String(30), unique=True, index=True)
+    vin: Mapped[str | None] = mapped_column(String(50), unique=True, nullable=True, index=True)
+    make: Mapped[str] = mapped_column(String(80), default="")
+    model: Mapped[str] = mapped_column(String(80), default="")
+    model_year: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    vehicle_type: Mapped[str] = mapped_column(String(30), default="customer", index=True)
+    tank_capacity: Mapped[Decimal | None] = mapped_column(Numeric(12, 2), nullable=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    account: Mapped["Account"] = relationship()
+    category: Mapped[Optional["VehicleCategory"]] = relationship()
+    group: Mapped[Optional["VehicleGroup"]] = relationship()
+    documents: Mapped[list["VehicleDocument"]] = relationship(back_populates="vehicle")
+    maintenance_records: Mapped[list["VehicleMaintenance"]] = relationship(back_populates="vehicle")
+
+
+class VehicleDocument(ResourceMixin, Base):
+    __tablename__ = "vehicle_documents"
+
+    vehicle_id: Mapped[int] = mapped_column(ForeignKey("vehicles.id"), index=True)
+    document_type: Mapped[str] = mapped_column(String(60), index=True)
+    document_number: Mapped[str] = mapped_column(String(80), default="", index=True)
+    file: Mapped[str] = mapped_column(Text)
+    issue_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    expiry_date: Mapped[date | None] = mapped_column(Date, nullable=True, index=True)
+    verification_status: Mapped[str] = mapped_column(String(32), default="pending", index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    vehicle: Mapped["Vehicle"] = relationship(back_populates="documents")
+
+
+class VehicleRule(ResourceMixin, Base):
+    __tablename__ = "vehicle_rules"
+
+    vehicle_id: Mapped[int] = mapped_column(ForeignKey("vehicles.id"), index=True)
+    rule_type: Mapped[str] = mapped_column(String(40), index=True)
+    product_id: Mapped[int | None] = mapped_column(ForeignKey("products.id"), nullable=True, index=True)
+    limit_amount: Mapped[Decimal | None] = mapped_column(Numeric(18, 2), nullable=True)
+    limit_quantity: Mapped[Decimal | None] = mapped_column(Numeric(18, 2), nullable=True)
+    period: Mapped[str] = mapped_column(String(30), default="monthly", index=True)
+    starts_on: Mapped[date | None] = mapped_column(Date, nullable=True)
+    ends_on: Mapped[date | None] = mapped_column(Date, nullable=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    vehicle: Mapped["Vehicle"] = relationship()
+    product: Mapped[Optional["Product"]] = relationship()
+
+
+class VehicleMaintenance(ResourceMixin, Base):
+    __tablename__ = "vehicle_maintenance"
+
+    vehicle_id: Mapped[int] = mapped_column(ForeignKey("vehicles.id"), index=True)
+    maintenance_type: Mapped[str] = mapped_column(String(60), index=True)
+    scheduled_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, index=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    odometer: Mapped[Decimal | None] = mapped_column(Numeric(14, 2), nullable=True)
+    cost: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    notes: Mapped[str] = mapped_column(Text, default="")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    vehicle: Mapped["Vehicle"] = relationship(back_populates="maintenance_records")
+
+
+class VehicleInspection(ResourceMixin, Base):
+    __tablename__ = "vehicle_inspections"
+
+    vehicle_id: Mapped[int] = mapped_column(ForeignKey("vehicles.id"), index=True)
+    inspection_date: Mapped[date] = mapped_column(Date, index=True)
+    inspector_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    result: Mapped[str] = mapped_column(String(30), default="pending", index=True)
+    notes: Mapped[str] = mapped_column(Text, default="")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    vehicle: Mapped["Vehicle"] = relationship()
+    inspector: Mapped[Optional["User"]] = relationship(foreign_keys=[inspector_id])
+
+
+class VehicleTrackingEvent(ResourceMixin, Base):
+    __tablename__ = "vehicle_tracking_events"
+
+    vehicle_id: Mapped[int] = mapped_column(ForeignKey("vehicles.id"), index=True)
+    latitude: Mapped[Decimal] = mapped_column(Numeric(10, 7))
+    longitude: Mapped[Decimal] = mapped_column(Numeric(10, 7))
+    speed: Mapped[Decimal | None] = mapped_column(Numeric(8, 2), nullable=True)
+    recorded_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    vehicle: Mapped["Vehicle"] = relationship()
+    __table_args__ = (Index("idx_vehicle_tracking_date", "vehicle_id", "recorded_at"),)
+
+
+class Driver(ResourceMixin, Base):
+    __tablename__ = "drivers"
+
+    account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"), index=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, unique=True, index=True)
+    employee_number: Mapped[str] = mapped_column(String(50), index=True)
+    first_name: Mapped[str] = mapped_column(String(100), index=True)
+    last_name: Mapped[str] = mapped_column(String(100), index=True)
+    phone: Mapped[str] = mapped_column(String(30), index=True)
+    pin_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    account: Mapped["Account"] = relationship()
+    user: Mapped[Optional["User"]] = relationship(foreign_keys=[user_id])
+    documents: Mapped[list["DriverDocument"]] = relationship(back_populates="driver")
+    assignments: Mapped[list["DriverAssignment"]] = relationship(back_populates="driver")
+    __table_args__ = (UniqueConstraint("account_id", "employee_number", name="uq_driver_account_employee"),)
+
+
+class DriverDocument(ResourceMixin, Base):
+    __tablename__ = "driver_documents"
+
+    driver_id: Mapped[int] = mapped_column(ForeignKey("drivers.id"), index=True)
+    document_type: Mapped[str] = mapped_column(String(50), index=True)
+    document_number: Mapped[str] = mapped_column(String(80), index=True)
+    licence_class: Mapped[str] = mapped_column(String(30), default="")
+    file: Mapped[str] = mapped_column(Text, default="")
+    issue_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    expiry_date: Mapped[date | None] = mapped_column(Date, nullable=True, index=True)
+    verification_status: Mapped[str] = mapped_column(String(32), default="pending", index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    driver: Mapped["Driver"] = relationship(back_populates="documents")
+
+
+class DriverAssignment(ResourceMixin, Base):
+    __tablename__ = "driver_assignments"
+
+    driver_id: Mapped[int] = mapped_column(ForeignKey("drivers.id"), index=True)
+    vehicle_id: Mapped[int] = mapped_column(ForeignKey("vehicles.id"), index=True)
+    starts_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    ends_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    driver: Mapped["Driver"] = relationship(back_populates="assignments")
+    vehicle: Mapped["Vehicle"] = relationship()
+
+
+class DriverRule(ResourceMixin, Base):
+    __tablename__ = "driver_rules"
+
+    driver_id: Mapped[int] = mapped_column(ForeignKey("drivers.id"), index=True)
+    rule_type: Mapped[str] = mapped_column(String(40), index=True)
+    product_id: Mapped[int | None] = mapped_column(ForeignKey("products.id"), nullable=True)
+    limit_amount: Mapped[Decimal | None] = mapped_column(Numeric(18, 2), nullable=True)
+    limit_quantity: Mapped[Decimal | None] = mapped_column(Numeric(18, 2), nullable=True)
+    period: Mapped[str] = mapped_column(String(30), default="monthly")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    driver: Mapped["Driver"] = relationship()
+    product: Mapped[Optional["Product"]] = relationship()
+
+
+class DriverPerformance(ResourceMixin, Base):
+    __tablename__ = "driver_performance"
+
+    driver_id: Mapped[int] = mapped_column(ForeignKey("drivers.id"), index=True)
+    period: Mapped[str] = mapped_column(String(20), index=True)
+    trips: Mapped[int] = mapped_column(Integer, default=0)
+    fuel_consumed: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    score: Mapped[Decimal] = mapped_column(Numeric(8, 2), default=0)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    driver: Mapped["Driver"] = relationship()
+    __table_args__ = (UniqueConstraint("driver_id", "period", name="uq_driver_performance_period"),)
+
+
+class DeliveryRoute(ResourceMixin, Base):
+    __tablename__ = "delivery_routes"
+
+    name: Mapped[str] = mapped_column(String(140), index=True)
+    code: Mapped[str] = mapped_column(String(40), unique=True, index=True)
+    origin_depot_id: Mapped[int | None] = mapped_column(ForeignKey("depots.id"), nullable=True, index=True)
+    destination_station_id: Mapped[int | None] = mapped_column(ForeignKey("stations.id"), nullable=True, index=True)
+    distance_km: Mapped[Decimal | None] = mapped_column(Numeric(12, 2), nullable=True)
+    estimated_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    origin_depot: Mapped[Optional["Depot"]] = relationship()
+    destination_station: Mapped[Optional["Station"]] = relationship()
+
+
+class Delivery(ResourceMixin, Base):
+    __tablename__ = "deliveries"
+
+    delivery_number: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    order_id: Mapped[int | None] = mapped_column(ForeignKey("fuel_orders.id"), nullable=True, index=True)
+    route_id: Mapped[int | None] = mapped_column(ForeignKey("delivery_routes.id"), nullable=True, index=True)
+    vehicle_id: Mapped[int | None] = mapped_column(ForeignKey("vehicles.id"), nullable=True, index=True)
+    driver_id: Mapped[int | None] = mapped_column(ForeignKey("drivers.id"), nullable=True, index=True)
+    depot_id: Mapped[int | None] = mapped_column(ForeignKey("depots.id"), nullable=True, index=True)
+    station_id: Mapped[int | None] = mapped_column(ForeignKey("stations.id"), nullable=True, index=True)
+    requested_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    scheduled_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, index=True)
+    dispatched_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    delivered_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    order: Mapped[Optional["FuelOrder"]] = relationship(back_populates="deliveries")
+    route: Mapped[Optional["DeliveryRoute"]] = relationship()
+    vehicle: Mapped[Optional["Vehicle"]] = relationship()
+    driver: Mapped[Optional["Driver"]] = relationship()
+    depot: Mapped[Optional["Depot"]] = relationship()
+    station: Mapped[Optional["Station"]] = relationship()
+    events: Mapped[list["DeliveryEvent"]] = relationship(back_populates="delivery")
+
+
+class DeliveryEvent(ResourceMixin, Base):
+    __tablename__ = "delivery_events"
+
+    delivery_id: Mapped[int] = mapped_column(ForeignKey("deliveries.id"), index=True)
+    event_type: Mapped[str] = mapped_column(String(40), index=True)
+    quantity: Mapped[Decimal | None] = mapped_column(Numeric(18, 2), nullable=True)
+    latitude: Mapped[Decimal | None] = mapped_column(Numeric(10, 7), nullable=True)
+    longitude: Mapped[Decimal | None] = mapped_column(Numeric(10, 7), nullable=True)
+    occurred_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    document_url: Mapped[str] = mapped_column(Text, default="")
+    notes: Mapped[str] = mapped_column(Text, default="")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    delivery: Mapped["Delivery"] = relationship(back_populates="events")
+    __table_args__ = (Index("idx_delivery_event_date", "delivery_id", "occurred_at"),)
+
+
+class DeliveryReconciliation(ResourceMixin, Base):
+    __tablename__ = "delivery_reconciliations"
+
+    delivery_id: Mapped[int] = mapped_column(ForeignKey("deliveries.id"), unique=True, index=True)
+    loaded_quantity: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    delivered_quantity: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    variance_quantity: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    verification_status: Mapped[str] = mapped_column(String(32), default="pending", index=True)
+    notes: Mapped[str] = mapped_column(Text, default="")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    delivery: Mapped["Delivery"] = relationship()
+
+
+class FuelCard(ResourceMixin, Base):
+    __tablename__ = "fuel_cards"
+
+    card_number: Mapped[str] = mapped_column(String(40), unique=True, index=True)
+    serial_number: Mapped[str] = mapped_column(String(80), unique=True, index=True)
+    account_id: Mapped[int | None] = mapped_column(ForeignKey("accounts.id"), nullable=True, index=True)
+    vehicle_id: Mapped[int | None] = mapped_column(ForeignKey("vehicles.id"), nullable=True, index=True)
+    driver_id: Mapped[int | None] = mapped_column(ForeignKey("drivers.id"), nullable=True, index=True)
+    pin_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    issued_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    activated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    expires_on: Mapped[date | None] = mapped_column(Date, nullable=True, index=True)
+    blocked_reason: Mapped[str] = mapped_column(Text, default="")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    account: Mapped[Optional["Account"]] = relationship()
+    vehicle: Mapped[Optional["Vehicle"]] = relationship()
+    driver: Mapped[Optional["Driver"]] = relationship()
+    rules: Mapped[list["CardRule"]] = relationship(back_populates="card")
+
+
+class CardRule(ResourceMixin, Base):
+    __tablename__ = "card_rules"
+
+    card_id: Mapped[int] = mapped_column(ForeignKey("fuel_cards.id"), index=True)
+    rule_type: Mapped[str] = mapped_column(String(40), index=True)
+    product_id: Mapped[int | None] = mapped_column(ForeignKey("products.id"), nullable=True)
+    limit_amount: Mapped[Decimal | None] = mapped_column(Numeric(18, 2), nullable=True)
+    limit_quantity: Mapped[Decimal | None] = mapped_column(Numeric(18, 2), nullable=True)
+    period: Mapped[str] = mapped_column(String(30), default="monthly")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    card: Mapped["FuelCard"] = relationship(back_populates="rules")
+    product: Mapped[Optional["Product"]] = relationship()
+
+
+class CardReplacement(ResourceMixin, Base):
+    __tablename__ = "card_replacements"
+
+    old_card_id: Mapped[int] = mapped_column(ForeignKey("fuel_cards.id"), index=True)
+    new_card_id: Mapped[int | None] = mapped_column(ForeignKey("fuel_cards.id"), nullable=True, unique=True)
+    reason: Mapped[str] = mapped_column(String(50), index=True)
+    requested_by_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    old_card: Mapped["FuelCard"] = relationship(foreign_keys=[old_card_id])
+    new_card: Mapped[Optional["FuelCard"]] = relationship(foreign_keys=[new_card_id])
+    requested_by: Mapped["User"] = relationship(foreign_keys=[requested_by_id])
+
+
+class PosDevice(ResourceMixin, Base):
+    __tablename__ = "pos_devices"
+
+    serial_number: Mapped[str] = mapped_column(String(80), unique=True, index=True)
+    terminal_id: Mapped[str | None] = mapped_column(String(80), unique=True, nullable=True, index=True)
+    model: Mapped[str] = mapped_column(String(80), default="")
+    provider: Mapped[str] = mapped_column(String(100), default="", index=True)
+    acquired_at: Mapped[date | None] = mapped_column(Date, nullable=True)
+    last_seen_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, index=True)
+    health_status: Mapped[str] = mapped_column(String(30), default="unknown", index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    assignments: Mapped[list["PosAssignment"]] = relationship(back_populates="device")
+    maintenance_records: Mapped[list["PosMaintenance"]] = relationship(back_populates="device")
+
+
+class PosAssignment(ResourceMixin, Base):
+    __tablename__ = "pos_assignments"
+
+    device_id: Mapped[int] = mapped_column(ForeignKey("pos_devices.id"), index=True)
+    station_id: Mapped[int | None] = mapped_column(ForeignKey("stations.id"), nullable=True, index=True)
+    attendant_id: Mapped[int | None] = mapped_column(ForeignKey("station_attendants.id"), nullable=True, index=True)
+    assigned_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    unassigned_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    device: Mapped["PosDevice"] = relationship(back_populates="assignments")
+    station: Mapped[Optional["Station"]] = relationship()
+    attendant: Mapped[Optional["StationAttendant"]] = relationship()
+
+
+class PosMaintenance(ResourceMixin, Base):
+    __tablename__ = "pos_maintenance"
+
+    device_id: Mapped[int] = mapped_column(ForeignKey("pos_devices.id"), index=True)
+    maintenance_type: Mapped[str] = mapped_column(String(50), index=True)
+    scheduled_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, index=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    outcome: Mapped[str] = mapped_column(String(40), default="pending", index=True)
+    notes: Mapped[str] = mapped_column(Text, default="")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    device: Mapped["PosDevice"] = relationship(back_populates="maintenance_records")
+
+
+class Transaction(ResourceMixin, Base):
+    __tablename__ = "transactions"
+
+    transaction_number: Mapped[str] = mapped_column(String(60), unique=True, index=True)
+    account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"), index=True)
+    station_id: Mapped[int | None] = mapped_column(ForeignKey("stations.id"), nullable=True, index=True)
+    product_id: Mapped[int | None] = mapped_column(ForeignKey("products.id"), nullable=True, index=True)
+    card_id: Mapped[int | None] = mapped_column(ForeignKey("fuel_cards.id"), nullable=True, index=True)
+    pos_device_id: Mapped[int | None] = mapped_column(ForeignKey("pos_devices.id"), nullable=True, index=True)
+    vehicle_id: Mapped[int | None] = mapped_column(ForeignKey("vehicles.id"), nullable=True, index=True)
+    driver_id: Mapped[int | None] = mapped_column(ForeignKey("drivers.id"), nullable=True, index=True)
+    attendant_id: Mapped[int | None] = mapped_column(ForeignKey("station_attendants.id"), nullable=True, index=True)
+    transaction_type: Mapped[str] = mapped_column(String(40), index=True)
+    payment_method: Mapped[str] = mapped_column(String(40), index=True)
+    quantity: Mapped[Decimal | None] = mapped_column(Numeric(18, 2), nullable=True)
+    amount: Mapped[Decimal] = mapped_column(Numeric(18, 2))
+    currency: Mapped[str] = mapped_column(String(3), default="ZMW")
+    occurred_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    external_reference: Mapped[str] = mapped_column(String(100), default="", index=True)
+    failure_reason: Mapped[str] = mapped_column(Text, default="")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    account: Mapped["Account"] = relationship()
+    station: Mapped[Optional["Station"]] = relationship()
+    product: Mapped[Optional["Product"]] = relationship()
+    card: Mapped[Optional["FuelCard"]] = relationship()
+    pos_device: Mapped[Optional["PosDevice"]] = relationship()
+    vehicle: Mapped[Optional["Vehicle"]] = relationship()
+    driver: Mapped[Optional["Driver"]] = relationship()
+    attendant: Mapped[Optional["StationAttendant"]] = relationship()
+    __table_args__ = (Index("idx_transaction_account_date", "account_id", "occurred_at"), Index("idx_transaction_type_status", "transaction_type", "status"))
+
+
+class PosSettlement(ResourceMixin, Base):
+    __tablename__ = "pos_settlements"
+
+    device_id: Mapped[int] = mapped_column(ForeignKey("pos_devices.id"), index=True)
+    settlement_reference: Mapped[str] = mapped_column(String(80), unique=True, index=True)
+    period_start: Mapped[datetime] = mapped_column(DateTime, index=True)
+    period_end: Mapped[datetime] = mapped_column(DateTime, index=True)
+    transaction_count: Mapped[int] = mapped_column(Integer, default=0)
+    expected_amount: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    settled_amount: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    verification_status: Mapped[str] = mapped_column(String(32), default="pending", index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    device: Mapped["PosDevice"] = relationship()
+
+
+class FundingRequest(ResourceMixin, Base):
+    __tablename__ = "funding_requests"
+
+    reference_number: Mapped[str] = mapped_column(String(60), unique=True, index=True)
+    account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"), index=True)
+    requested_by_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    request_type: Mapped[str] = mapped_column(String(30), index=True)
+    amount: Mapped[Decimal] = mapped_column(Numeric(18, 2))
+    currency: Mapped[str] = mapped_column(String(3), default="ZMW")
+    approved_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    approved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    notes: Mapped[str] = mapped_column(Text, default="")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    account: Mapped["Account"] = relationship()
+    requested_by: Mapped["User"] = relationship(foreign_keys=[requested_by_id])
+    approved_by: Mapped[Optional["User"]] = relationship(foreign_keys=[approved_by_id])
+
+
+class BalanceAdjustment(ResourceMixin, Base):
+    __tablename__ = "balance_adjustments"
+
+    account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"), index=True)
+    reference_number: Mapped[str] = mapped_column(String(60), unique=True, index=True)
+    adjustment_type: Mapped[str] = mapped_column(String(20), index=True)
+    amount: Mapped[Decimal] = mapped_column(Numeric(18, 2))
+    reason: Mapped[str] = mapped_column(Text)
+    approved_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    account: Mapped["Account"] = relationship()
+    approved_by: Mapped[Optional["User"]] = relationship(foreign_keys=[approved_by_id])
+
+
+class Payment(ResourceMixin, Base):
+    __tablename__ = "payments"
+
+    payment_number: Mapped[str] = mapped_column(String(60), unique=True, index=True)
+    account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"), index=True)
+    payment_type: Mapped[str] = mapped_column(String(30), index=True)
+    payment_method: Mapped[str] = mapped_column(String(40), index=True)
+    amount: Mapped[Decimal] = mapped_column(Numeric(18, 2))
+    currency: Mapped[str] = mapped_column(String(3), default="ZMW")
+    paid_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, index=True)
+    provider_reference: Mapped[str] = mapped_column(String(100), default="", index=True)
+    failure_reason: Mapped[str] = mapped_column(Text, default="")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    account: Mapped["Account"] = relationship()
+    allocations: Mapped[list["PaymentAllocation"]] = relationship(back_populates="payment")
+
+
+class Invoice(ResourceMixin, Base):
+    __tablename__ = "invoices"
+
+    invoice_number: Mapped[str] = mapped_column(String(60), unique=True, index=True)
+    account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"), index=True)
+    invoice_type: Mapped[str] = mapped_column(String(30), default="invoice", index=True)
+    issue_date: Mapped[date] = mapped_column(Date, default=date.today, index=True)
+    due_date: Mapped[date | None] = mapped_column(Date, nullable=True, index=True)
+    subtotal: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    tax_amount: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    total_amount: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    balance_due: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    currency: Mapped[str] = mapped_column(String(3), default="ZMW")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    account: Mapped["Account"] = relationship()
+    lines: Mapped[list["InvoiceLine"]] = relationship(back_populates="invoice")
+    payments: Mapped[list["PaymentAllocation"]] = relationship(back_populates="invoice")
+
+
+class InvoiceLine(ResourceMixin, Base):
+    __tablename__ = "invoice_lines"
+
+    invoice_id: Mapped[int] = mapped_column(ForeignKey("invoices.id"), index=True)
+    product_id: Mapped[int | None] = mapped_column(ForeignKey("products.id"), nullable=True)
+    description: Mapped[str] = mapped_column(String(255))
+    quantity: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=1)
+    unit_price: Mapped[Decimal] = mapped_column(Numeric(18, 4), default=0)
+    tax_amount: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    line_total: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    invoice: Mapped["Invoice"] = relationship(back_populates="lines")
+    product: Mapped[Optional["Product"]] = relationship()
+
+
+class PaymentAllocation(ResourceMixin, Base):
+    __tablename__ = "payment_allocations"
+
+    payment_id: Mapped[int] = mapped_column(ForeignKey("payments.id"), index=True)
+    invoice_id: Mapped[int] = mapped_column(ForeignKey("invoices.id"), index=True)
+    amount: Mapped[Decimal] = mapped_column(Numeric(18, 2))
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    payment: Mapped["Payment"] = relationship(back_populates="allocations")
+    invoice: Mapped["Invoice"] = relationship(back_populates="payments")
+    __table_args__ = (UniqueConstraint("payment_id", "invoice_id", name="uq_payment_invoice"),)
+
+
+class FinancialDocument(ResourceMixin, Base):
+    __tablename__ = "financial_documents"
+
+    document_number: Mapped[str] = mapped_column(String(60), unique=True, index=True)
+    document_type: Mapped[str] = mapped_column(String(30), index=True)
+    account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"), index=True)
+    invoice_id: Mapped[int | None] = mapped_column(ForeignKey("invoices.id"), nullable=True, index=True)
+    payment_id: Mapped[int | None] = mapped_column(ForeignKey("payments.id"), nullable=True, index=True)
+    amount: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    issued_on: Mapped[date] = mapped_column(Date, default=date.today, index=True)
+    file: Mapped[str] = mapped_column(Text, default="")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    account: Mapped["Account"] = relationship()
+    invoice: Mapped[Optional["Invoice"]] = relationship()
+    payment: Mapped[Optional["Payment"]] = relationship()
+
+
+class BankBranch(ResourceMixin, Base):
+    __tablename__ = "bank_branches"
+
+    bank_id: Mapped[int] = mapped_column(ForeignKey("banks.id"), index=True)
+    name: Mapped[str] = mapped_column(String(120), index=True)
+    code: Mapped[str] = mapped_column(String(30), index=True)
+    address: Mapped[str] = mapped_column(Text, default="")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    bank: Mapped["Bank"] = relationship()
+    __table_args__ = (UniqueConstraint("bank_id", "code", name="uq_bank_branch_code"),)
+
+
+class BankAccount(ResourceMixin, Base):
+    __tablename__ = "bank_accounts"
+
+    bank_id: Mapped[int] = mapped_column(ForeignKey("banks.id"), index=True)
+    branch_id: Mapped[int | None] = mapped_column(ForeignKey("bank_branches.id"), nullable=True, index=True)
+    account_id: Mapped[int | None] = mapped_column(ForeignKey("accounts.id"), nullable=True, index=True)
+    account_name: Mapped[str] = mapped_column(String(160), index=True)
+    account_number: Mapped[str] = mapped_column(String(80), unique=True, index=True)
+    currency: Mapped[str] = mapped_column(String(3), default="ZMW", index=True)
+    balance: Mapped[Decimal] = mapped_column(Numeric(18, 2), default=0)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    bank: Mapped["Bank"] = relationship()
+    branch: Mapped[Optional["BankBranch"]] = relationship()
+    account: Mapped[Optional["Account"]] = relationship()
+
+
+class BankTransaction(ResourceMixin, Base):
+    __tablename__ = "bank_transactions"
+
+    bank_account_id: Mapped[int] = mapped_column(ForeignKey("bank_accounts.id"), index=True)
+    transaction_type: Mapped[str] = mapped_column(String(30), index=True)
+    reference_number: Mapped[str] = mapped_column(String(100), index=True)
+    amount: Mapped[Decimal] = mapped_column(Numeric(18, 2))
+    transaction_date: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    matched_transaction_id: Mapped[int | None] = mapped_column(ForeignKey("transactions.id"), nullable=True)
+    verification_status: Mapped[str] = mapped_column(String(32), default="pending", index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    bank_account: Mapped["BankAccount"] = relationship()
+    matched_transaction: Mapped[Optional["Transaction"]] = relationship()
+    __table_args__ = (Index("idx_bank_transaction_account_date", "bank_account_id", "transaction_date"),)
+
+
+class PaymentProvider(ResourceMixin, Base):
+    __tablename__ = "payment_providers"
+
+    name: Mapped[str] = mapped_column(String(120), unique=True, index=True)
+    code: Mapped[str] = mapped_column(String(40), unique=True, index=True)
+    provider_type: Mapped[str] = mapped_column(String(40), index=True)
+    configuration: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+
+class VerificationCase(ResourceMixin, Base):
+    __tablename__ = "verification_cases"
+
+    account_id: Mapped[int | None] = mapped_column(ForeignKey("accounts.id"), nullable=True, index=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
+    verification_type: Mapped[str] = mapped_column(String(30), index=True)
+    verification_status: Mapped[str] = mapped_column(String(32), default="pending", index=True)
+    risk_level: Mapped[str] = mapped_column(String(20), default="unknown", index=True)
+    reviewed_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    account: Mapped[Optional["Account"]] = relationship()
+    subject_user: Mapped[Optional["User"]] = relationship(foreign_keys=[user_id])
+    reviewed_by: Mapped[Optional["User"]] = relationship(foreign_keys=[reviewed_by_id])
+
+
+class RiskProfile(ResourceMixin, Base):
+    __tablename__ = "risk_profiles"
+
+    account_id: Mapped[int] = mapped_column(ForeignKey("accounts.id"), unique=True, index=True)
+    risk_level: Mapped[str] = mapped_column(String(20), default="low", index=True)
+    risk_score: Mapped[Decimal] = mapped_column(Numeric(8, 2), default=0)
+    assessed_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    next_review_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    account: Mapped["Account"] = relationship()
+
+
+class ComplianceCase(ResourceMixin, Base):
+    __tablename__ = "compliance_cases"
+
+    case_number: Mapped[str] = mapped_column(String(60), unique=True, index=True)
+    case_type: Mapped[str] = mapped_column(String(50), index=True)
+    severity: Mapped[str] = mapped_column(String(20), default="medium", index=True)
+    account_id: Mapped[int | None] = mapped_column(ForeignKey("accounts.id"), nullable=True, index=True)
+    transaction_id: Mapped[int | None] = mapped_column(ForeignKey("transactions.id"), nullable=True, index=True)
+    station_id: Mapped[int | None] = mapped_column(ForeignKey("stations.id"), nullable=True, index=True)
+    assigned_to_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
+    reported_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    description: Mapped[str] = mapped_column(Text, default="")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    account: Mapped[Optional["Account"]] = relationship()
+    transaction: Mapped[Optional["Transaction"]] = relationship()
+    station: Mapped[Optional["Station"]] = relationship()
+    assigned_to: Mapped[Optional["User"]] = relationship(foreign_keys=[assigned_to_id])
+
+
+class ComplianceDocument(ResourceMixin, Base):
+    __tablename__ = "compliance_documents"
+
+    owner_type: Mapped[str] = mapped_column(String(30), index=True)
+    account_id: Mapped[int | None] = mapped_column(ForeignKey("accounts.id"), nullable=True, index=True)
+    station_id: Mapped[int | None] = mapped_column(ForeignKey("stations.id"), nullable=True, index=True)
+    vehicle_id: Mapped[int | None] = mapped_column(ForeignKey("vehicles.id"), nullable=True, index=True)
+    document_type: Mapped[str] = mapped_column(String(40), index=True)
+    document_number: Mapped[str] = mapped_column(String(80), index=True)
+    provider: Mapped[str] = mapped_column(String(140), default="")
+    issue_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    expiry_date: Mapped[date | None] = mapped_column(Date, nullable=True, index=True)
+    verification_status: Mapped[str] = mapped_column(String(32), default="pending", index=True)
+    file: Mapped[str] = mapped_column(Text, default="")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    account: Mapped[Optional["Account"]] = relationship()
+    station: Mapped[Optional["Station"]] = relationship()
+    vehicle: Mapped[Optional["Vehicle"]] = relationship()
+
+
+class RegulatoryReport(ResourceMixin, Base):
+    __tablename__ = "regulatory_reports"
+
+    report_type: Mapped[str] = mapped_column(String(60), index=True)
+    period_start: Mapped[date] = mapped_column(Date, index=True)
+    period_end: Mapped[date] = mapped_column(Date, index=True)
+    submitted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    submitted_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    file: Mapped[str] = mapped_column(Text, default="")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    submitted_by: Mapped[Optional["User"]] = relationship(foreign_keys=[submitted_by_id])
+    __table_args__ = (UniqueConstraint("report_type", "period_start", "period_end", name="uq_regulatory_report_period"),)
+
+
+class PermissionGroup(ResourceMixin, Base):
+    __tablename__ = "permission_groups"
+
+    name: Mapped[str] = mapped_column(String(100), unique=True, index=True)
+    code: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    description: Mapped[str] = mapped_column(Text, default="")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+
+class PermissionGroupMember(ResourceMixin, Base):
+    __tablename__ = "permission_group_members"
+
+    group_id: Mapped[int] = mapped_column(ForeignKey("permission_groups.id"), index=True)
+    permission_id: Mapped[int] = mapped_column(ForeignKey("permissions.id"), index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    group: Mapped["PermissionGroup"] = relationship()
+    permission: Mapped["Permissions"] = relationship()
+    __table_args__ = (UniqueConstraint("group_id", "permission_id", name="uq_permission_group_member"),)
+
+
+class UserSession(ResourceMixin, Base):
+    __tablename__ = "user_sessions"
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    session_token_hash: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    ip_address: Mapped[str] = mapped_column(String(64), default="", index=True)
+    user_agent: Mapped[str] = mapped_column(Text, default="")
+    started_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime, index=True)
+    ended_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    user: Mapped["User"] = relationship(foreign_keys=[user_id])
+
+
+class LoginEvent(ResourceMixin, Base):
+    __tablename__ = "login_events"
+
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
+    email: Mapped[str] = mapped_column(String(255), index=True)
+    event_type: Mapped[str] = mapped_column(String(30), index=True)
+    succeeded: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    ip_address: Mapped[str] = mapped_column(String(64), default="", index=True)
+    user_agent: Mapped[str] = mapped_column(Text, default="")
+    occurred_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    user: Mapped[Optional["User"]] = relationship(foreign_keys=[user_id])
+    __table_args__ = (Index("idx_login_email_date", "email", "occurred_at"),)
+
+
+class SecurityEvent(ResourceMixin, Base):
+    __tablename__ = "security_events"
+
+    event_type: Mapped[str] = mapped_column(String(50), index=True)
+    severity: Mapped[str] = mapped_column(String(20), default="info", index=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
+    ip_address: Mapped[str] = mapped_column(String(64), default="", index=True)
+    occurred_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    description: Mapped[str] = mapped_column(Text, default="")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    user: Mapped[Optional["User"]] = relationship(foreign_keys=[user_id])
+
+
+class ReportDefinition(ResourceMixin, Base):
+    __tablename__ = "report_definitions"
+
+    name: Mapped[str] = mapped_column(String(160), index=True)
+    code: Mapped[str] = mapped_column(String(60), unique=True, index=True)
+    report_type: Mapped[str] = mapped_column(String(50), index=True)
+    query_definition: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    columns: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    schedules: Mapped[list["ReportSchedule"]] = relationship(back_populates="report")
+
+
+class ReportSchedule(ResourceMixin, Base):
+    __tablename__ = "report_schedules"
+
+    report_id: Mapped[int] = mapped_column(ForeignKey("report_definitions.id"), index=True)
+    cron_expression: Mapped[str] = mapped_column(String(100))
+    format: Mapped[str] = mapped_column(String(20), default="pdf")
+    recipients: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    next_run_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, index=True)
+    last_run_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    report: Mapped["ReportDefinition"] = relationship(back_populates="schedules")
+    outputs: Mapped[list["ReportOutput"]] = relationship(back_populates="schedule")
+
+
+class ReportOutput(ResourceMixin, Base):
+    __tablename__ = "report_outputs"
+
+    report_id: Mapped[int] = mapped_column(ForeignKey("report_definitions.id"), index=True)
+    schedule_id: Mapped[int | None] = mapped_column(ForeignKey("report_schedules.id"), nullable=True, index=True)
+    generated_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    generated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    format: Mapped[str] = mapped_column(String(20), default="pdf")
+    file: Mapped[str] = mapped_column(Text)
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    report: Mapped["ReportDefinition"] = relationship()
+    schedule: Mapped[Optional["ReportSchedule"]] = relationship(back_populates="outputs")
+    generated_by: Mapped[Optional["User"]] = relationship(foreign_keys=[generated_by_id])
+
+
+class SystemSetting(ResourceMixin, Base):
+    __tablename__ = "system_settings"
+
+    category: Mapped[str] = mapped_column(String(60), index=True)
+    key: Mapped[str] = mapped_column(String(100), index=True)
+    value: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    description: Mapped[str] = mapped_column(Text, default="")
+    is_secret: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    __table_args__ = (UniqueConstraint("category", "key", name="uq_system_setting_category_key"),)
+
+
+class ApprovalWorkflow(ResourceMixin, Base):
+    __tablename__ = "approval_workflows"
+
+    name: Mapped[str] = mapped_column(String(140), index=True)
+    code: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    resource_type: Mapped[str] = mapped_column(String(60), index=True)
+    steps: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+
+class Integration(ResourceMixin, Base):
+    __tablename__ = "integrations"
+
+    name: Mapped[str] = mapped_column(String(140), index=True)
+    code: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    integration_type: Mapped[str] = mapped_column(String(50), index=True)
+    provider: Mapped[str] = mapped_column(String(100), default="", index=True)
+    configuration: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
+    last_health_check_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+
+class ApiClient(ResourceMixin, Base):
+    __tablename__ = "api_clients"
+
+    name: Mapped[str] = mapped_column(String(140), index=True)
+    client_id: Mapped[str] = mapped_column(String(100), unique=True, index=True)
+    client_secret_hash: Mapped[str] = mapped_column(String(255))
+    scopes: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, index=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+
+class Webhook(ResourceMixin, Base):
+    __tablename__ = "webhooks"
+
+    name: Mapped[str] = mapped_column(String(140), index=True)
+    url: Mapped[str] = mapped_column(Text)
+    secret_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    events: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+
+class SystemJob(ResourceMixin, Base):
+    __tablename__ = "system_jobs"
+
+    job_type: Mapped[str] = mapped_column(String(50), index=True)
+    reference: Mapped[str] = mapped_column(String(100), default="", index=True)
+    scheduled_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, index=True)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    progress: Mapped[int] = mapped_column(Integer, default=0)
+    input: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    output: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    error_message: Mapped[str] = mapped_column(Text, default="")
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+
+class Notification(ResourceMixin, Base):
+    __tablename__ = "notifications"
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    notification_type: Mapped[str] = mapped_column(String(40), index=True)
+    title: Mapped[str] = mapped_column(String(180))
+    message: Mapped[str] = mapped_column(Text)
+    read_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, index=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    user: Mapped["User"] = relationship(foreign_keys=[user_id])
+
+
+class SupportTicket(ResourceMixin, Base):
+    __tablename__ = "support_tickets"
+
+    ticket_number: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    account_id: Mapped[int | None] = mapped_column(ForeignKey("accounts.id"), nullable=True, index=True)
+    opened_by_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    assigned_to_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
+    category: Mapped[str] = mapped_column(String(50), index=True)
+    priority: Mapped[str] = mapped_column(String(20), default="normal", index=True)
+    subject: Mapped[str] = mapped_column(String(200))
+    description: Mapped[str] = mapped_column(Text)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+    account: Mapped[Optional["Account"]] = relationship()
+    opened_by: Mapped["User"] = relationship(foreign_keys=[opened_by_id])
+    assigned_to: Mapped[Optional["User"]] = relationship(foreign_keys=[assigned_to_id])
