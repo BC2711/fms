@@ -10,7 +10,7 @@ from app.core.config import get_settings
 from app.core.errors import AppError
 from app.core.security import decode_access_token
 from app.database.session import get_db
-from app.models.identity import User
+from app.models.resources import User
 
 bearer = HTTPBearer(auto_error=False)
 

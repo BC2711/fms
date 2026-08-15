@@ -11,5 +11,13 @@ describe('configured FormGenerator', () => {
   it('validates required fields', async () => { render(<MemoryRouter><FormGenerator formConfig={config} mode="create" onSubmit={vi.fn()} isSubmitting={false} /></MemoryRouter>); fireEvent.click(screen.getByRole('button', { name: 'Create' })); expect(await screen.findByRole('alert')).toHaveTextContent('Name is required') })
   it('submits form data', async () => { const submit = vi.fn(); render(<MemoryRouter><FormGenerator formConfig={config} mode="create" onSubmit={submit} isSubmitting={false} /></MemoryRouter>); fireEvent.change(screen.getByLabelText(/Name/), { target: { value: 'Alpha' } }); fireEvent.click(screen.getByRole('button', { name: 'Create' })); await waitFor(() => expect(submit).toHaveBeenCalledWith(expect.objectContaining({ name: 'Alpha', status: 'active' }), expect.anything())) })
   it('loads edit initial data', async () => { render(<MemoryRouter><FormGenerator formConfig={config} mode="edit" initialData={{ name: 'Existing', status: 'active' }} onSubmit={vi.fn()} isSubmitting={false} /></MemoryRouter>); await waitFor(() => expect(screen.getByLabelText(/Name/)).toHaveValue('Existing')) })
+  it('normalizes numeric select values loaded in edit mode', async () => {
+    const submit = vi.fn()
+    const editConfig: FormConfig = { fields: [{ name: 'station_type_id', type: 'select', label: 'Station Type', required: true, options: [{ label: 'Service Station', value: 1 }] }] }
+    render(<MemoryRouter><FormGenerator formConfig={editConfig} mode="edit" initialData={{ station_type_id: 1 }} onSubmit={submit} isSubmitting={false} /></MemoryRouter>)
+    expect(screen.getByLabelText(/Station Type/)).toHaveValue('1')
+    fireEvent.click(screen.getByRole('button', { name: 'Save changes' }))
+    await waitFor(() => expect(submit).toHaveBeenCalledWith(expect.objectContaining({ station_type_id: '1' }), expect.anything()))
+  })
   it('lays fields out using the configured column count', () => { render(<MemoryRouter><FormGenerator formConfig={{ ...config, layout: { type: 'columns', columns: 3 } }} mode="create" onSubmit={vi.fn()} isSubmitting={false} /></MemoryRouter>); expect(screen.getByLabelText(/Name/).closest('[data-grid-columns]')).toHaveAttribute('data-grid-columns', '4') })
 })

@@ -226,16 +226,12 @@ const form: FormConfig = {
 
 const raw: PageConfig = {
     id: 'stations',
-
     title: 'All Stations',
     page_title: 'Station Management',
-
     description:
         'Manage fuel stations, operators, locations, licences and operational status.',
-
     type: 'list',
     page_type: 'list',
-
     path: '/stations/stations',
     route: '/stations/stations',
 
@@ -336,19 +332,16 @@ const raw: PageConfig = {
         rowKey: 'id',
         stickyHeader: true,
         striped: true,
-
         pagination: {
             enabled: true,
             pageSize: 10,
             pageSizeOptions: [10, 20, 50, 100],
         },
-
         sorting: {
             enabled: true,
             defaultColumn: 'name',
             defaultDirection: 'asc',
         },
-
         columns: [
             {
                 id: 'code',
@@ -441,15 +434,14 @@ const raw: PageConfig = {
                         type: 'navigate',
                         label: 'View',
                         icon: 'Eye',
+                        path: '/stations/stations/{id}',
                     },
                     {
                         id: 'edit',
                         type: 'edit',
                         label: 'Edit',
                         icon: 'Pencil',
-                        permission: {
-                            any: ['stations.update'],
-                        },
+                        path: '/stations/stations/{id}/edit',
                     },
                     {
                         id: 'price-board',
