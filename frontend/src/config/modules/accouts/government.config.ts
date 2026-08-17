@@ -9,16 +9,13 @@ import type {
 } from '@/types/configuration.types'
 
 const api: ApiConfig = {
-    baseUrl: '/api',
-
-    data_mapping: {
+    baseUrl: '/api', data_mapping: {
         type: 'paginated',
         items: 'data.items',
         total: 'data.total',
         page: 'data.page',
         pageSize: 'data.pageSize',
     },
-
     endpoints: {
         list: {
             path: '/accounts/government-institutions',
@@ -42,6 +39,40 @@ const api: ApiConfig = {
         delete: {
             path: '/accounts/government-institutions/{id}',
             method: 'DELETE',
+        },
+    },
+}
+
+const vehiclesApi: ApiConfig = {
+    baseUrl: '/api',
+    data_mapping: {
+        type: 'paginated',
+        items: 'data.items',
+        total: 'data.total',
+        page: 'data.page',
+        pageSize: 'data.pageSize',
+    },
+    endpoints: {
+        list: {
+            path: '/accounts/government-institutions/{id}/vehicles',
+            method: 'GET',
+        },
+    },
+}
+
+const allocationsApi: ApiConfig = {
+    baseUrl: '/api',
+    data_mapping: {
+        type: 'paginated',
+        items: 'data.items',
+        total: 'data.total',
+        page: 'data.page',
+        pageSize: 'data.pageSize',
+    },
+    endpoints: {
+        list: {
+            path: '/accounts/government-institutions/{id}/allocations',
+            method: 'GET',
         },
     },
 }
@@ -210,9 +241,7 @@ const raw: PageConfig = {
     page_type: 'list',
     path: '/accounts/government-institutions',
     route: '/accounts/government-institutions',
-
     api,
-
     statistics: [
         {
             id: 'total',
@@ -292,19 +321,16 @@ const raw: PageConfig = {
         rowKey: 'id',
         stickyHeader: true,
         striped: true,
-
         pagination: {
             enabled: true,
             pageSize: 10,
             pageSizeOptions: [10, 20, 50, 100],
         },
-
         sorting: {
             enabled: true,
             defaultColumn: 'name',
             defaultDirection: 'asc',
         },
-
         columns: [
             {
                 id: 'account-number',
@@ -396,6 +422,7 @@ const raw: PageConfig = {
                         type: 'navigate',
                         label: 'View',
                         icon: 'Eye',
+                        path: '/accounts/government-institutions/{id}',
                     },
                     {
                         id: 'vehicles',
@@ -416,6 +443,7 @@ const raw: PageConfig = {
                         type: 'edit',
                         label: 'Edit',
                         icon: 'Pencil',
+                        path: '/accounts/government-institutions/{id}/edit',
                     },
                     {
                         id: 'delete',
@@ -460,6 +488,16 @@ const raw: PageConfig = {
                 ...form,
                 submitLabel: 'Add Government Institution',
             },
+            page_actions: [
+                {
+                    id: 'back',
+                    type: 'navigate',
+                    label: 'Back to Government Institutions',
+                    path: '/accounts/government-institutions',
+                    icon: 'ArrowLeft',
+                    variant: 'secondary',
+                },
+            ],
         },
         {
             id: 'government-institutions-details',
@@ -472,7 +510,6 @@ const raw: PageConfig = {
             route: '/accounts/government-institutions/:id',
             api,
             recordIdParam: 'id',
-
             fields: [
                 'name',
                 'code',
@@ -493,7 +530,6 @@ const raw: PageConfig = {
                 'verification_status',
                 'status',
             ],
-
             sections: [
                 {
                     id: 'institution',
@@ -521,6 +557,16 @@ const raw: PageConfig = {
                     ],
                 },
             ],
+            page_actions: [
+                {
+                    id: 'back',
+                    type: 'navigate',
+                    label: 'Back to Government Institutions',
+                    path: '/accounts/government-institutions',
+                    icon: 'ArrowLeft',
+                    variant: 'secondary',
+                },
+            ],
         },
         {
             id: 'government-institutions-edit',
@@ -537,6 +583,355 @@ const raw: PageConfig = {
                 submitLabel: 'Save Changes',
             },
             recordIdParam: 'id',
+            page_actions: [
+                {
+                    id: 'back',
+                    type: 'navigate',
+                    label: 'Back to Government Institutions',
+                    path: '/accounts/government-institutions',
+                    icon: 'ArrowLeft',
+                    variant: 'secondary',
+                },
+            ],
+        },
+        {
+            id: 'government-institutions-vehicles',
+            parentId: 'government-institutions',
+            title: 'Government Institution Vehicles',
+            page_title: 'Registered Vehicles',
+            description: 'View vehicles registered to this government institution.',
+            type: 'list',
+            page_type: 'list',
+            path: '/accounts/government-institutions/:id/vehicles',
+            route: '/accounts/government-institutions/:id/vehicles',
+            api: vehiclesApi,
+            statistics: [
+                {
+                    id: 'total-vehicles',
+                    type: 'statistic',
+                    title: 'Total Vehicles',
+                    dataPath: 'statistics.total',
+                    icon: 'Car',
+                    format: 'number',
+                },
+                {
+                    id: 'active-vehicles',
+                    type: 'statistic',
+                    title: 'Active',
+                    dataPath: 'statistics.active',
+                    icon: 'CircleCheck',
+                    format: 'number',
+                },
+                {
+                    id: 'inactive-vehicles',
+                    type: 'statistic',
+                    title: 'Inactive',
+                    dataPath: 'statistics.inactive',
+                    icon: 'CircleX',
+                    format: 'number',
+                },
+            ],
+            page_actions: [
+                {
+                    id: 'back',
+                    type: 'navigate',
+                    label: 'Back to Government Institutions',
+                    path: '/accounts/government-institutions',
+                    icon: 'ArrowLeft',
+                    variant: 'secondary',
+                },
+            ],
+            filters: [
+                {
+                    id: 'search',
+                    type: 'search',
+                    label: 'Search',
+                    field: 'search',
+                    query_parameter: 'search',
+                    placeholder: 'Search registration, fleet number, make or model',
+                },
+                {
+                    id: 'fuel-type',
+                    type: 'select',
+                    label: 'Fuel Type',
+                    field: 'fuel_type',
+                    query_parameter: 'fuel_type',
+                    options: [
+                        { label: 'Petrol', value: 'petrol' },
+                        { label: 'Diesel', value: 'diesel' },
+                        { label: 'Electric', value: 'electric' },
+                        { label: 'Hybrid', value: 'hybrid' },
+                    ],
+                },
+                {
+                    id: 'status',
+                    type: 'select',
+                    label: 'Status',
+                    field: 'status',
+                    query_parameter: 'status',
+                    options: [
+                        { label: 'Active', value: 'active' },
+                        { label: 'Inactive', value: 'inactive' },
+                        { label: 'Suspended', value: 'suspended' },
+                    ],
+                },
+            ],
+            table: {
+                rowKey: 'id',
+                stickyHeader: true,
+                striped: true,
+                pagination: {
+                    enabled: true,
+                    pageSize: 10,
+                    pageSizeOptions: [10, 20, 50, 100],
+                },
+                sorting: {
+                    enabled: true,
+                    defaultColumn: 'registration_number',
+                    defaultDirection: 'asc',
+                },
+                columns: [
+                    {
+                        id: 'registration-number',
+                        type: 'text',
+                        header: 'Registration No.',
+                        accessor: 'registration_number',
+                        sortable: true,
+                        searchable: true,
+                    },
+                    {
+                        id: 'fleet-number',
+                        type: 'text',
+                        header: 'Fleet No.',
+                        accessor: 'fleet_number',
+                        sortable: true,
+                    },
+                    {
+                        id: 'make',
+                        type: 'text',
+                        header: 'Make',
+                        accessor: 'make',
+                        sortable: true,
+                    },
+                    {
+                        id: 'model',
+                        type: 'text',
+                        header: 'Model',
+                        accessor: 'model',
+                    },
+                    {
+                        id: 'fuel-type',
+                        type: 'text',
+                        header: 'Fuel Type',
+                        accessor: 'fuel_type',
+                    },
+                    {
+                        id: 'card-number',
+                        type: 'text',
+                        header: 'Fuel Card',
+                        accessor: 'fuel_card.card_number',
+                    },
+                    {
+                        id: 'monthly-limit',
+                        type: 'number',
+                        header: 'Monthly Limit',
+                        accessor: 'monthly_limit',
+                        format: 'currency',
+                        currency: 'ZMW',
+                    },
+                    {
+                        id: 'status',
+                        type: 'badge',
+                        header: 'Status',
+                        accessor: 'status',
+                        sortable: true,
+                        options: {
+                            active: 'success',
+                            inactive: 'warning',
+                            suspended: 'danger',
+                        },
+                    },
+                    {
+                        id: 'created-at',
+                        type: 'datetime',
+                        header: 'Created',
+                        accessor: 'created_at',
+                        sortable: true,
+                    },
+                ],
+            },
+        },
+        {
+            id: 'government-institutions-allocations',
+            parentId: 'government-institutions',
+            title: 'Government Institution Allocations',
+            page_title: 'Fuel Allocations',
+            description: 'Review fuel budget allocations for this government institution.',
+            type: 'list',
+            page_type: 'list',
+            path: '/accounts/government-institutions/:id/allocations',
+            route: '/accounts/government-institutions/:id/allocations',
+            api: allocationsApi,
+            statistics: [
+                {
+                    id: 'total-allocated',
+                    type: 'statistic',
+                    title: 'Total Allocated',
+                    dataPath: 'statistics.total_allocated',
+                    icon: 'Fuel',
+                    format: 'currency',
+                },
+                {
+                    id: 'total-used',
+                    type: 'statistic',
+                    title: 'Total Used',
+                    dataPath: 'statistics.total_used',
+                    icon: 'Receipt',
+                    format: 'currency',
+                },
+                {
+                    id: 'available-balance',
+                    type: 'statistic',
+                    title: 'Available Balance',
+                    dataPath: 'statistics.available_balance',
+                    icon: 'WalletCards',
+                    format: 'currency',
+                },
+            ],
+            page_actions: [
+                {
+                    id: 'back',
+                    type: 'navigate',
+                    label: 'Back to Government Institutions',
+                    path: '/accounts/government-institutions',
+                    icon: 'ArrowLeft',
+                    variant: 'secondary',
+                },
+            ],
+            filters: [
+                {
+                    id: 'search',
+                    type: 'search',
+                    label: 'Search',
+                    field: 'search',
+                    query_parameter: 'search',
+                    placeholder: 'Search reference, period or cost centre',
+                },
+                {
+                    id: 'allocation-date',
+                    type: 'date_range',
+                    label: 'Allocation Date',
+                    fromField: 'date_from',
+                    toField: 'date_to',
+                    from_query_parameter: 'date_from',
+                    to_query_parameter: 'date_to',
+                },
+                {
+                    id: 'status',
+                    type: 'select',
+                    label: 'Status',
+                    field: 'status',
+                    query_parameter: 'status',
+                    options: [
+                        { label: 'Active', value: 'active' },
+                        { label: 'Exhausted', value: 'exhausted' },
+                        { label: 'Expired', value: 'expired' },
+                        { label: 'Cancelled', value: 'cancelled' },
+                    ],
+                },
+            ],
+            table: {
+                rowKey: 'id',
+                stickyHeader: true,
+                striped: true,
+                pagination: {
+                    enabled: true,
+                    pageSize: 10,
+                    pageSizeOptions: [10, 20, 50, 100],
+                },
+                sorting: {
+                    enabled: true,
+                    defaultColumn: 'allocation_date',
+                    defaultDirection: 'desc',
+                },
+                columns: [
+                    {
+                        id: 'reference',
+                        type: 'text',
+                        header: 'Reference',
+                        accessor: 'reference',
+                        sortable: true,
+                        searchable: true,
+                    },
+                    {
+                        id: 'period',
+                        type: 'text',
+                        header: 'Period',
+                        accessor: 'period',
+                        sortable: true,
+                    },
+                    {
+                        id: 'cost-centre',
+                        type: 'text',
+                        header: 'Cost Centre',
+                        accessor: 'cost_centre',
+                    },
+                    {
+                        id: 'allocated-amount',
+                        type: 'number',
+                        header: 'Allocated',
+                        accessor: 'allocated_amount',
+                        sortable: true,
+                        format: 'currency',
+                        currency: 'ZMW',
+                    },
+                    {
+                        id: 'used-amount',
+                        type: 'number',
+                        header: 'Used',
+                        accessor: 'used_amount',
+                        sortable: true,
+                        format: 'currency',
+                        currency: 'ZMW',
+                    },
+                    {
+                        id: 'remaining-amount',
+                        type: 'number',
+                        header: 'Remaining',
+                        accessor: 'remaining_amount',
+                        sortable: true,
+                        format: 'currency',
+                        currency: 'ZMW',
+                    },
+                    {
+                        id: 'allocation-date',
+                        type: 'datetime',
+                        header: 'Allocated',
+                        accessor: 'allocation_date',
+                        sortable: true,
+                    },
+                    {
+                        id: 'expiry-date',
+                        type: 'datetime',
+                        header: 'Expires',
+                        accessor: 'expiry_date',
+                        sortable: true,
+                    },
+                    {
+                        id: 'status',
+                        type: 'badge',
+                        header: 'Status',
+                        accessor: 'status',
+                        sortable: true,
+                        options: {
+                            active: 'success',
+                            exhausted: 'warning',
+                            expired: 'danger',
+                            cancelled: 'danger',
+                        },
+                    },
+                ],
+            },
         },
     ],
 }
@@ -570,3 +965,19 @@ export const governmentInstitutionsEditConfig = validateConfig(
         (page) => page.type === 'edit',
     ),
 )
+
+export const governmentInstitutionsVehiclesConfig = validateConfig(
+    'government institutions vehicles page',
+    pageConfigSchema,
+    governmentInstitutionsListConfig.sub_pages?.find(
+        (page) => page.id === 'government-institutions-vehicles',
+    ),
+) as ListPageConfig
+
+export const governmentInstitutionsAllocationsConfig = validateConfig(
+    'government institutions allocations page',
+    pageConfigSchema,
+    governmentInstitutionsListConfig.sub_pages?.find(
+        (page) => page.id === 'government-institutions-allocations',
+    ),
+) as ListPageConfig
