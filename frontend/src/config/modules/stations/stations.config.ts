@@ -234,7 +234,6 @@ const raw: PageConfig = {
     page_type: 'list',
     path: '/stations/stations',
     route: '/stations/stations',
-
     api,
 
     statistics: [

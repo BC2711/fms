@@ -25,7 +25,7 @@ function renderPage(config: PageConfig, routeParams: Readonly<Params<string>>) {
   // if(config.id ==='corporate-companies') return <AccountsListPage />
   switch (config.page_type ?? config.type) {
     case 'dashboard': return <><BreadcrumbGenerator config={config} /><DashboardGenerator dashboardConfig={config as Extract<PageConfig, { type: 'dashboard' }>} /></>
-    case 'list': return <ListPageGenerator config={config as Extract<PageConfig, { type: 'list' }>} />
+    case 'list': return <ListPageGenerator config={config as Extract<PageConfig, { type: 'list' }>} routeParams={routeParams} />
     case 'create': return <FormPageGenerator config={config as Extract<PageConfig, { type: 'create' }>} mode="create" routeParams={routeParams} />
     case 'edit': return <FormPageGenerator config={config as Extract<PageConfig, { type: 'edit' }>} mode="edit" routeParams={routeParams} />
     case 'details': return <DetailsGenerator pageConfig={config as Extract<PageConfig, { type: 'details' }>} />

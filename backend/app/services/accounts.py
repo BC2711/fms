@@ -1,5 +1,4 @@
 from decimal import Decimal
-
 from app.core.errors import AppError
 
 
@@ -12,3 +11,6 @@ class AccountBalanceService:
         if new_balance < 0:
             raise AppError("Insufficient account balance", 409)
         return new_balance
+    
+    def get_omc_stations(self, session):
+       pass

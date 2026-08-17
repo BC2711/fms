@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, type Params } from 'react-router-dom'
 import type { PaginationState, SortingState } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -12,7 +12,7 @@ import type { ListPageConfig } from '@/types/configuration.types'
 import { useDynamicQuery } from '@/hooks/useDynamicQuery'
 import type { PaginatedResponse } from '@/services/response-mapper'
 
-export function ListPageGenerator({ config }: { config: ListPageConfig }) {
+export function ListPageGenerator({ config, routeParams = {} }: { config: ListPageConfig; routeParams?: Readonly<Params<string>> }) {
   const [searchParams, setSearchParams] = useSearchParams()
   const page = Math.max(1, Number(searchParams.get('page') ?? 1))
   const pageSize = Math.max(1, Number(searchParams.get('pageSize') ?? config.table.pagination?.pageSize ?? 10))
@@ -24,7 +24,10 @@ export function ListPageGenerator({ config }: { config: ListPageConfig }) {
   const [filterValues, setFilterValues] = useState<Record<string, string>>(readFilters)
   useEffect(() => setFilterValues(readFilters()), [searchParams, keys])
   const activeFilters = useMemo(() => Object.fromEntries(Object.entries(filterValues).filter(([, value]) => value !== '')), [filterValues])
-  const query = useDynamicQuery<PaginatedResponse<Record<string, unknown>>>({ pageConfig: config, filters: activeFilters, pagination: { page, pageSize }, sorting: sort ? { field: sort, direction } : undefined, enabled: authReady })
+  const endpointParams = Object.fromEntries(
+    Object.entries(routeParams).filter((entry): entry is [string, string] => entry[1] !== undefined),
+  )
+  const query = useDynamicQuery<PaginatedResponse<Record<string, unknown>>>({ pageConfig: config, routeParams: endpointParams, filters: activeFilters, pagination: { page, pageSize }, sorting: sort ? { field: sort, direction } : undefined, enabled: authReady })
 
   return (
     <section className="space-y-5">
