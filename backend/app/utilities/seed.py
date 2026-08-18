@@ -1,9 +1,38 @@
-from sqlalchemy import func, select
+from datetime import datetime, timezone
+
+from decimal import Decimal
+
+from sqlalchemy import Boolean, Date, DateTime, Enum, Float, Integer, JSON, LargeBinary, Numeric, String, Text, func, select
 from sqlalchemy.orm import Session
 
 from app.configuration.resources import RESOURCES
 from app.core.security import hash_password
-from app.models.resources import Account, Bank, Menu, Permission, Role, Station, StationType, TestItem, User, UserType
+from app.database.base import Base
+from app.models.resources import Account, Bank, GenericRecord, Menu, Permission, Role, Station, StationType, TestItem, User, UserType
+
+
+DEMO_RESOURCES = (
+    ("fuel-operations/fuel-products", "Fuel Product"),
+    ("fuel-operations/fuel-stock-levels", "Stock Position"),
+    ("requests-orders/all-fuel-requests", "Fuel Request"),
+    ("requests-orders/all-orders", "Customer Order"),
+    ("logistics/deliveries", "Delivery"),
+    ("logistics/dispatch-management", "Dispatch"),
+    ("fleet/all-vehicles", "Fleet Vehicle"),
+    ("fleet/vehicle-maintenance", "Maintenance Job"),
+    ("stations/station-performance", "Station Review"),
+    ("cards-pos-fuel-cards/all-cards", "Fuel Card"),
+    ("cards-pos-fuel-cards/card-transactions", "Card Transaction"),
+    ("cards-pos-devices/pos-devices", "POS Device"),
+    ("cards-pos-devices/pos-transactions", "POS Transaction"),
+    ("finance-transactions/all-transactions", "Financial Transaction"),
+    ("finance-funding/funding-requests", "Funding Request"),
+    ("finance-reconciliation/reconciliation-records", "Reconciliation"),
+    ("compliance/compliance-reviews", "Compliance Review"),
+    ("compliance/incidents", "Compliance Incident"),
+    ("reports/generated-reports", "Generated Report"),
+    ("my-account/activity-history", "Account Activity"),
+)
 
 
 def permission_codes() -> list[str]:
@@ -84,5 +113,120 @@ def seed_database(db: Session) -> None:
         db.flush()
         db.add(Station(name="Lusaka Central Station", code="LSK001", station_type_id=station_type.id, province_id=1, district_id=1))
     db.commit()
+
+
+def seed_demo_data(db: Session) -> int:
+    """Add deterministic operational records used by development dashboards."""
+    admin = db.scalar(select(User).where(User.email == "admin@fms.example.com"))
+    if admin is None:
+        seed_database(db)
+        admin = db.scalar(select(User).where(User.email == "admin@fms.example.com"))
+    now = datetime.now(timezone.utc)
+    statuses = ("active", "completed", "pending", "draft", "inactive")
+    created = 0
+    for resource_index, (resource_path, label) in enumerate(DEMO_RESOURCES):
+        for month_offset in range(6):
+            for item_index in range(1 + (resource_index + month_offset) % 3):
+                code = f"DEMO-{resource_index + 1:02}-{month_offset + 1:02}-{item_index + 1:02}"
+                exists = db.scalar(select(GenericRecord.id).where(GenericRecord.resource_path == resource_path, GenericRecord.code == code))
+                if exists:
+                    continue
+                month_index = now.year * 12 + now.month - 1 - month_offset
+                year, month_zero = divmod(month_index, 12)
+                day = min(4 + item_index * 7 + resource_index % 5, 27)
+                created_at = datetime(year, month_zero + 1, day, 9 + item_index, tzinfo=timezone.utc)
+                amount = 750 + resource_index * 425 + month_offset * 180 + item_index * 95
+                db.add(GenericRecord(
+                    resource_path=resource_path,
+                    name=f"{label} {month_offset + 1}-{item_index + 1}",
+                    code=code,
+                    description="Dashboard demonstration record",
+                    status=statuses[(resource_index + month_offset + item_index) % len(statuses)],
+                    data={"amount": amount, "quantity": 100 + resource_index * 12 + item_index * 25, "source": "demo-seed"},
+                    created_by=admin.id,
+                    updated_by=admin.id,
+                    created_at=created_at,
+                    updated_at=created_at,
+                ))
+                created += 1
+    db.commit()
+    return created
+
+
+def _dummy_column_value(table_name: str, column) -> object:
+    key = column.name.lower()
+    token = f"demo-{table_name.replace('_', '-')}-{key}"
+    if isinstance(column.type, Boolean):
+        return True
+    if isinstance(column.type, DateTime):
+        return datetime.now(timezone.utc)
+    if isinstance(column.type, Date):
+        return datetime.now(timezone.utc).date()
+    if isinstance(column.type, (Numeric, Float)):
+        return Decimal("100.00")
+    if isinstance(column.type, Integer):
+        return 1
+    if isinstance(column.type, JSON):
+        return {"source": "demo-seed"}
+    if isinstance(column.type, LargeBinary):
+        return b"demo"
+    if isinstance(column.type, Enum):
+        return column.type.enums[0]
+    if isinstance(column.type, (String, Text)):
+        if "email" in key:
+            return f"{table_name}.{key}@demo.example.com"
+        if key in {"url", "endpoint", "callback_url", "webhook_url"}:
+            return "https://demo.example.com/callback"
+        if "phone" in key:
+            return "+260970000001"
+        if "status" in key:
+            return "active"
+        if key.endswith("type") or key in {"action", "method", "severity", "priority"}:
+            return "demo"
+        if "code" in key or "number" in key or key.endswith("key"):
+            return token.upper()[: max(1, getattr(column.type, "length", None) or 80)]
+        return token[: max(1, getattr(column.type, "length", None) or 200)]
+    return token
+
+
+def seed_all_tables(db: Session) -> tuple[int, list[str]]:
+    """Populate every empty mapped table with a valid dependency-aware demo row."""
+    tables = list(Base.metadata.tables.values())
+    created = 0
+    pending = {table.name: table for table in tables if not db.scalar(select(func.count()).select_from(table))}
+    for _ in range(len(pending) + 1):
+        progressed = False
+        for table_name, table in list(pending.items()):
+            values = {}
+            blocked = False
+            for column in table.columns:
+                if column.primary_key and column.autoincrement:
+                    continue
+                if column.default is not None or column.server_default is not None or column.nullable:
+                    continue
+                if column.foreign_keys:
+                    foreign_key = next(iter(column.foreign_keys))
+                    target = foreign_key.column.table
+                    target_value = db.scalar(select(foreign_key.column).limit(1))
+                    if target_value is None:
+                        blocked = True
+                        break
+                    values[column.name] = target_value
+                else:
+                    values[column.name] = _dummy_column_value(table_name, column)
+            if blocked:
+                continue
+            try:
+                with db.begin_nested():
+                    db.execute(table.insert().values(**values))
+                pending.pop(table_name)
+                created += 1
+                progressed = True
+            except Exception:
+                continue
+        if not pending or not progressed:
+            break
+    db.commit()
+    return created, sorted(pending)
 import json
 from pathlib import Path
