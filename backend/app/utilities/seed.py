@@ -111,7 +111,7 @@ def seed_database(db: Session) -> None:
         station_type = StationType(name="Service Station", code="SERVICE")
         db.add(station_type)
         db.flush()
-        db.add(Station(name="Lusaka Central Station", code="LSK001", station_type_id=station_type.id, province_id=1, district_id=1))
+        db.add(Station(name="Lusaka Central Station", code="LSK001", station_type_id=station_type.id))
     db.commit()
 
 
@@ -153,9 +153,9 @@ def seed_demo_data(db: Session) -> int:
     return created
 
 
-def _dummy_column_value(table_name: str, column) -> object:
+def _dummy_column_value(table_name: str, column, row_index: int) -> object:
     key = column.name.lower()
-    token = f"demo-{table_name.replace('_', '-')}-{key}"
+    token = f"demo-{table_name.replace('_', '-')}-{key}-{row_index + 1:03}"
     if isinstance(column.type, Boolean):
         return True
     if isinstance(column.type, DateTime):
@@ -163,67 +163,73 @@ def _dummy_column_value(table_name: str, column) -> object:
     if isinstance(column.type, Date):
         return datetime.now(timezone.utc).date()
     if isinstance(column.type, (Numeric, Float)):
-        return Decimal("100.00")
+        return Decimal(100 + row_index * 25)
     if isinstance(column.type, Integer):
-        return 1
+        return row_index + 1
     if isinstance(column.type, JSON):
-        return {"source": "demo-seed"}
+        return {"source": "demo-seed", "sequence": row_index + 1}
     if isinstance(column.type, LargeBinary):
         return b"demo"
     if isinstance(column.type, Enum):
         return column.type.enums[0]
     if isinstance(column.type, (String, Text)):
+        length = max(1, getattr(column.type, "length", None) or 200)
+        suffix = f"-{row_index + 1:03}"
+        unique_token = f"{token[:max(0, length - len(suffix))]}{suffix}"[-length:]
         if "email" in key:
-            return f"{table_name}.{key}@demo.example.com"
+            return f"{table_name}.{key}.{row_index + 1}@demo.example.com"
         if key in {"url", "endpoint", "callback_url", "webhook_url"}:
             return "https://demo.example.com/callback"
         if "phone" in key:
-            return "+260970000001"
+            return f"+260970{row_index + 1:06}"
         if "status" in key:
             return "active"
         if key.endswith("type") or key in {"action", "method", "severity", "priority"}:
-            return "demo"
+            return f"demo-{row_index + 1}"[:length]
         if "code" in key or "number" in key or key.endswith("key"):
-            return token.upper()[: max(1, getattr(column.type, "length", None) or 80)]
-        return token[: max(1, getattr(column.type, "length", None) or 200)]
+            return unique_token.upper()
+        return unique_token
     return token
 
 
-def seed_all_tables(db: Session) -> tuple[int, list[str]]:
-    """Populate every empty mapped table with a valid dependency-aware demo row."""
+def seed_all_tables(db: Session, target_rows: int = 20) -> tuple[int, list[str]]:
+    """Populate every mapped table to a minimum row count."""
     tables = list(Base.metadata.tables.values())
     created = 0
-    pending = {table.name: table for table in tables if not db.scalar(select(func.count()).select_from(table))}
-    for _ in range(len(pending) + 1):
+    pending = {table.name: table for table in tables if db.scalar(select(func.count()).select_from(table)) < target_rows}
+    for _ in range(len(pending) * 2 + 1):
         progressed = False
         for table_name, table in list(pending.items()):
-            values = {}
-            blocked = False
-            for column in table.columns:
-                if column.primary_key and column.autoincrement:
-                    continue
-                if column.default is not None or column.server_default is not None or column.nullable:
-                    continue
-                if column.foreign_keys:
-                    foreign_key = next(iter(column.foreign_keys))
-                    target = foreign_key.column.table
-                    target_value = db.scalar(select(foreign_key.column).limit(1))
-                    if target_value is None:
-                        blocked = True
-                        break
-                    values[column.name] = target_value
-                else:
-                    values[column.name] = _dummy_column_value(table_name, column)
-            if blocked:
-                continue
-            try:
-                with db.begin_nested():
-                    db.execute(table.insert().values(**values))
+            current = int(db.scalar(select(func.count()).select_from(table)) or 0)
+            while current < target_rows:
+                values = {}
+                blocked = False
+                for column in table.columns:
+                    if column.primary_key and len(table.primary_key.columns) == 1 and isinstance(column.type, Integer):
+                        continue
+                    if column.default is not None or column.server_default is not None or column.nullable:
+                        continue
+                    if column.foreign_keys:
+                        foreign_key = next(iter(column.foreign_keys))
+                        target_count = int(db.scalar(select(func.count()).select_from(foreign_key.column.table)) or 0)
+                        if target_count == 0:
+                            blocked = True
+                            break
+                        values[column.name] = db.scalar(select(foreign_key.column).order_by(foreign_key.column).offset(current % target_count).limit(1))
+                    else:
+                        values[column.name] = _dummy_column_value(table_name, column, current)
+                if blocked:
+                    break
+                try:
+                    with db.begin_nested():
+                        db.execute(table.insert().values(**values))
+                    current += 1
+                    created += 1
+                    progressed = True
+                except Exception:
+                    break
+            if current >= target_rows:
                 pending.pop(table_name)
-                created += 1
-                progressed = True
-            except Exception:
-                continue
         if not pending or not progressed:
             break
     db.commit()

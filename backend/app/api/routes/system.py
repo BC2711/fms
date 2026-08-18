@@ -33,6 +33,16 @@ DASHBOARD_SCOPES: dict[str, tuple[str, ...] | None] = {
     "reports-kpi-dashboard": None,
     "my-account-my-dashboard": ("my-account",),
 }
+DASHBOARD_ALIASES = {
+    "executive-dashboard": "dashboard-executive-dashboard",
+    "operations-dashboard": "dashboard-operations-dashboard",
+    "sales-dashboard": "dashboard-sales-dashboard",
+    "inventory-dashboard": "dashboard-inventory-dashboard",
+    "finance-dashboard": "dashboard-finance-dashboard",
+    "fleet-dashboard": "dashboard-fleet-dashboard",
+    "station-performance": "dashboard-station-performance",
+    "compliance-dashboard": "compliance-compliance-dashboard",
+}
 
 
 @router.get("/health")
@@ -106,6 +116,7 @@ def dashboard(db: Annotated[Session, Depends(get_db)], user: Annotated[User, Dep
 
 @router.get("/dashboard/{dashboard_key}")
 def scoped_dashboard(dashboard_key: str, db: Annotated[Session, Depends(get_db)], user: Annotated[User, Depends(get_current_user)]):
+    dashboard_key = DASHBOARD_ALIASES.get(dashboard_key, dashboard_key)
     if dashboard_key not in DASHBOARD_SCOPES:
         from app.core.errors import NotFoundError
         raise NotFoundError("Dashboard not found")

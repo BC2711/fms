@@ -1,6 +1,7 @@
 from datetime import date, datetime
 from decimal import Decimal
 from typing import Any, Optional
+from uuid import uuid4
 
 from sqlalchemy import (
     Date,
@@ -139,7 +140,7 @@ class Role(ResourceMixin, Base):
 
     name: Mapped[str] = mapped_column(String(100), index=True)
     description: Mapped[str] = mapped_column(Text, default="")
-    code: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    code: Mapped[str] = mapped_column(String(64), unique=True, index=True, default=lambda: f"role-{uuid4().hex[:12]}")
     parent_id: Mapped[int | None] = mapped_column(ForeignKey("roles.id"), nullable=True, index=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
 

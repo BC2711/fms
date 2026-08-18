@@ -11,6 +11,6 @@ if __name__ == "__main__":
         created = seed_demo_data(session)
         print(f"Seeded {created} dashboard demo records.")
         table_rows, skipped = seed_all_tables(session)
-        print(f"Seeded {table_rows} previously empty tables.")
+        print(f"Seeded {table_rows} rows to ensure at least 20 records per table.")
         if skipped:
             raise RuntimeError(f"Unable to seed tables: {', '.join(skipped)}")

@@ -23,7 +23,7 @@ const api: ApiConfig = {
     endpoints: {
         list: { path: `${ngoUrl}`, method: 'GET' },
         item: {
-            path: `${ngoUrl}/:id`,
+            path: `${ngoUrl}/{id}`,
             method: 'GET',
             responseMappingPath: 'data',
         },
@@ -33,12 +33,12 @@ const api: ApiConfig = {
             responseMappingPath: 'data',
         },
         update: {
-            path: `${ngoUrl}/:id`,
+            path: `${ngoUrl}/{id}`,
             method: 'PUT',
             responseMappingPath: 'data',
         },
         delete: {
-            path: `${ngoUrl}/:id`,
+            path: `${ngoUrl}/{id}`,
             method: 'DELETE',
         },
     },
@@ -70,7 +70,7 @@ const vehiclesApi: ApiConfig = {
     },
     endpoints: {
         list: {
-            path: `${ngoUrl}/:id/vehicles`,
+            path: `${ngoUrl}/{id}/vehicles`,
             method: 'GET',
         },
     },
@@ -87,7 +87,7 @@ const transactionsApi: ApiConfig = {
     },
     endpoints: {
         list: {
-            path: `${ngoUrl}/:id/transactions`,
+            path: `${ngoUrl}/{id}/transactions`,
             method: 'GET',
         },
     },

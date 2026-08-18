@@ -15,12 +15,24 @@ from app.utilities.seed import seed_database
 
 @pytest.fixture(autouse=True)
 def database():
-    Base.metadata.drop_all(engine)
+    with engine.connect() as connection:
+        connection.exec_driver_sql("PRAGMA foreign_keys=OFF")
+        connection.commit()
+        Base.metadata.drop_all(connection)
+        connection.commit()
+        connection.exec_driver_sql("PRAGMA foreign_keys=ON")
+        connection.commit()
     Base.metadata.create_all(engine)
     with SessionLocal() as session:
         seed_database(session)
     yield
-    Base.metadata.drop_all(engine)
+    with engine.connect() as connection:
+        connection.exec_driver_sql("PRAGMA foreign_keys=OFF")
+        connection.commit()
+        Base.metadata.drop_all(connection)
+        connection.commit()
+        connection.exec_driver_sql("PRAGMA foreign_keys=ON")
+        connection.commit()
 
 
 @pytest.fixture
