@@ -7,44 +7,10 @@ import type {
     ListPageConfig,
     PageConfig,
 } from '@/types/configuration.types'
-
+const governmentUrl = import.meta.env.VITE_API_ROUTE_GOVERNMENT_INSTITUTIONS
+const baseUrl = import.meta.env.VITE_API_URL
 const api: ApiConfig = {
-    baseUrl: '/api', data_mapping: {
-        type: 'paginated',
-        items: 'data.items',
-        total: 'data.total',
-        page: 'data.page',
-        pageSize: 'data.pageSize',
-    },
-    endpoints: {
-        list: {
-            path: '/accounts/government-institutions',
-            method: 'GET',
-        },
-        item: {
-            path: '/accounts/government-institutions/{id}',
-            method: 'GET',
-            responseMappingPath: 'data',
-        },
-        create: {
-            path: '/accounts/government-institutions',
-            method: 'POST',
-            responseMappingPath: 'data',
-        },
-        update: {
-            path: '/accounts/government-institutions/{id}',
-            method: 'PUT',
-            responseMappingPath: 'data',
-        },
-        delete: {
-            path: '/accounts/government-institutions/{id}',
-            method: 'DELETE',
-        },
-    },
-}
-
-const vehiclesApi: ApiConfig = {
-    baseUrl: '/api',
+    baseUrl: `${baseUrl}`,
     data_mapping: {
         type: 'paginated',
         items: 'data.items',
@@ -54,7 +20,43 @@ const vehiclesApi: ApiConfig = {
     },
     endpoints: {
         list: {
-            path: '/accounts/government-institutions/{id}/vehicles',
+            path: `${governmentUrl}`,
+            method: 'GET',
+        },
+        item: {
+            path: `${governmentUrl}/{id}`,
+            method: 'GET',
+            responseMappingPath: 'data',
+        },
+        create: {
+            path: `${governmentUrl}`,
+            method: 'POST',
+            responseMappingPath: 'data',
+        },
+        update: {
+            path: `${governmentUrl}/{id}`,
+            method: 'PUT',
+            responseMappingPath: 'data',
+        },
+        delete: {
+            path: `${governmentUrl}/{id}`,
+            method: 'DELETE',
+        },
+    },
+}
+
+const vehiclesApi: ApiConfig = {
+    baseUrl: `${baseUrl}`,
+    data_mapping: {
+        type: 'paginated',
+        items: 'data.items',
+        total: 'data.total',
+        page: 'data.page',
+        pageSize: 'data.pageSize',
+    },
+    endpoints: {
+        list: {
+            path: `${governmentUrl}/{id}/vehicles`,
             method: 'GET',
         },
     },
@@ -78,7 +80,7 @@ const allocationsApi: ApiConfig = {
 }
 
 const form: FormConfig = {
-    cancelPath: '/accounts/government-institutions',
+    cancelPath: `${governmentUrl}`,
     resetEnabled: true,
     layout: {
         type: 'columns',
@@ -239,8 +241,8 @@ const raw: PageConfig = {
     description: 'Manage government institutions and public-sector fuel accounts.',
     type: 'list',
     page_type: 'list',
-    path: '/accounts/government-institutions',
-    route: '/accounts/government-institutions',
+    path: `${governmentUrl}`,
+    route: `${governmentUrl}`,
     api,
     statistics: [
         {
@@ -422,28 +424,28 @@ const raw: PageConfig = {
                         type: 'navigate',
                         label: 'View',
                         icon: 'Eye',
-                        path: '/accounts/government-institutions/{id}',
+                        path: `${governmentUrl}/{id}`,
                     },
                     {
                         id: 'vehicles',
                         type: 'navigate',
                         label: 'Vehicles',
                         icon: 'Car',
-                        path: '/accounts/government-institutions/{id}/vehicles',
+                        path: `${governmentUrl}/{id}/vehicles`,
                     },
                     {
                         id: 'allocations',
                         type: 'navigate',
                         label: 'Allocations',
                         icon: 'Fuel',
-                        path: '/accounts/government-institutions/{id}/allocations',
+                        path: `${governmentUrl}/{id}/allocations`,
                     },
                     {
                         id: 'edit',
                         type: 'edit',
                         label: 'Edit',
                         icon: 'Pencil',
-                        path: '/accounts/government-institutions/{id}/edit',
+                        path: `${governmentUrl}/{id}/edit`,
                     },
                     {
                         id: 'delete',
@@ -451,7 +453,7 @@ const raw: PageConfig = {
                         label: 'Delete',
                         icon: 'Trash2',
                         endpoint:
-                            '/api/accounts/government-institutions/{id}',
+                            `${baseUrl}/${governmentUrl}/{id}`,
                         requires_confirmation: true,
                         confirmation:
                             'Delete this government institution?',
@@ -469,7 +471,7 @@ const raw: PageConfig = {
             type: 'navigate',
             label: 'Add Government Institution',
             icon: 'Plus',
-            path: '/accounts/government-institutions/create',
+            path: `${governmentUrl}/create`,
         },
     ],
 
@@ -481,8 +483,8 @@ const raw: PageConfig = {
             page_title: 'Add Government Institution',
             type: 'create',
             page_type: 'create',
-            path: '/accounts/government-institutions/create',
-            route: '/accounts/government-institutions/create',
+            path: `${governmentUrl}/create`,
+            route: `${governmentUrl}/create`,
             api,
             form: {
                 ...form,
@@ -493,7 +495,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to Government Institutions',
-                    path: '/accounts/government-institutions',
+                    path: `${governmentUrl}`,
                     icon: 'ArrowLeft',
                     variant: 'secondary',
                 },
@@ -506,8 +508,8 @@ const raw: PageConfig = {
             page_title: 'Government Institution Details',
             type: 'details',
             page_type: 'details',
-            path: '/accounts/government-institutions/:id',
-            route: '/accounts/government-institutions/:id',
+            path: `${governmentUrl}/:id`,
+            route: `${governmentUrl}/:id`,
             api,
             recordIdParam: 'id',
             fields: [
@@ -562,7 +564,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to Government Institutions',
-                    path: '/accounts/government-institutions',
+                    path: `${governmentUrl}`,
                     icon: 'ArrowLeft',
                     variant: 'secondary',
                 },
@@ -575,8 +577,8 @@ const raw: PageConfig = {
             page_title: 'Edit Government Institution',
             type: 'edit',
             page_type: 'edit',
-            path: '/accounts/government-institutions/:id/edit',
-            route: '/accounts/government-institutions/:id/edit',
+            path: `${governmentUrl}/:id/edit`,
+            route: `${governmentUrl}/:id/edit`,
             api,
             form: {
                 ...form,
@@ -588,7 +590,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to Government Institutions',
-                    path: '/accounts/government-institutions',
+                    path: `${governmentUrl}`,
                     icon: 'ArrowLeft',
                     variant: 'secondary',
                 },
@@ -602,8 +604,8 @@ const raw: PageConfig = {
             description: 'View vehicles registered to this government institution.',
             type: 'list',
             page_type: 'list',
-            path: '/accounts/government-institutions/:id/vehicles',
-            route: '/accounts/government-institutions/:id/vehicles',
+            path: `${governmentUrl}/:id/vehicles`,
+            route: `${governmentUrl}/:id/vehicles`,
             api: vehiclesApi,
             statistics: [
                 {
@@ -636,7 +638,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to Government Institutions',
-                    path: '/accounts/government-institutions',
+                    path: `${governmentUrl}`,
                     icon: 'ArrowLeft',
                     variant: 'secondary',
                 },
@@ -769,8 +771,8 @@ const raw: PageConfig = {
             description: 'Review fuel budget allocations for this government institution.',
             type: 'list',
             page_type: 'list',
-            path: '/accounts/government-institutions/:id/allocations',
-            route: '/accounts/government-institutions/:id/allocations',
+            path: `${governmentUrl}/:id/allocations`,
+            route: `${governmentUrl}/:id/allocations`,
             api: allocationsApi,
             statistics: [
                 {
@@ -803,7 +805,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to Government Institutions',
-                    path: '/accounts/government-institutions',
+                    path: `${governmentUrl}`,
                     icon: 'ArrowLeft',
                     variant: 'secondary',
                 },

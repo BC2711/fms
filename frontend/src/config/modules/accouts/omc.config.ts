@@ -8,8 +8,9 @@ import type {
     PageConfig,
 } from '@/types/configuration.types'
 
+const omcBaseUrl = import.meta.env.VITE_API_ROUTE_OIL_MARKETING_COMPANIES
 const api: ApiConfig = {
-    baseUrl: '/api',
+    baseUrl: import.meta.env.VITE_API_BASE_URL,
     data_mapping: {
         type: 'paginated',
         items: 'data.items',
@@ -19,33 +20,33 @@ const api: ApiConfig = {
     },
     endpoints: {
         list: {
-            path: '/accounts/oil-marketing-companies',
+            path: `${omcBaseUrl}`,
             method: 'GET',
         },
         item: {
-            path: '/accounts/oil-marketing-companies/{id}',
+            path: `${omcBaseUrl}/{id}`,
             method: 'GET',
             responseMappingPath: 'data',
         },
         create: {
-            path: '/accounts/oil-marketing-companies',
+            path: `${omcBaseUrl}`,
             method: 'POST',
             responseMappingPath: 'data',
         },
         update: {
-            path: '/accounts/oil-marketing-companies/{id}',
+            path: `${omcBaseUrl}/{id}`,
             method: 'PUT',
             responseMappingPath: 'data',
         },
         delete: {
-            path: '/accounts/oil-marketing-companies/{id}',
+            path: `${omcBaseUrl}/{id}`,
             method: 'DELETE',
         },
     },
 }
 
 const stationsApi: ApiConfig = {
-    baseUrl: '/api',
+    baseUrl: import.meta.env.VITE_API_URL,
     data_mapping: {
         type: 'paginated',
         items: 'data.items',
@@ -62,7 +63,7 @@ const stationsApi: ApiConfig = {
 }
 
 const transactionsApi: ApiConfig = {
-    baseUrl: '/api',
+    baseUrl: import.meta.env.VITE_API_URL,
     data_mapping: {
         type: 'paginated',
         items: 'data.items',
@@ -72,21 +73,21 @@ const transactionsApi: ApiConfig = {
     },
     endpoints: {
         list: {
-            path: '/accounts/oil-marketing-companies/{id}/transactions',
+            path: omcBaseUrl + '/{id}/transactions',
             method: 'GET',
         },
     },
 }
 
 const statementApi: ApiConfig = {
-    baseUrl: '/api',
+    baseUrl: import.meta.env.VITE_API_URL,
     data_mapping: {
         type: 'item',
         item: 'data',
     },
     endpoints: {
         item: {
-            path: '/accounts/oil-marketing-companies/{id}/statement',
+            path: omcBaseUrl + '/{id}/statement',
             method: 'GET',
             responseMappingPath: 'data',
         },
@@ -94,7 +95,7 @@ const statementApi: ApiConfig = {
 }
 
 const form: FormConfig = {
-    cancelPath: '/accounts/oil-marketing-companies',
+    cancelPath: omcBaseUrl,
     resetEnabled: true,
     layout: {
         type: 'columns',
@@ -507,8 +508,8 @@ const raw: PageConfig = {
     description: 'Manage registered oil marketing companies, licences, stations, account balances, verification and operational status.',
     type: 'list',
     page_type: 'list',
-    path: '/accounts/oil-marketing-companies',
-    route: '/accounts/oil-marketing-companies',
+    path: omcBaseUrl,
+    route: omcBaseUrl,
     api,
     statistics: [
         {
@@ -725,41 +726,42 @@ const raw: PageConfig = {
                         type: 'navigate',
                         label: 'View',
                         icon: 'Eye',
+                        path: omcBaseUrl + '/{id}',
                     },
                     {
                         id: 'edit',
                         type: 'edit',
                         label: 'Edit',
                         icon: 'Pencil',
-                        path: '/accounts/oil-marketing-companies/{id}/edit',
+                        path: omcBaseUrl + '/{id}/edit',
                     },
                     {
                         id: 'stations',
                         type: 'navigate',
                         label: 'Stations',
                         icon: 'MapPin',
-                        path: '/accounts/oil-marketing-companies/{id}/stations',
+                        path: omcBaseUrl + '/{id}/stations',
                     },
                     {
                         id: 'transactions',
                         type: 'navigate',
                         label: 'Transactions',
                         icon: 'Receipt',
-                        path: '/accounts/oil-marketing-companies/{id}/transactions',
+                        path: omcBaseUrl + '/{id}/transactions',
                     },
                     {
                         id: 'statement',
                         type: 'navigate',
                         label: 'Statement',
                         icon: 'FileText',
-                        path: '/accounts/oil-marketing-companies/{id}/statement',
+                        path: omcBaseUrl + '/{id}/statement',
                     },
                     {
                         id: 'delete',
                         type: 'delete',
                         label: 'Delete',
                         icon: 'Trash2',
-                        endpoint: '/api/accounts/oil-marketing-companies/{id}',
+                        endpoint: omcBaseUrl + '/{id}',
                         requires_confirmation: true,
                         confirmation: 'Are you sure you want to delete this oil marketing company?',
                         success_message: 'Oil marketing company deleted successfully.',
@@ -775,7 +777,7 @@ const raw: PageConfig = {
             type: 'navigate',
             label: 'Add Oil Marketing Company',
             icon: 'Plus',
-            path: '/accounts/oil-marketing-companies/create',
+            path: omcBaseUrl + '/create',
             // permission: {
             //     any: ['oil_marketing_companies.create'],
             // },
@@ -791,8 +793,8 @@ const raw: PageConfig = {
             description: 'Register a new oil marketing company in the fuel management system.',
             type: 'create',
             page_type: 'create',
-            path: '/accounts/oil-marketing-companies/create',
-            route: '/accounts/oil-marketing-companies/create',
+            path: omcBaseUrl + '/create',
+            route: omcBaseUrl + '/create',
             // authentication: {
             //     required: true,
             // },
@@ -804,6 +806,15 @@ const raw: PageConfig = {
                 ...form,
                 submitLabel: 'Add Oil Marketing Company',
             },
+            page_actions: [
+                {
+                    id: 'back',
+                    type: 'navigate',
+                    label: 'Back',
+                    path: omcBaseUrl,
+                    variant: 'secondary',
+                }
+            ],
         },
         {
             id: 'oil-marketing-companies-details',
@@ -812,8 +823,8 @@ const raw: PageConfig = {
             page_title: 'Oil Marketing Company Details',
             type: 'details',
             page_type: 'details',
-            path: '/accounts/oil-marketing-companies/:id',
-            route: '/accounts/oil-marketing-companies/:id',
+            path: omcBaseUrl + '/:id',
+            route: omcBaseUrl + '/:id',
             // authentication: {
             //     required: true,
             // },
@@ -848,32 +859,30 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back',
-                    path: '/accounts/oil-marketing-companies',
+                    icon: 'ArrowLeft',
+                    path: omcBaseUrl,
                     variant: 'secondary',
                 },
-
                 {
                     id: 'edit',
                     type: 'edit',
                     label: 'Edit',
                     icon: 'Pencil',
-                    path: '/accounts/oil-marketing-companies/{id}/edit',
+                    path: omcBaseUrl + '/{id}/edit',
                 },
-
                 {
                     id: 'stations',
                     type: 'navigate',
                     label: 'View Stations',
                     icon: 'MapPin',
-                    path: '/accounts/oil-marketing-companies/{id}/stations',
+                    path: omcBaseUrl + '/{id}/stations',
                 },
-
                 {
                     id: 'statement',
                     type: 'navigate',
                     label: 'Account Statement',
                     icon: 'FileText',
-                    path: '/accounts/oil-marketing-companies/{id}/statement',
+                    path: omcBaseUrl + '/{id}/statement',
                 },
             ],
             sections: [
@@ -1122,14 +1131,22 @@ const raw: PageConfig = {
             page_title: 'Edit OMC',
             type: 'edit',
             page_type: 'edit',
-            path: '/accounts/oil-marketing-companies/:id/edit',
-            route: '/accounts/oil-marketing-companies/:id/edit',
+            path: omcBaseUrl + '/:id/edit',
+            route: omcBaseUrl + '/:id/edit',
             api,
             form: {
                 ...form,
                 submitLabel: 'Save Changes',
             },
             recordIdParam: 'id',
+            page_actions: [
+                {
+                    id: 'back',
+                    type: 'navigate',
+                    label: 'Back to OMCs',
+                    path: omcBaseUrl,
+                }
+            ],
         },
         {
             id: 'oil-marketing-companies-stations',
@@ -1138,8 +1155,8 @@ const raw: PageConfig = {
             page_title: 'OMC Stations',
             type: 'list',
             page_type: 'list',
-            path: '/accounts/oil-marketing-companies/:id/stations',
-            route: '/accounts/oil-marketing-companies/:id/stations',
+            path: omcBaseUrl + '/:id/stations',
+            route: omcBaseUrl + '/:id/stations',
             api: stationsApi,
             statistics: [
                 {
@@ -1180,7 +1197,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to OMCs',
-                    path: '/accounts/oil-marketing-companies',
+                    path: omcBaseUrl,
                 }
             ],
             filters: [
@@ -1329,8 +1346,8 @@ const raw: PageConfig = {
             page_title: 'OMC Transactions',
             type: 'list',
             page_type: 'list',
-            path: '/accounts/oil-marketing-companies/:id/transactions',
-            route: '/accounts/oil-marketing-companies/:id/transactions',
+            path: omcBaseUrl + '/:id/transactions',
+            route: omcBaseUrl + '/:id/transactions',
             api: transactionsApi,
             statistics: [
                 {
@@ -1363,7 +1380,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to OMCs',
-                    path: '/accounts/oil-marketing-companies',
+                    path: omcBaseUrl,
                 },
             ],
             filters: [
@@ -1493,8 +1510,8 @@ const raw: PageConfig = {
             description: 'Review the company account balance and statement summary.',
             type: 'details',
             page_type: 'details',
-            path: '/accounts/oil-marketing-companies/:id/statement',
-            route: '/accounts/oil-marketing-companies/:id/statement',
+            path: omcBaseUrl + '/:id/statement',
+            route: omcBaseUrl + '/:id/statement',
             api: statementApi,
             recordIdParam: 'id',
             fields: [
@@ -1511,7 +1528,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to OMCs',
-                    path: '/accounts/oil-marketing-companies',
+                    path: omcBaseUrl,
                     variant: 'secondary',
                 },
             ],

@@ -8,6 +8,8 @@ import type {
     PageConfig,
 } from '@/types/configuration.types'
 
+const baseUrl = import.meta.env.VITE_API_URL;
+const individualUrl = import.meta.env.VITE_API_ROUTE_INDIVIDUALS;
 const api: ApiConfig = {
     baseUrl: '/api',
 
@@ -44,7 +46,7 @@ const api: ApiConfig = {
 }
 
 const vehiclesApi: ApiConfig = {
-    baseUrl: '/api',
+    baseUrl: `${baseUrl}`,
     data_mapping: {
         type: 'paginated',
         items: 'data.items',
@@ -54,14 +56,14 @@ const vehiclesApi: ApiConfig = {
     },
     endpoints: {
         list: {
-            path: '/accounts/individuals/{id}/vehicles',
+            path: `${individualUrl}/{id}/vehicles`,
             method: 'GET',
         },
     },
 }
 
 const transactionsApi: ApiConfig = {
-    baseUrl: '/api',
+    baseUrl: `${baseUrl}`,
     data_mapping: {
         type: 'paginated',
         items: 'data.items',
@@ -71,14 +73,14 @@ const transactionsApi: ApiConfig = {
     },
     endpoints: {
         list: {
-            path: '/accounts/individuals/{id}/transactions',
+            path: `${individualUrl}/{id}/transactions`,
             method: 'GET',
         },
     },
 }
 
 const form: FormConfig = {
-    cancelPath: '/accounts/individuals',
+    cancelPath: `${individualUrl}`,
     resetEnabled: true,
     layout: {
         type: 'columns',
@@ -222,8 +224,8 @@ const raw: PageConfig = {
     description: 'Manage individual fuel account holders.',
     type: 'list',
     page_type: 'list',
-    path: '/accounts/individuals',
-    route: '/accounts/individuals',
+    path: `${individualUrl}`,
+    route: `${individualUrl}`,
     api,
     statistics: [
         {
@@ -403,35 +405,35 @@ const raw: PageConfig = {
                         type: 'navigate',
                         label: 'View',
                         icon: 'Eye',
-                        path: '/accounts/individuals/{id}',
+                        path: `${individualUrl}/{id}`,
                     },
                     {
                         id: 'edit',
                         type: 'edit',
                         label: 'Edit',
                         icon: 'Pencil',
-                        path: '/accounts/individuals/{id}/edit',
+                        path: `${individualUrl}/{id}/edit`,
                     },
                     {
                         id: 'vehicles',
                         type: 'navigate',
                         label: 'Vehicles',
                         icon: 'Car',
-                        path: '/accounts/individuals/{id}/vehicles',
+                        path: `${individualUrl}/{id}/vehicles`,
                     },
                     {
                         id: 'transactions',
                         type: 'navigate',
                         label: 'Transactions',
                         icon: 'List',
-                        path: '/accounts/individuals/{id}/transactions',
+                        path: `${individualUrl}/{id}/transactions`,
                     },
                     {
                         id: 'delete',
                         type: 'delete',
                         label: 'Delete',
                         icon: 'Trash2',
-                        endpoint: '/api/accounts/individuals/{id}',
+                        endpoint: `${baseUrl}/${individualUrl}/{id}`,
                         requires_confirmation: true,
                         confirmation: 'Delete this individual account?',
                         success_message: 'Individual account deleted.',
@@ -447,7 +449,7 @@ const raw: PageConfig = {
             type: 'navigate',
             label: 'Add Individual',
             icon: 'Plus',
-            path: '/accounts/individuals/create',
+            path: `${individualUrl}/create`,
         },
     ],
 
@@ -459,8 +461,8 @@ const raw: PageConfig = {
             page_title: 'Add Individual',
             type: 'create',
             page_type: 'create',
-            path: '/accounts/individuals/create',
-            route: '/accounts/individuals/create',
+            path: `${individualUrl}/create`,
+            route: `${individualUrl}/create`,
             api,
             form: {
                 ...form,
@@ -471,7 +473,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to Individuals',
-                    path: '/accounts/individuals',
+                    path: `${individualUrl}`,
                     icon: 'ArrowLeft',
                     variant: 'secondary',
                 },
@@ -484,8 +486,8 @@ const raw: PageConfig = {
             page_title: 'Individual Details',
             type: 'details',
             page_type: 'details',
-            path: '/accounts/individuals/:id',
-            route: '/accounts/individuals/:id',
+            path: `${individualUrl}/:id`,
+            route: `${individualUrl}/:id`,
             api,
             recordIdParam: 'id',
             fields: [
@@ -537,7 +539,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to Individuals',
-                    path: '/accounts/individuals',
+                    path: `${individualUrl}`,
                     icon: 'ArrowLeft',
                     variant: 'secondary',
                 },
@@ -550,8 +552,8 @@ const raw: PageConfig = {
             page_title: 'Edit Individual',
             type: 'edit',
             page_type: 'edit',
-            path: '/accounts/individuals/:id/edit',
-            route: '/accounts/individuals/:id/edit',
+            path: `${individualUrl}/:id/edit`,
+            route: `${individualUrl}/:id/edit`,
             api,
             form: {
                 ...form,
@@ -563,7 +565,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to Individuals',
-                    path: '/accounts/individuals',
+                    path: `${individualUrl}`,
                     icon: 'ArrowLeft',
                     variant: 'secondary',
                 },
@@ -577,8 +579,8 @@ const raw: PageConfig = {
             description: 'View vehicles registered to this individual account.',
             type: 'list',
             page_type: 'list',
-            path: '/accounts/individuals/:id/vehicles',
-            route: '/accounts/individuals/:id/vehicles',
+            path: `${individualUrl}/:id/vehicles`,
+            route: `${individualUrl}/:id/vehicles`,
             api: vehiclesApi,
             statistics: [
                 {
@@ -619,7 +621,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to Individuals',
-                    path: '/accounts/individuals',
+                    path: `${individualUrl}`,
                     icon: 'ArrowLeft',
                     variant: 'secondary',
                 },
@@ -752,8 +754,8 @@ const raw: PageConfig = {
             description: 'Review fuel and account transactions for this individual.',
             type: 'list',
             page_type: 'list',
-            path: '/accounts/individuals/:id/transactions',
-            route: '/accounts/individuals/:id/transactions',
+            path: `${individualUrl}/:id/transactions`,
+            route: `${individualUrl}/:id/transactions`,
             api: transactionsApi,
             statistics: [
                 {
@@ -786,7 +788,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to Individuals',
-                    path: '/accounts/individuals',
+                    path: `${individualUrl}`,
                     icon: 'ArrowLeft',
                     variant: 'secondary',
                 },

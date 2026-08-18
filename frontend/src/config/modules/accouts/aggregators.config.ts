@@ -8,8 +8,10 @@ import type {
     PageConfig,
 } from '@/types/configuration.types'
 
+const aggregatorBaseUrl = import.meta.env.VITE_API_ROUTE_AGGREGATORS
+
 const api: ApiConfig = {
-    baseUrl: '/api',
+    baseUrl: import.meta.env.VITE_API_URL,
 
     data_mapping: {
         type: 'paginated',
@@ -20,31 +22,34 @@ const api: ApiConfig = {
     },
 
     endpoints: {
-        list: { path: '/accounts/aggregators', method: 'GET' },
+        list: {
+            path: aggregatorBaseUrl,
+            method: 'GET'
+        },
         item: {
-            path: '/accounts/aggregators/{id}',
+            path: `${aggregatorBaseUrl}/{id}`,
             method: 'GET',
             responseMappingPath: 'data',
         },
         create: {
-            path: '/accounts/aggregators',
+            path: aggregatorBaseUrl,
             method: 'POST',
             responseMappingPath: 'data',
         },
         update: {
-            path: '/accounts/aggregators/{id}',
+            path: `${aggregatorBaseUrl}/{id}`,
             method: 'PUT',
             responseMappingPath: 'data',
         },
         delete: {
-            path: '/accounts/aggregators/{id}',
+            path: `${aggregatorBaseUrl}/{id}`,
             method: 'DELETE',
         },
     },
 }
 
 const vehiclesApi: ApiConfig = {
-    baseUrl: '/api',
+    baseUrl: import.meta.env.VITE_API_URL,
     data_mapping: {
         type: 'paginated',
         items: 'data.items',
@@ -54,14 +59,14 @@ const vehiclesApi: ApiConfig = {
     },
     endpoints: {
         list: {
-            path: '/accounts/aggregators/{id}/vehicles',
+            path: `${aggregatorBaseUrl}/{id}/vehicles`,
             method: 'GET',
         },
     },
 }
 
 const transactionsApi: ApiConfig = {
-    baseUrl: '/api',
+    baseUrl: import.meta.env.VITE_API_URL,
     data_mapping: {
         type: 'paginated',
         items: 'data.items',
@@ -71,14 +76,14 @@ const transactionsApi: ApiConfig = {
     },
     endpoints: {
         list: {
-            path: '/accounts/aggregators/{id}/transactions',
+            path: `${aggregatorBaseUrl}/{id}/transactions`,
             method: 'GET',
         },
     },
 }
 
 const form: FormConfig = {
-    cancelPath: '/accounts/aggregators',
+    cancelPath: `${aggregatorBaseUrl}`,
     resetEnabled: true,
     layout: {
         type: 'columns',
@@ -226,8 +231,8 @@ const raw: PageConfig = {
     description: 'Manage aggregators and the accounts managed under them.',
     type: 'list',
     page_type: 'list',
-    path: '/accounts/aggregators',
-    route: '/accounts/aggregators',
+    path: aggregatorBaseUrl,
+    route: aggregatorBaseUrl,
     api,
     statistics: [
         {
@@ -402,35 +407,35 @@ const raw: PageConfig = {
                         type: 'navigate',
                         label: 'View',
                         icon: 'Eye',
-                        path: '/accounts/aggregators/{id}',
+                        path: `${aggregatorBaseUrl}/{id}`,
                     },
                     {
                         id: 'edit',
                         type: 'edit',
                         label: 'Edit',
                         icon: 'Pencil',
-                        path: '/accounts/aggregators/{id}/edit',
+                        path: `${aggregatorBaseUrl}/{id}/edit`,
                     },
                     {
                         id: 'vehicles',
                         type: 'navigate',
                         label: 'Vehicles',
                         icon: 'Car',
-                        path: '/accounts/aggregators/{id}/vehicles',
+                        path: `${aggregatorBaseUrl}/{id}/vehicles`,
                     },
                     {
                         id: 'transactions',
                         type: 'navigate',
                         label: 'Transactions',
                         icon: 'Receipt',
-                        path: '/accounts/aggregators/{id}/transactions',
+                        path: `${aggregatorBaseUrl}/{id}/transactions`,
                     },
                     {
                         id: 'delete',
                         type: 'delete',
                         label: 'Delete',
                         icon: 'Trash2',
-                        endpoint: '/api/accounts/aggregators/{id}',
+                        endpoint: `${aggregatorBaseUrl}/{id}`,
                         requires_confirmation: true,
                         confirmation: 'Delete this aggregator?',
                         success_message: 'Aggregator deleted.',
@@ -446,7 +451,7 @@ const raw: PageConfig = {
             type: 'navigate',
             label: 'Add Aggregator',
             icon: 'Plus',
-            path: '/accounts/aggregators/create',
+            path: `${aggregatorBaseUrl}/create`,
         },
     ],
 
@@ -458,8 +463,8 @@ const raw: PageConfig = {
             page_title: 'Add Aggregator',
             type: 'create',
             page_type: 'create',
-            path: '/accounts/aggregators/create',
-            route: '/accounts/aggregators/create',
+            path: `${aggregatorBaseUrl}/create`,
+            route: `${aggregatorBaseUrl}/create`,
             api,
             form: {
                 ...form,
@@ -470,7 +475,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to Aggregators',
-                    path: '/accounts/aggregators',
+                    path: `${aggregatorBaseUrl}`,
                     icon: 'ArrowLeft',
                     variant: 'secondary',
                 },
@@ -483,8 +488,8 @@ const raw: PageConfig = {
             page_title: 'Aggregator Details',
             type: 'details',
             page_type: 'details',
-            path: '/accounts/aggregators/:id',
-            route: '/accounts/aggregators/:id',
+            path: `${aggregatorBaseUrl}/{id}`,
+            route: `${aggregatorBaseUrl}/{id}`,
             api,
             recordIdParam: 'id',
 
@@ -532,7 +537,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to Aggregators',
-                    path: '/accounts/aggregators',
+                    path: `${aggregatorBaseUrl}`,
                     icon: 'ArrowLeft',
                     variant: 'secondary',
                 },
@@ -545,8 +550,8 @@ const raw: PageConfig = {
             page_title: 'Edit Aggregator',
             type: 'edit',
             page_type: 'edit',
-            path: '/accounts/aggregators/:id/edit',
-            route: '/accounts/aggregators/:id/edit',
+            path: `${aggregatorBaseUrl}/{id}/edit`,
+            route: `${aggregatorBaseUrl}/{id}/edit`,
             api,
             form: {
                 ...form,
@@ -558,7 +563,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to Aggregators',
-                    path: '/accounts/aggregators',
+                    path: `${aggregatorBaseUrl}`,
                     icon: 'ArrowLeft',
                     variant: 'secondary',
                 },
@@ -573,8 +578,8 @@ const raw: PageConfig = {
             description: 'View vehicles registered to this aggregator account.',
             type: 'list',
             page_type: 'list',
-            path: '/accounts/aggregators/:id/vehicles',
-            route: '/accounts/aggregators/:id/vehicles',
+            path: `${aggregatorBaseUrl}/{id}/vehicles`,
+            route: `${aggregatorBaseUrl}/{id}/vehicles`,
             api: vehiclesApi,
             statistics: [
                 {
@@ -615,7 +620,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to Aggregators',
-                    path: '/accounts/aggregators',
+                    path: `${aggregatorBaseUrl}`,
                     icon: 'ArrowLeft',
                     variant: 'secondary',
                 },
@@ -748,8 +753,8 @@ const raw: PageConfig = {
             description: 'Review fuel and account transactions for this individual.',
             type: 'list',
             page_type: 'list',
-            path: '/accounts/aggregators/:id/transactions',
-            route: '/accounts/aggregators/:id/transactions',
+            path: `${aggregatorBaseUrl}/{id}/transactions`,
+            route: `${aggregatorBaseUrl}/{id}/transactions`,
             api: transactionsApi,
             statistics: [
                 {
@@ -782,7 +787,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to aggregators',
-                    path: '/accounts/aggregators',
+                    path: `${aggregatorBaseUrl}`,
                     icon: 'ArrowLeft',
                     variant: 'secondary',
                 },

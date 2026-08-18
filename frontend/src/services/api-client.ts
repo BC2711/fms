@@ -1,6 +1,7 @@
 import axios, { type AxiosRequestConfig } from 'axios'
 
 import { useAuthStore } from '@/auth/auth.store'
+import { API_BASE_URL, resolveBackendBaseUrl, resolveBackendPath } from '@/config/backend-env'
 import { getToken } from '@/services/token-manager'
 
 const DEFAULT_TIMEOUT = 30_000
@@ -22,7 +23,7 @@ export function setUnauthorizedHandler(handler: UnauthorizedHandler): void {
 
 export function createApiClient(options: ApiClientOptions = {}) {
   const client = axios.create({
-    baseURL: options.baseURL ?? import.meta.env.VITE_API_URL ?? '/api',
+    baseURL: resolveBackendBaseUrl(options.baseURL) ?? API_BASE_URL,
     timeout: options.timeout ?? DEFAULT_TIMEOUT,
   })
 
@@ -51,23 +52,28 @@ export type RequestOptions = Omit<AxiosRequestConfig, 'url' | 'method' | 'data'>
 }
 
 export async function get<T>(url: string, config?: RequestOptions): Promise<T> {
-  return await apiClient.get<T>(url, config) as unknown as T
+  return await apiClient.get<T>(resolveBackendPath(url), normalizeRequestOptions(config)) as unknown as T
 }
 
 export async function post<TResponse, TBody = unknown>(url: string, body?: TBody, config?: RequestOptions): Promise<TResponse> {
-  return await apiClient.post<TResponse, never, TBody>(url, body, config) as unknown as TResponse
+  return await apiClient.post<TResponse, never, TBody>(resolveBackendPath(url), body, normalizeRequestOptions(config)) as unknown as TResponse
 }
 
 export async function put<TResponse, TBody = unknown>(url: string, body?: TBody, config?: RequestOptions): Promise<TResponse> {
-  return await apiClient.put<TResponse, never, TBody>(url, body, config) as unknown as TResponse
+  return await apiClient.put<TResponse, never, TBody>(resolveBackendPath(url), body, normalizeRequestOptions(config)) as unknown as TResponse
 }
 
 export async function patch<TResponse, TBody = unknown>(url: string, body?: TBody, config?: RequestOptions): Promise<TResponse> {
-  return await apiClient.patch<TResponse, never, TBody>(url, body, config) as unknown as TResponse
+  return await apiClient.patch<TResponse, never, TBody>(resolveBackendPath(url), body, normalizeRequestOptions(config)) as unknown as TResponse
 }
 
 export async function deleteRequest<T>(url: string, config?: RequestOptions): Promise<T> {
-  return await apiClient.delete<T>(url, config) as unknown as T
+  return await apiClient.delete<T>(resolveBackendPath(url), normalizeRequestOptions(config)) as unknown as T
+}
+
+function normalizeRequestOptions(config?: RequestOptions): RequestOptions | undefined {
+  if (!config) return undefined
+  return { ...config, baseURL: resolveBackendBaseUrl(config.baseURL) }
 }
 
 export { deleteRequest as delete }

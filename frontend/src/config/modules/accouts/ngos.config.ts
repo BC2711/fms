@@ -8,8 +8,11 @@ import type {
     PageConfig,
 } from '@/types/configuration.types'
 
+const baseUrl = import.meta.env.VITE_API_URL;
+const ngoUrl = import.meta.env.VITE_API_ROUTE_NGOS;
+
 const api: ApiConfig = {
-    baseUrl: '/api',
+    baseUrl: `${baseUrl}`,
     data_mapping: {
         type: 'paginated',
         items: 'data.items',
@@ -18,24 +21,24 @@ const api: ApiConfig = {
         pageSize: 'data.pageSize',
     },
     endpoints: {
-        list: { path: '/accounts/ngos', method: 'GET' },
+        list: { path: `${ngoUrl}`, method: 'GET' },
         item: {
-            path: '/accounts/ngos/{id}',
+            path: `${ngoUrl}/:id`,
             method: 'GET',
             responseMappingPath: 'data',
         },
         create: {
-            path: '/accounts/ngos',
+            path: `${ngoUrl}`,
             method: 'POST',
             responseMappingPath: 'data',
         },
         update: {
-            path: '/accounts/ngos/{id}',
+            path: `${ngoUrl}/:id`,
             method: 'PUT',
             responseMappingPath: 'data',
         },
         delete: {
-            path: '/accounts/ngos/{id}',
+            path: `${ngoUrl}/:id`,
             method: 'DELETE',
         },
     },
@@ -57,7 +60,7 @@ const api: ApiConfig = {
 //     },
 // }
 const vehiclesApi: ApiConfig = {
-    baseUrl: '/api',
+    baseUrl: `${baseUrl}`,
     data_mapping: {
         type: 'paginated',
         items: 'data.items',
@@ -67,14 +70,14 @@ const vehiclesApi: ApiConfig = {
     },
     endpoints: {
         list: {
-            path: '/accounts/ngos/{id}/vehicles',
+            path: `${ngoUrl}/:id/vehicles`,
             method: 'GET',
         },
     },
 }
 
 const transactionsApi: ApiConfig = {
-    baseUrl: '/api',
+    baseUrl: `${baseUrl}`,
     data_mapping: {
         type: 'paginated',
         items: 'data.items',
@@ -84,14 +87,14 @@ const transactionsApi: ApiConfig = {
     },
     endpoints: {
         list: {
-            path: '/accounts/ngos/{id}/transactions',
+            path: `${ngoUrl}/:id/transactions`,
             method: 'GET',
         },
     },
 }
 
 const form: FormConfig = {
-    cancelPath: '/accounts/ngos',
+    cancelPath: `${ngoUrl}`,
     resetEnabled: true,
     layout: {
         type: 'columns',
@@ -242,8 +245,8 @@ const raw: PageConfig = {
     description: 'Manage NGO fuel accounts and allocations.',
     type: 'list',
     page_type: 'list',
-    path: '/accounts/ngos',
-    route: '/accounts/ngos',
+    path: `${ngoUrl}`,
+    route: `${ngoUrl}`,
     api,
 
     statistics: [
@@ -416,42 +419,42 @@ const raw: PageConfig = {
                         type: 'navigate',
                         label: 'View',
                         icon: 'Eye',
-                        path: '/accounts/ngos/{id}',
+                        path: `${ngoUrl}/:id`,
                     },
                     {
                         id: 'edit',
                         type: 'edit',
                         label: 'Edit',
                         icon: 'Pencil',
-                        path: '/accounts/ngos/{id}/edit',
+                        path: `${ngoUrl}/:id/edit`,
                     },
                     //  {
                     //     id: 'cards',
                     //     type: 'navigate',
                     //     label: 'Cards',
                     //     icon: 'atm',
-                    //     path: '/accounts/ngos/{id}/cards',
+                    //     path: `${ngoUrl}/:id/cards`,
                     // },
                     {
                         id: 'vehicles',
                         type: 'navigate',
                         label: 'Vehicles',
                         icon: 'Truck',
-                        path: '/accounts/ngos/{id}/vehicles',
+                        path: `${ngoUrl}/:id/vehicles`,
                     },
                     {
                         id: 'transactions',
                         type: 'navigate',
                         label: 'Transactions',
                         icon: 'Receipt',
-                        path: '/accounts/ngos/{id}/transactions',
+                        path: `${ngoUrl}/:id/transactions`,
                     },
                     {
                         id: 'delete',
                         type: 'delete',
                         label: 'Delete',
                         icon: 'Trash2',
-                        endpoint: '/api/accounts/ngos/{id}',
+                        endpoint: `${baseUrl}/${ngoUrl}/:id`,
                         requires_confirmation: true,
                         confirmation: 'Delete this NGO?',
                         success_message: 'NGO deleted.',
@@ -467,7 +470,7 @@ const raw: PageConfig = {
             type: 'navigate',
             label: 'Add NGO',
             icon: 'Plus',
-            path: '/accounts/ngos/create',
+            path: `${ngoUrl}/create`,
         },
     ],
 
@@ -479,8 +482,8 @@ const raw: PageConfig = {
             page_title: 'Add NGO',
             type: 'create',
             page_type: 'create',
-            path: '/accounts/ngos/create',
-            route: '/accounts/ngos/create',
+            path: `${ngoUrl}/create`,
+            route: `${ngoUrl}/create`,
             api,
             form: {
                 ...form,
@@ -491,7 +494,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to NGOs',
-                    path: '/accounts/ngos',
+                    path: `${ngoUrl}`,
                     icon: 'ArrowLeft',
                     variant: 'secondary',
                 },
@@ -504,8 +507,8 @@ const raw: PageConfig = {
             page_title: 'NGO Details',
             type: 'details',
             page_type: 'details',
-            path: '/accounts/ngos/:id',
-            route: '/accounts/ngos/:id',
+            path: `${ngoUrl}/:id`,
+            route: `${ngoUrl}/:id`,
             api,
             recordIdParam: 'id',
             fields: [
@@ -554,7 +557,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to NGOs',
-                    path: '/accounts/ngos',
+                    path: `${ngoUrl}`,
                     icon: 'ArrowLeft',
                     variant: 'secondary',
                 },
@@ -567,15 +570,15 @@ const raw: PageConfig = {
             page_title: 'Edit NGO',
             type: 'edit',
             page_type: 'edit',
-            path: '/accounts/ngos/:id/edit',
-            route: '/accounts/ngos/:id/edit',
+            path: `${ngoUrl}/:id/edit`,
+            route: `${ngoUrl}/:id/edit`,
             api,
             form: {
                 ...form,
                 submitLabel: 'Save Changes',
             },
             recordIdParam: 'id',
-        },        
+        },
         {
             id: 'ngos-vehicles',
             parentId: 'ngos',
@@ -584,8 +587,8 @@ const raw: PageConfig = {
             description: 'View vehicles registered to this NGO account.',
             type: 'list',
             page_type: 'list',
-            path: '/accounts/ngos/:id/vehicles',
-            route: '/accounts/ngos/:id/vehicles',
+            path: `${ngoUrl}/:id/vehicles`,
+            route: `${ngoUrl}/:id/vehicles`,
             api: vehiclesApi,
             statistics: [
                 {
@@ -626,7 +629,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to NGOs',
-                    path: '/accounts/ngos',
+                    path: `${ngoUrl}`,
                     icon: 'ArrowLeft',
                     variant: 'secondary',
                 },
@@ -759,8 +762,8 @@ const raw: PageConfig = {
             description: 'Review fuel and account transactions for this NGO.',
             type: 'list',
             page_type: 'list',
-            path: '/accounts/ngos/:id/transactions',
-            route: '/accounts/ngos/:id/transactions',
+            path: `${ngoUrl}/:id/transactions`,
+            route: `${ngoUrl}/:id/transactions`,
             api: transactionsApi,
             statistics: [
                 {
@@ -793,7 +796,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to NGOs',
-                    path: '/accounts/ngos',
+                    path: `${ngoUrl}`,
                     icon: 'ArrowLeft',
                     variant: 'secondary',
                 },

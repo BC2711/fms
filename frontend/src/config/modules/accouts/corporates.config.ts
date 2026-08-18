@@ -8,8 +8,10 @@ import type {
     PageConfig,
 } from '@/types/configuration.types'
 
+const corporateBaseUrl = import.meta.env.VITE_API_ROUTE_CORPORATE_COMPANIES
+const baseUrl = import.meta.env.VITE_API_URL
 const api: ApiConfig = {
-    baseUrl: '/api',
+    baseUrl: baseUrl,
     data_mapping: {
         type: 'paginated',
         items: 'data.items',
@@ -19,33 +21,33 @@ const api: ApiConfig = {
     },
     endpoints: {
         list: {
-            path: '/accounts/corporate-companies',
+            path: `${corporateBaseUrl}`,
             method: 'GET',
         },
         item: {
-            path: '/accounts/corporate-companies/{id}',
+            path: `${corporateBaseUrl}/{id}`,
             method: 'GET',
             responseMappingPath: 'data',
         },
         create: {
-            path: '/accounts/corporate-companies',
+            path: `${corporateBaseUrl}`,
             method: 'POST',
             responseMappingPath: 'data',
         },
         update: {
-            path: '/accounts/corporate-companies/{id}',
+            path: `${corporateBaseUrl}/{id}`,
             method: 'PUT',
             responseMappingPath: 'data',
         },
         delete: {
-            path: '/accounts/corporate-companies/{id}',
+            path: `${corporateBaseUrl}/{id}`,
             method: 'DELETE',
         },
     },
 }
 
 const vehiclesApi: ApiConfig = {
-    baseUrl: '/api',
+    baseUrl: baseUrl,
     data_mapping: {
         type: 'paginated',
         items: 'data.items',
@@ -55,14 +57,14 @@ const vehiclesApi: ApiConfig = {
     },
     endpoints: {
         list: {
-            path: '/accounts/corporate-companies/{id}/vehicles',
+            path: `${corporateBaseUrl}/{id}/vehicles`,
             method: 'GET',
         },
     },
 }
 
 const transactionsApi: ApiConfig = {
-    baseUrl: '/api',
+    baseUrl: baseUrl,
     data_mapping: {
         type: 'paginated',
         items: 'data.items',
@@ -72,14 +74,14 @@ const transactionsApi: ApiConfig = {
     },
     endpoints: {
         list: {
-            path: '/accounts/corporate-companies/{id}/transactions',
+            path: `${corporateBaseUrl}/{id}/transactions`,
             method: 'GET',
         },
     },
 }
 
 const form: FormConfig = {
-    cancelPath: '/accounts/corporate-companies',
+    cancelPath: `${corporateBaseUrl}`,
     resetEnabled: true,
     layout: {
         type: 'columns',
@@ -259,8 +261,8 @@ const raw: PageConfig = {
     description: 'Manage corporate fuel account holders.',
     type: 'list',
     page_type: 'list',
-    path: '/accounts/corporate-companies',
-    route: '/accounts/corporate-companies',
+    path: `${corporateBaseUrl}`,
+    route: `${corporateBaseUrl}`,
     api,
     statistics: [
         {
@@ -445,35 +447,35 @@ const raw: PageConfig = {
                         type: 'navigate',
                         label: 'View',
                         icon: 'Eye',
-                        path:'/accounts/corporate-companies/{id}',
+                        path: `${corporateBaseUrl}/{id}`,
                     },
                     {
                         id: 'edit',
                         type: 'edit',
                         label: 'Edit',
                         icon: 'Pencil',
-                        path: '/accounts/corporate-companies/{id}/edit',
+                        path: `${corporateBaseUrl}/{id}/edit`,
                     },
                     {
                         id: 'vehicles',
                         type: 'navigate',
                         label: 'Vehicles',
                         icon: 'Truck',
-                        path: '/accounts/corporate-companies/{id}/vehicles',
+                        path: `${corporateBaseUrl}/{id}/vehicles`,
                     },
                     {
                         id: 'transactions',
                         type: 'navigate',
                         label: 'Transactions',
                         icon: 'Receipt',
-                        path: '/accounts/corporate-companies/{id}/transactions',
+                        path: `${corporateBaseUrl}/{id}/transactions`,
                     },
                     {
                         id: 'delete',
                         type: 'delete',
                         label: 'Delete',
                         icon: 'Trash2',
-                        endpoint: '/api/accounts/corporate-companies/{id}',
+                        endpoint: `${baseUrl}/${corporateBaseUrl}/{id}`,
                         permission: {
                             any: ['corporate_companies.delete'],
                         },
@@ -492,7 +494,7 @@ const raw: PageConfig = {
             type: 'navigate',
             label: 'Add Corporate Company',
             icon: 'Plus',
-            path: '/accounts/corporate-companies/create',
+            path: `${corporateBaseUrl}/create`,
         },
     ],
 
@@ -504,8 +506,8 @@ const raw: PageConfig = {
             page_title: 'Add Corporate Company',
             type: 'create',
             page_type: 'create',
-            path: '/accounts/corporate-companies/create',
-            route: '/accounts/corporate-companies/create',
+            path: `${corporateBaseUrl}/create`,
+            route: `${corporateBaseUrl}/create`,
             api,
             form: {
                 ...form,
@@ -519,8 +521,8 @@ const raw: PageConfig = {
             page_title: 'Corporate Company Details',
             type: 'details',
             page_type: 'details',
-            path: '/accounts/corporate-companies/:id',
-            route: '/accounts/corporate-companies/:id',
+            path: `${corporateBaseUrl}/:id`,
+            route: `${corporateBaseUrl}/:id`,
             api,
             recordIdParam: 'id',
 
@@ -602,8 +604,8 @@ const raw: PageConfig = {
             page_title: 'Edit Corporate Company',
             type: 'edit',
             page_type: 'edit',
-            path: '/accounts/corporate-companies/:id/edit',
-            route: '/accounts/corporate-companies/:id/edit',
+            path: `${corporateBaseUrl}/:id/edit`,
+            route: `${corporateBaseUrl}/:id/edit`,
             authentication: { required: true },
             permissions: {
                 any: ['corporate_companies.update'],
@@ -623,8 +625,8 @@ const raw: PageConfig = {
             description: 'View vehicles registered to this corporate account.',
             type: 'list',
             page_type: 'list',
-            path: '/accounts/corporate-companies/:id/vehicles',
-            route: '/accounts/corporate-companies/:id/vehicles',
+            path: `${corporateBaseUrl}/:id/vehicles`,
+            route: `${corporateBaseUrl}/:id/vehicles`,
             api: vehiclesApi,
             statistics: [
                 {
@@ -665,7 +667,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to Corporate Companies',
-                    path: '/accounts/corporate-companies',
+                    path: `${corporateBaseUrl}`,
                     icon: 'ArrowLeft',
                     variant: 'secondary',
                 },
@@ -798,8 +800,8 @@ const raw: PageConfig = {
             description: 'Review fuel and account transactions for this corporate company.',
             type: 'list',
             page_type: 'list',
-            path: '/accounts/corporate-companies/:id/transactions',
-            route: '/accounts/corporate-companies/:id/transactions',
+            path: `${corporateBaseUrl}/:id/transactions`,
+            route: `${corporateBaseUrl}/:id/transactions`,
             api: transactionsApi,
             statistics: [
                 {
@@ -832,7 +834,7 @@ const raw: PageConfig = {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back to Corporate Companies',
-                    path: '/accounts/corporate-companies',
+                    path: `${corporateBaseUrl}`,
                     icon: 'ArrowLeft',
                     variant: 'secondary',
                 },
