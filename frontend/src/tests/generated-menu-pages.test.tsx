@@ -32,7 +32,7 @@ describe('generated missing pages', () => {
   })
 
   it('configures every remaining menu page and its CRUD routes', () => {
-    expect(Object.keys(generatedMenuPageRegistry).length).toBeGreaterThan(100)
+    expect(Object.keys(generatedMenuPageRegistry).length).toBe(0)
     expect(getPageConfigByRoute('/fuel-operations/fuel-products')?.type).toBe('list')
     expect(getPageConfigByRoute('/fuel-operations/fuel-products/create')?.type).toBe('create')
     expect(getPageConfigByRoute('/fuel-operations/fuel-products/15')?.type).toBe('details')

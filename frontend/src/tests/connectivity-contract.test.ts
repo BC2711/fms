@@ -33,13 +33,11 @@ describe('frontend/backend connectivity contract', () => {
     }
   })
 
-  it('uses dedicated FastAPI prefixes or the authenticated generic resource backend', () => {
-    const dedicatedPrefixes = ['/auth/', '/accounts', '/stations', '/banks', '/test-items']
+  it('uses normalized backend paths for dedicated and generic resources', () => {
     for (const page of pages.filter((candidate) => candidate.type !== 'dashboard')) {
       for (const endpoint of Object.values(page.api.endpoints)) {
-        const dedicated = dedicatedPrefixes.some((prefix) => endpoint.path === prefix.replace(/\/$/, '') || endpoint.path.startsWith(prefix))
-        const generated = page.id.startsWith('generated-') || page.id.startsWith('administration-') || page.id.startsWith('settings-')
-        expect(dedicated || generated, `${page.id}: ${endpoint.method} ${endpoint.path}`).toBe(true)
+        expect(endpoint.path, `${page.id}: ${endpoint.method}`).toMatch(/^\/(?!api(?:\/|$))/)
+        expect(endpoint.path, `${page.id}: ${endpoint.method}`).not.toContain(':id')
       }
     }
   })

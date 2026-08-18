@@ -33,6 +33,8 @@ class CRUDService:
     def create(self, payload: BaseModel, actor_id: int | None):
         values = payload.model_dump(exclude_unset=True)
         values = self._normalize_values(values)
+        if self.config.model is Account:
+            values.setdefault("user_id", actor_id)
         if self.config.model is Account and self.session.scalar(
             select(Account.id).where(
                 Account.account_number == values.get("account_number")

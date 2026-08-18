@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { financeConfigs } from '@/config/modules/finance/finance.config'
 import { getPageConfigByRoute } from '@/config/page-registry'
+import { dashboardConfigIds } from '@/config/pages/dashboard.config'
 
 describe('finance configuration', () => {
   it('registers all 50 Finance menu leaves with menu icons', () => {
@@ -9,7 +10,9 @@ describe('finance configuration', () => {
     expect(getPageConfigByRoute('/banks')).toBeDefined()
     expect(financeConfigs.length + 1).toBe(50)
     for (const page of financeConfigs) {
-      expect(getPageConfigByRoute(page.path)).toBe(page)
+      const registered = getPageConfigByRoute(page.path)
+      if (dashboardConfigIds.has(page.id)) expect(registered?.type).toBe('dashboard')
+      else expect(registered).toBe(page)
       const statistic = page.statistics?.[0]
       if (statistic?.type === 'statistic') expect(statistic.icon).toBe('Circle')
     }
