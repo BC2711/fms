@@ -804,13 +804,14 @@ const raw: PageConfig = {
             api,
             form: {
                 ...form,
-                submitLabel: 'Add Oil Marketing Company',
+                submitLabel: 'Add OMC',
             },
             page_actions: [
                 {
                     id: 'back',
                     type: 'navigate',
                     label: 'Back',
+                    icon: 'ArrowLeft',
                     path: omcBaseUrl,
                     variant: 'secondary',
                 }
@@ -1143,6 +1144,7 @@ const raw: PageConfig = {
                 {
                     id: 'back',
                     type: 'navigate',
+                    icon: 'ArrowLeft',
                     label: 'Back to OMCs',
                     path: omcBaseUrl,
                 }
@@ -1196,6 +1198,7 @@ const raw: PageConfig = {
                 {
                     id: 'back',
                     type: 'navigate',
+                    icon: 'ArrowLeft',
                     label: 'Back to OMCs',
                     path: omcBaseUrl,
                 }
@@ -1379,6 +1382,7 @@ const raw: PageConfig = {
                 {
                     id: 'back',
                     type: 'navigate',
+                    icon: 'ArrowLeft',
                     label: 'Back to OMCs',
                     path: omcBaseUrl,
                 },
@@ -1527,6 +1531,7 @@ const raw: PageConfig = {
                 {
                     id: 'back',
                     type: 'navigate',
+                    icon: 'ArrowLeft',
                     label: 'Back to OMCs',
                     path: omcBaseUrl,
                     variant: 'secondary',

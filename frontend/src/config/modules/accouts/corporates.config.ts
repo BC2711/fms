@@ -513,6 +513,16 @@ const raw: PageConfig = {
                 ...form,
                 submitLabel: 'Add Corporate Company',
             },
+            page_actions: [
+                {
+                    id: 'back',
+                    type: 'navigate',
+                    label: 'Back to Corporate Companies',
+                    icon: 'ArrowLeft',
+                    path: `${corporateBaseUrl}`,
+                    variant: 'secondary',
+                }
+            ],
         },
         {
             id: 'corporate-companies-details',
@@ -543,6 +553,16 @@ const raw: PageConfig = {
                 'credit_limit',
                 'verification_status',
                 'status',
+            ],
+            page_actions: [
+                {
+                    id: 'back',
+                    type: 'navigate',
+                    label: 'Back to Corporate Companies',
+                    icon: 'ArrowLeft',
+                    path: `${corporateBaseUrl}`,
+                    variant: 'secondary',
+                }
             ],
 
             sections: [
@@ -616,6 +636,16 @@ const raw: PageConfig = {
                 submitLabel: 'Save Changes',
             },
             recordIdParam: 'id',
+            page_actions: [
+                {
+                    id: 'back',
+                    type: 'navigate',
+                    label: 'Back to Corporate Companies',
+                    icon: 'ArrowLeft',
+                    path: `${corporateBaseUrl}`,
+                    variant: 'secondary',
+                }
+            ],
         },
         {
             id: 'corporate-companies-vehicles',

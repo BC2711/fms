@@ -488,8 +488,8 @@ const raw: PageConfig = {
             page_title: 'Aggregator Details',
             type: 'details',
             page_type: 'details',
-            path: `${aggregatorBaseUrl}/{id}`,
-            route: `${aggregatorBaseUrl}/{id}`,
+            path: `${aggregatorBaseUrl}/:id`,
+            route: `${aggregatorBaseUrl}/:id`,
             api,
             recordIdParam: 'id',
 
@@ -550,8 +550,8 @@ const raw: PageConfig = {
             page_title: 'Edit Aggregator',
             type: 'edit',
             page_type: 'edit',
-            path: `${aggregatorBaseUrl}/{id}/edit`,
-            route: `${aggregatorBaseUrl}/{id}/edit`,
+            path: `${aggregatorBaseUrl}/:id/edit`,
+            route: `${aggregatorBaseUrl}/:id/edit`,
             api,
             form: {
                 ...form,
@@ -578,8 +578,8 @@ const raw: PageConfig = {
             description: 'View vehicles registered to this aggregator account.',
             type: 'list',
             page_type: 'list',
-            path: `${aggregatorBaseUrl}/{id}/vehicles`,
-            route: `${aggregatorBaseUrl}/{id}/vehicles`,
+            path: `${aggregatorBaseUrl}/:id/vehicles`,
+            route: `${aggregatorBaseUrl}/:id/vehicles`,
             api: vehiclesApi,
             statistics: [
                 {
@@ -753,8 +753,8 @@ const raw: PageConfig = {
             description: 'Review fuel and account transactions for this individual.',
             type: 'list',
             page_type: 'list',
-            path: `${aggregatorBaseUrl}/{id}/transactions`,
-            route: `${aggregatorBaseUrl}/{id}/transactions`,
+            path: `${aggregatorBaseUrl}/:id/transactions`,
+            route: `${aggregatorBaseUrl}/:id/transactions`,
             api: transactionsApi,
             statistics: [
                 {
