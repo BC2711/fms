@@ -2,12 +2,14 @@ import { ArrowUpRight, CircleCheck, Clock3, Command, RefreshCw } from 'lucide-re
 import { Link } from 'react-router-dom'
 
 import { useAuthStore } from '@/auth/auth.store'
+import { ActivityLineChart, DistributionChart, ModuleBarChart, type ChartPoint } from '@/components/dashboard/DashboardCharts'
 import { DynamicIcon } from '@/framework/runtime/DynamicIcon'
 import { useDynamicQuery } from '@/hooks/useDynamicQuery'
 import type { DashboardPageConfig, MenuItem } from '@/types/configuration.types'
 
 interface DashboardData {
   summary?: { items?: number; accounts?: number; stations?: number; generated_records?: number }
+  charts?: { monthly_activity?: ChartPoint[]; module_activity?: ChartPoint[]; status_distribution?: ChartPoint[]; account_mix?: ChartPoint[] }
 }
 
 const accents = [
@@ -55,6 +57,7 @@ export function OperationsDashboard({ config }: { config: DashboardPageConfig })
   const modules = (user?.menus ?? []).filter((item) => item.is_visible !== false && item.id !== 'dashboard' && Boolean(firstPath(item)))
   const summary = query.data?.summary ?? {}
   const totalDestinations = modules.reduce((total, item) => total + leafCount(item), 0)
+  const workflowCoverage = modules.slice(0, 7).map((module) => ({ label: module.label, value: leafCount(module) }))
   const maxLeaves = Math.max(...modules.map(leafCount), 1)
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
@@ -64,9 +67,9 @@ export function OperationsDashboard({ config }: { config: DashboardPageConfig })
     <section className="space-y-6" aria-labelledby="dashboard-heading">
       <header className="flex flex-col gap-4 border-b border-slate-200 pb-6 dark:border-white/10 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p className="text-sm font-medium text-cyan-700 dark:text-cyan-300">{today}</p>
-          <h1 id="dashboard-heading" className="mt-1 text-3xl font-bold text-slate-950 dark:text-white">{greeting}, {user?.name?.split(' ')[0] ?? 'Operator'}</h1>
-          <p className="mt-2 max-w-2xl text-sm text-slate-500 dark:text-slate-400">Your live view of fuel operations, accounts, stations, and service activity.</p>
+          <p className="text-sm font-medium text-cyan-700 dark:text-cyan-300">{greeting}, {user?.name?.split(' ')[0] ?? 'Operator'} <span className="text-slate-400">/ {today}</span></p>
+          <h1 id="dashboard-heading" className="mt-1 text-3xl font-bold text-slate-950 dark:text-white">{config.page_title ?? config.title}</h1>
+          <p className="mt-2 max-w-2xl text-sm text-slate-500 dark:text-slate-400">{config.description}</p>
         </div>
         <div className="flex items-center gap-2">
           <span className="inline-flex h-9 items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 text-xs font-semibold text-emerald-800 dark:border-emerald-400/20 dark:bg-emerald-400/10 dark:text-emerald-300"><CircleCheck size={15} /> Systems operational</span>
@@ -83,6 +86,14 @@ export function OperationsDashboard({ config }: { config: DashboardPageConfig })
           <Metric label="Operational records" value={summary.generated_records ?? 0} icon="Database" loading={query.isLoading} />
           <Metric label="Available workflows" value={totalDestinations} icon="LayoutDashboard" loading={false} />
         </div>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-6">
+        <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900 2xl:col-span-3"><div><h2 className="text-sm font-bold text-slate-950 dark:text-white">Operational activity</h2><p className="mt-1 text-xs text-slate-500">Records created over the last six months</p></div>{query.isLoading ? <div className="mt-5 h-64 animate-pulse rounded bg-slate-100 dark:bg-slate-800" /> : <ActivityLineChart data={query.data?.charts?.monthly_activity ?? []} />}</article>
+        <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900 2xl:col-span-3"><div><h2 className="text-sm font-bold text-slate-950 dark:text-white">Activity by module</h2><p className="mt-1 text-xs text-slate-500">Highest-volume operational areas</p></div>{query.isLoading ? <div className="mt-5 h-64 animate-pulse rounded bg-slate-100 dark:bg-slate-800" /> : <ModuleBarChart data={query.data?.charts?.module_activity ?? []} />}</article>
+        <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900 2xl:col-span-2"><div><h2 className="text-sm font-bold text-slate-950 dark:text-white">Record status</h2><p className="mt-1 text-xs text-slate-500">Current operational distribution</p></div>{query.isLoading ? <div className="mt-5 h-64 animate-pulse rounded bg-slate-100 dark:bg-slate-800" /> : <DistributionChart data={query.data?.charts?.status_distribution ?? []} />}</article>
+        <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900 2xl:col-span-2"><div><h2 className="text-sm font-bold text-slate-950 dark:text-white">Account portfolio</h2><p className="mt-1 text-xs text-slate-500">Accounts by customer category</p></div>{query.isLoading ? <div className="mt-5 h-64 animate-pulse rounded bg-slate-100 dark:bg-slate-800" /> : <DistributionChart data={query.data?.charts?.account_mix ?? []} ariaLabel="Account portfolio distribution chart" />}</article>
+        <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900 2xl:col-span-2"><div><h2 className="text-sm font-bold text-slate-950 dark:text-white">Workflow coverage</h2><p className="mt-1 text-xs text-slate-500">Authorized destinations by module</p></div><ModuleBarChart data={workflowCoverage} ariaLabel="Authorized workflow coverage chart" /></article>
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">

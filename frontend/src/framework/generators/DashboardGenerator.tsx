@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 
-import { OperationsDashboard } from '@/components/dashboard/OperationsDashboard'
+import { dashboardConfigIds } from '@/config/pages/dashboard.config'
 import { SimpleChart } from '@/components/data-display/SimpleChart'
 import { WidgetWrapper } from '@/components/data-display/WidgetWrapper'
 import { DynamicComponent } from '@/framework/runtime/DynamicComponent'
@@ -13,6 +13,8 @@ const gridSpans: Record<number, string> = {
   1: 'lg:col-span-1', 2: 'lg:col-span-2', 3: 'lg:col-span-3', 4: 'lg:col-span-4', 5: 'lg:col-span-5', 6: 'lg:col-span-6',
   7: 'lg:col-span-7', 8: 'lg:col-span-8', 9: 'lg:col-span-9', 10: 'lg:col-span-10', 11: 'lg:col-span-11', 12: 'lg:col-span-12',
 }
+
+const OperationsDashboard = lazy(() => import('@/components/dashboard/OperationsDashboard').then((module) => ({ default: module.OperationsDashboard })))
 
 function readPath<T>(data: Record<string, unknown>, path: string): T | undefined {
   return path.split('.').reduce<unknown>((value, segment) => value && typeof value === 'object' ? (value as Record<string, unknown>)[segment] : undefined, data) as T | undefined
@@ -46,7 +48,7 @@ function FetchedWidget({ dashboardConfig, widget }: { dashboardConfig: Dashboard
 }
 
 export function DashboardGenerator({ dashboardConfig }: { dashboardConfig: DashboardPageConfig }) {
-  if (dashboardConfig.id === 'dashboard') return <OperationsDashboard config={dashboardConfig} />
+  if (dashboardConfigIds.has(dashboardConfig.id)) return <Suspense fallback={<div aria-label="Loading dashboard" className="h-96 animate-pulse rounded-lg bg-slate-100 dark:bg-slate-900" />}><OperationsDashboard config={dashboardConfig} /></Suspense>
   return <section className="space-y-5"><h1 className="text-3xl font-bold">{dashboardConfig.page_title ?? dashboardConfig.title}</h1>{dashboardConfig.description && <p className="text-gray-500">{dashboardConfig.description}</p>}<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-12">{dashboardConfig.widgets.map((widget) => {
     const canFetch = Boolean(dashboardConfig.api && widget.endpointKey && dashboardConfig.api.endpoints[widget.endpointKey])
     return <div key={widget.id} data-widget-type={widget.type} data-grid-columns={widget.grid?.columns ?? 6} className={`md:col-span-2 ${gridSpans[widget.grid?.columns ?? 6]}`}>{canFetch ? <FetchedWidget dashboardConfig={dashboardConfig} widget={widget} /> : <WidgetContent widget={widget} data={{}} isLoading={false} />}</div>

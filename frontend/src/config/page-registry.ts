@@ -1,4 +1,4 @@
-import { dashboardConfig } from '@/config/pages/dashboard.config'
+import { dashboardConfig, dashboardPageRegistry } from '@/config/pages/dashboard.config'
 import { testItemsCreateConfig, testItemsDetailsConfig, testItemsEditConfig, testItemsListConfig } from '@/config/modules/test-items.config'
 import type { ListPageConfig, PageConfig } from '@/types/configuration.types'
 import { banksCreateConfig, banksDetailsConfig, banksEditConfig, banksListConfig } from '@/config/modules/banks.config'
@@ -53,6 +53,7 @@ export const pageRegistry: Record<string, PageConfig> = {
   ...reportsPageRegistry,
   ...myAccountPageRegistry,
   ...settingsPageRegistry,
+  ...dashboardPageRegistry,
   login: loginConfig,
   register: registerConfig,
   'forgot-password': forgetPasswordConfig,
