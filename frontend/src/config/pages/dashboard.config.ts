@@ -27,7 +27,7 @@ function createDashboard(definition: DashboardDefinition): DashboardPageConfig {
   return {
     ...definition, page_title: definition.title, type: 'dashboard', page_type: 'dashboard', route: definition.path,
     authentication: { required: true },
-    api: { baseUrl: apiBaseUrl, endpoints: { summary: { path: '/dashboard', method: 'GET' } }, data_mapping: { type: 'item', item: 'data' } },
+    api: { baseUrl: apiBaseUrl, endpoints: { summary: { path: definition.id === 'dashboard' ? '/dashboard' : `/dashboard/${definition.id}`, method: 'GET' } }, data_mapping: { type: 'item', item: 'data' } },
     widgets: [
       { id: `${definition.id}-accounts`, type: 'statistic', title: 'Accounts', dataPath: 'summary.accounts', endpointKey: 'summary', icon: 'Users', format: 'number' },
       { id: `${definition.id}-stations`, type: 'statistic', title: 'Stations', dataPath: 'summary.stations', endpointKey: 'summary', icon: 'Fuel', format: 'number' },

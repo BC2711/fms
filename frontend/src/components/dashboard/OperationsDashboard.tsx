@@ -9,7 +9,7 @@ import type { DashboardPageConfig, MenuItem } from '@/types/configuration.types'
 
 interface DashboardData {
   summary?: { items?: number; accounts?: number; stations?: number; generated_records?: number }
-  charts?: { monthly_activity?: ChartPoint[]; module_activity?: ChartPoint[]; status_distribution?: ChartPoint[]; account_mix?: ChartPoint[] }
+  charts?: { monthly_activity?: ChartPoint[]; module_activity?: ChartPoint[]; status_distribution?: ChartPoint[]; account_mix?: ChartPoint[]; category_mix?: ChartPoint[] }
 }
 
 const accents = [
@@ -58,6 +58,8 @@ export function OperationsDashboard({ config }: { config: DashboardPageConfig })
   const summary = query.data?.summary ?? {}
   const totalDestinations = modules.reduce((total, item) => total + leafCount(item), 0)
   const workflowCoverage = modules.slice(0, 7).map((module) => ({ label: module.label, value: leafCount(module) }))
+  const subject = (config.page_title ?? config.title).replace(/ Dashboard$/i, '').replace(/ Performance$/i, '')
+  const usesAccountMix = ['dashboard', 'dashboard-executive-dashboard', 'dashboard-sales-dashboard', 'my-account-my-dashboard'].includes(config.id)
   const maxLeaves = Math.max(...modules.map(leafCount), 1)
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
@@ -89,10 +91,10 @@ export function OperationsDashboard({ config }: { config: DashboardPageConfig })
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-6">
-        <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900 2xl:col-span-3"><div><h2 className="text-sm font-bold text-slate-950 dark:text-white">Operational activity</h2><p className="mt-1 text-xs text-slate-500">Records created over the last six months</p></div>{query.isLoading ? <div className="mt-5 h-64 animate-pulse rounded bg-slate-100 dark:bg-slate-800" /> : <ActivityLineChart data={query.data?.charts?.monthly_activity ?? []} />}</article>
-        <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900 2xl:col-span-3"><div><h2 className="text-sm font-bold text-slate-950 dark:text-white">Activity by module</h2><p className="mt-1 text-xs text-slate-500">Highest-volume operational areas</p></div>{query.isLoading ? <div className="mt-5 h-64 animate-pulse rounded bg-slate-100 dark:bg-slate-800" /> : <ModuleBarChart data={query.data?.charts?.module_activity ?? []} />}</article>
-        <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900 2xl:col-span-2"><div><h2 className="text-sm font-bold text-slate-950 dark:text-white">Record status</h2><p className="mt-1 text-xs text-slate-500">Current operational distribution</p></div>{query.isLoading ? <div className="mt-5 h-64 animate-pulse rounded bg-slate-100 dark:bg-slate-800" /> : <DistributionChart data={query.data?.charts?.status_distribution ?? []} />}</article>
-        <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900 2xl:col-span-2"><div><h2 className="text-sm font-bold text-slate-950 dark:text-white">Account portfolio</h2><p className="mt-1 text-xs text-slate-500">Accounts by customer category</p></div>{query.isLoading ? <div className="mt-5 h-64 animate-pulse rounded bg-slate-100 dark:bg-slate-800" /> : <DistributionChart data={query.data?.charts?.account_mix ?? []} ariaLabel="Account portfolio distribution chart" />}</article>
+        <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900 2xl:col-span-3"><div><h2 className="text-sm font-bold text-slate-950 dark:text-white">{subject} trend</h2><p className="mt-1 text-xs text-slate-500">Database activity over the last six months</p></div>{query.isLoading ? <div className="mt-5 h-64 animate-pulse rounded bg-slate-100 dark:bg-slate-800" /> : <ActivityLineChart data={query.data?.charts?.monthly_activity ?? []} />}</article>
+        <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900 2xl:col-span-3"><div><h2 className="text-sm font-bold text-slate-950 dark:text-white">{subject} volume</h2><p className="mt-1 text-xs text-slate-500">Highest-volume database resource areas</p></div>{query.isLoading ? <div className="mt-5 h-64 animate-pulse rounded bg-slate-100 dark:bg-slate-800" /> : <ModuleBarChart data={query.data?.charts?.category_mix ?? []} ariaLabel={`${subject} volume chart`} />}</article>
+        <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900 2xl:col-span-2"><div><h2 className="text-sm font-bold text-slate-950 dark:text-white">{subject} status</h2><p className="mt-1 text-xs text-slate-500">Current scoped record distribution</p></div>{query.isLoading ? <div className="mt-5 h-64 animate-pulse rounded bg-slate-100 dark:bg-slate-800" /> : <DistributionChart data={query.data?.charts?.status_distribution ?? []} ariaLabel={`${subject} status chart`} />}</article>
+        <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900 2xl:col-span-2"><div><h2 className="text-sm font-bold text-slate-950 dark:text-white">{usesAccountMix ? 'Account portfolio' : `${subject} composition`}</h2><p className="mt-1 text-xs text-slate-500">{usesAccountMix ? 'Accounts by customer category' : 'Records by domain category'}</p></div>{query.isLoading ? <div className="mt-5 h-64 animate-pulse rounded bg-slate-100 dark:bg-slate-800" /> : <DistributionChart data={(usesAccountMix ? query.data?.charts?.account_mix : query.data?.charts?.category_mix) ?? []} ariaLabel={`${subject} composition chart`} />}</article>
         <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-slate-900 2xl:col-span-2"><div><h2 className="text-sm font-bold text-slate-950 dark:text-white">Workflow coverage</h2><p className="mt-1 text-xs text-slate-500">Authorized destinations by module</p></div><ModuleBarChart data={workflowCoverage} ariaLabel="Authorized workflow coverage chart" /></article>
       </div>
 

@@ -17,7 +17,7 @@ describe('dashboard page configuration', () => {
     for (const route of dashboardRoutes) {
       const config = getPageConfigByRoute(route)
       expect(config?.type, route).toBe('dashboard')
-      expect(config?.api?.endpoints.summary?.path, route).toBe('/dashboard')
+      expect(config?.api?.endpoints.summary?.path, route).toBe(route === '/dashboard' ? '/dashboard' : `/dashboard/${config?.id}`)
     }
   })
 })
