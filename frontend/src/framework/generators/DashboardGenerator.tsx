@@ -1,5 +1,6 @@
 import { useState } from 'react'
 
+import { OperationsDashboard } from '@/components/dashboard/OperationsDashboard'
 import { SimpleChart } from '@/components/data-display/SimpleChart'
 import { WidgetWrapper } from '@/components/data-display/WidgetWrapper'
 import { DynamicComponent } from '@/framework/runtime/DynamicComponent'
@@ -45,6 +46,7 @@ function FetchedWidget({ dashboardConfig, widget }: { dashboardConfig: Dashboard
 }
 
 export function DashboardGenerator({ dashboardConfig }: { dashboardConfig: DashboardPageConfig }) {
+  if (dashboardConfig.id === 'dashboard') return <OperationsDashboard config={dashboardConfig} />
   return <section className="space-y-5"><h1 className="text-3xl font-bold">{dashboardConfig.page_title ?? dashboardConfig.title}</h1>{dashboardConfig.description && <p className="text-gray-500">{dashboardConfig.description}</p>}<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-12">{dashboardConfig.widgets.map((widget) => {
     const canFetch = Boolean(dashboardConfig.api && widget.endpointKey && dashboardConfig.api.endpoints[widget.endpointKey])
     return <div key={widget.id} data-widget-type={widget.type} data-grid-columns={widget.grid?.columns ?? 6} className={`md:col-span-2 ${gridSpans[widget.grid?.columns ?? 6]}`}>{canFetch ? <FetchedWidget dashboardConfig={dashboardConfig} widget={widget} /> : <WidgetContent widget={widget} data={{}} isLoading={false} />}</div>
