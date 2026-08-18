@@ -614,6 +614,7 @@ const raw: PageConfig = {
             options: [],
         },
     ],
+
     table: {
         rowKey: 'id',
         stickyHeader: true,
@@ -775,7 +776,7 @@ const raw: PageConfig = {
         {
             id: 'add-oil-marketing-company',
             type: 'navigate',
-            label: 'Add Oil Marketing Company',
+            label: 'Add OMC',
             icon: 'Plus',
             path: omcBaseUrl + '/create',
             // permission: {
@@ -788,8 +789,8 @@ const raw: PageConfig = {
         {
             id: 'oil-marketing-companies-create',
             parentId: 'oil-marketing-companies',
-            title: 'Add Oil Marketing Company',
-            page_title: 'Add Oil Marketing Company',
+            title: 'Add OMC',
+            page_title: 'Add OMC',
             description: 'Register a new oil marketing company in the fuel management system.',
             type: 'create',
             page_type: 'create',

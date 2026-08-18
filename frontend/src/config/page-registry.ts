@@ -31,8 +31,28 @@ import { provincesListConfig } from '@/config/modules/administrations/location/p
 import { districtsListConfig } from '@/config/modules/administrations/location/district.config'
 import { townsListConfig } from '@/config/modules/administrations/location/town.config'
 import { regionsListConfig } from '@/config/modules/administrations/location/region.config'
+import { fuelOperationPageRegistry } from '@/config/modules/fuel-operation/fuel-operations.config'
+import { requestOrderPageRegistry } from '@/config/modules/request-and-orders/request-orders.config'
+import { logisticsPageRegistry } from '@/config/modules/logistics/logistics.config'
+import { fleetPageRegistry } from '@/config/modules/fleet/fleet.config'
+import { cardsPosPageRegistry } from '@/config/modules/cards-and-pos/cards-pos.config'
+import { financePageRegistry } from '@/config/modules/finance/finance.config'
+import { compliancePageRegistry } from '@/config/modules/compliance/compliance.config'
+import { reportsPageRegistry } from '@/config/modules/reports/reports.config'
+import { myAccountPageRegistry } from '@/config/modules/my-account/my-account.config'
+import { settingsPageRegistry } from '@/config/modules/settings/settings.config'
 
 export const pageRegistry: Record<string, PageConfig> = {
+  ...fuelOperationPageRegistry,
+  ...requestOrderPageRegistry,
+  ...logisticsPageRegistry,
+  ...fleetPageRegistry,
+  ...cardsPosPageRegistry,
+  ...financePageRegistry,
+  ...compliancePageRegistry,
+  ...reportsPageRegistry,
+  ...myAccountPageRegistry,
+  ...settingsPageRegistry,
   login: loginConfig,
   register: registerConfig,
   'forgot-password': forgetPasswordConfig,
