@@ -40,6 +40,55 @@ const api: ApiConfig = {
         },
     },
 }
+// const cardsApi: ApiConfig = {
+//     baseUrl: '/api',
+//     data_mapping: {
+//         type: 'paginated',
+//         items: 'data.items',
+//         total: 'data.total',
+//         page: 'data.page',
+//         pageSize: 'data.pageSize',
+//     },
+//     endpoints: {
+//         list: {
+//             path: '/accounts/ngos/{id}/cards',
+//             method: 'GET',
+//         },
+//     },
+// }
+const vehiclesApi: ApiConfig = {
+    baseUrl: '/api',
+    data_mapping: {
+        type: 'paginated',
+        items: 'data.items',
+        total: 'data.total',
+        page: 'data.page',
+        pageSize: 'data.pageSize',
+    },
+    endpoints: {
+        list: {
+            path: '/accounts/ngos/{id}/vehicles',
+            method: 'GET',
+        },
+    },
+}
+
+const transactionsApi: ApiConfig = {
+    baseUrl: '/api',
+    data_mapping: {
+        type: 'paginated',
+        items: 'data.items',
+        total: 'data.total',
+        page: 'data.page',
+        pageSize: 'data.pageSize',
+    },
+    endpoints: {
+        list: {
+            path: '/accounts/ngos/{id}/transactions',
+            method: 'GET',
+        },
+    },
+}
 
 const form: FormConfig = {
     cancelPath: '/accounts/ngos',
@@ -272,19 +321,16 @@ const raw: PageConfig = {
         rowKey: 'id',
         stickyHeader: true,
         striped: true,
-
         pagination: {
             enabled: true,
             pageSize: 10,
             pageSizeOptions: [10, 20, 50],
         },
-
         sorting: {
             enabled: true,
             defaultColumn: 'name',
             defaultDirection: 'asc',
         },
-
         columns: [
             {
                 id: 'account-number',
@@ -370,12 +416,35 @@ const raw: PageConfig = {
                         type: 'navigate',
                         label: 'View',
                         icon: 'Eye',
+                        path: '/accounts/ngos/{id}',
                     },
                     {
                         id: 'edit',
                         type: 'edit',
                         label: 'Edit',
                         icon: 'Pencil',
+                        path: '/accounts/ngos/{id}/edit',
+                    },
+                    //  {
+                    //     id: 'cards',
+                    //     type: 'navigate',
+                    //     label: 'Cards',
+                    //     icon: 'atm',
+                    //     path: '/accounts/ngos/{id}/cards',
+                    // },
+                    {
+                        id: 'vehicles',
+                        type: 'navigate',
+                        label: 'Vehicles',
+                        icon: 'Truck',
+                        path: '/accounts/ngos/{id}/vehicles',
+                    },
+                    {
+                        id: 'transactions',
+                        type: 'navigate',
+                        label: 'Transactions',
+                        icon: 'Receipt',
+                        path: '/accounts/ngos/{id}/transactions',
                     },
                     {
                         id: 'delete',
@@ -417,6 +486,16 @@ const raw: PageConfig = {
                 ...form,
                 submitLabel: 'Add NGO',
             },
+            page_actions: [
+                {
+                    id: 'back',
+                    type: 'navigate',
+                    label: 'Back to NGOs',
+                    path: '/accounts/ngos',
+                    icon: 'ArrowLeft',
+                    variant: 'secondary',
+                },
+            ],
         },
         {
             id: 'ngos-details',
@@ -429,7 +508,6 @@ const raw: PageConfig = {
             route: '/accounts/ngos/:id',
             api,
             recordIdParam: 'id',
-
             fields: [
                 'name',
                 'code',
@@ -471,6 +549,16 @@ const raw: PageConfig = {
                     ],
                 },
             ],
+            page_actions: [
+                {
+                    id: 'back',
+                    type: 'navigate',
+                    label: 'Back to NGOs',
+                    path: '/accounts/ngos',
+                    icon: 'ArrowLeft',
+                    variant: 'secondary',
+                },
+            ],
         },
         {
             id: 'ngos-edit',
@@ -487,6 +575,355 @@ const raw: PageConfig = {
                 submitLabel: 'Save Changes',
             },
             recordIdParam: 'id',
+        },        
+        {
+            id: 'ngos-vehicles',
+            parentId: 'ngos',
+            title: 'NGOs Vehicles',
+            page_title: 'Registered Vehicles',
+            description: 'View vehicles registered to this NGO account.',
+            type: 'list',
+            page_type: 'list',
+            path: '/accounts/ngos/:id/vehicles',
+            route: '/accounts/ngos/:id/vehicles',
+            api: vehiclesApi,
+            statistics: [
+                {
+                    id: 'total-vehicles',
+                    type: 'statistic',
+                    title: 'Total Vehicles',
+                    dataPath: 'statistics.total',
+                    icon: 'Car',
+                    format: 'number',
+                },
+                {
+                    id: 'active-vehicles',
+                    type: 'statistic',
+                    title: 'Active',
+                    dataPath: 'statistics.active',
+                    icon: 'CircleCheck',
+                    format: 'number',
+                },
+                {
+                    id: 'inactive-vehicles',
+                    type: 'statistic',
+                    title: 'Inactive',
+                    dataPath: 'statistics.inactive',
+                    icon: 'CircleX',
+                    format: 'number',
+                },
+                {
+                    id: 'fuel-cards',
+                    type: 'statistic',
+                    title: 'Assigned Fuel Cards',
+                    dataPath: 'statistics.assigned_cards',
+                    icon: 'CreditCard',
+                    format: 'number',
+                },
+            ],
+            page_actions: [
+                {
+                    id: 'back',
+                    type: 'navigate',
+                    label: 'Back to NGOs',
+                    path: '/accounts/ngos',
+                    icon: 'ArrowLeft',
+                    variant: 'secondary',
+                },
+            ],
+            filters: [
+                {
+                    id: 'search',
+                    type: 'search',
+                    label: 'Search',
+                    field: 'search',
+                    query_parameter: 'search',
+                    placeholder: 'Search registration, fleet number, make or model',
+                },
+                {
+                    id: 'fuel-type',
+                    type: 'select',
+                    label: 'Fuel Type',
+                    field: 'fuel_type',
+                    query_parameter: 'fuel_type',
+                    options: [
+                        { label: 'Petrol', value: 'petrol' },
+                        { label: 'Diesel', value: 'diesel' },
+                        { label: 'Electric', value: 'electric' },
+                        { label: 'Hybrid', value: 'hybrid' },
+                    ],
+                },
+                {
+                    id: 'status',
+                    type: 'select',
+                    label: 'Status',
+                    field: 'status',
+                    query_parameter: 'status',
+                    options: [
+                        { label: 'Active', value: 'active' },
+                        { label: 'Inactive', value: 'inactive' },
+                        { label: 'Suspended', value: 'suspended' },
+                    ],
+                },
+            ],
+            table: {
+                rowKey: 'id',
+                stickyHeader: true,
+                striped: true,
+                pagination: {
+                    enabled: true,
+                    pageSize: 10,
+                    pageSizeOptions: [10, 20, 50, 100],
+                },
+                sorting: {
+                    enabled: true,
+                    defaultColumn: 'registration_number',
+                    defaultDirection: 'asc',
+                },
+                columns: [
+                    {
+                        id: 'registration-number',
+                        type: 'text',
+                        header: 'Registration No.',
+                        accessor: 'registration_number',
+                        sortable: true,
+                        searchable: true,
+                    },
+                    {
+                        id: 'fleet-number',
+                        type: 'text',
+                        header: 'Fleet No.',
+                        accessor: 'fleet_number',
+                        sortable: true,
+                    },
+                    {
+                        id: 'make',
+                        type: 'text',
+                        header: 'Make',
+                        accessor: 'make',
+                        sortable: true,
+                    },
+                    {
+                        id: 'model',
+                        type: 'text',
+                        header: 'Model',
+                        accessor: 'model',
+                    },
+                    {
+                        id: 'fuel-type',
+                        type: 'text',
+                        header: 'Fuel Type',
+                        accessor: 'fuel_type',
+                    },
+                    {
+                        id: 'fuel-card',
+                        type: 'text',
+                        header: 'Fuel Card',
+                        accessor: 'fuel_card.card_number',
+                    },
+                    {
+                        id: 'monthly-limit',
+                        type: 'number',
+                        header: 'Monthly Limit',
+                        accessor: 'monthly_limit',
+                        format: 'currency',
+                        currency: 'ZMW',
+                    },
+                    {
+                        id: 'status',
+                        type: 'badge',
+                        header: 'Status',
+                        accessor: 'status',
+                        sortable: true,
+                        options: {
+                            active: 'success',
+                            inactive: 'warning',
+                            suspended: 'danger',
+                        },
+                    },
+                    {
+                        id: 'created-at',
+                        type: 'datetime',
+                        header: 'Created',
+                        accessor: 'created_at',
+                        sortable: true,
+                    },
+                ],
+            },
+        },
+        {
+            id: 'ngos-transactions',
+            parentId: 'ngos',
+            title: 'NGO Transactions',
+            page_title: 'NGO Transactions',
+            description: 'Review fuel and account transactions for this NGO.',
+            type: 'list',
+            page_type: 'list',
+            path: '/accounts/ngos/:id/transactions',
+            route: '/accounts/ngos/:id/transactions',
+            api: transactionsApi,
+            statistics: [
+                {
+                    id: 'total-transactions',
+                    type: 'statistic',
+                    title: 'Total Transactions',
+                    dataPath: 'statistics.total',
+                    icon: 'Receipt',
+                    format: 'number',
+                },
+                {
+                    id: 'successful-transactions',
+                    type: 'statistic',
+                    title: 'Successful',
+                    dataPath: 'statistics.successful',
+                    icon: 'CircleCheck',
+                    format: 'number',
+                },
+                {
+                    id: 'failed-transactions',
+                    type: 'statistic',
+                    title: 'Failed',
+                    dataPath: 'statistics.failed',
+                    icon: 'CircleX',
+                    format: 'number',
+                },
+            ],
+            page_actions: [
+                {
+                    id: 'back',
+                    type: 'navigate',
+                    label: 'Back to NGOs',
+                    path: '/accounts/ngos',
+                    icon: 'ArrowLeft',
+                    variant: 'secondary',
+                },
+            ],
+            filters: [
+                {
+                    id: 'search',
+                    type: 'search',
+                    label: 'Search',
+                    field: 'search',
+                    query_parameter: 'search',
+                    placeholder: 'Search reference, vehicle, card or station',
+                },
+                {
+                    id: 'transaction-type',
+                    type: 'select',
+                    label: 'Transaction Type',
+                    field: 'transaction_type',
+                    query_parameter: 'transaction_type',
+                    options: [
+                        { label: 'Fuel Purchase', value: 'fuel_purchase' },
+                        { label: 'Payment', value: 'payment' },
+                        { label: 'Refund', value: 'refund' },
+                        { label: 'Adjustment', value: 'adjustment' },
+                    ],
+                },
+                {
+                    id: 'transaction-date',
+                    type: 'date_range',
+                    label: 'Transaction Date',
+                    fromField: 'date_from',
+                    toField: 'date_to',
+                    from_query_parameter: 'date_from',
+                    to_query_parameter: 'date_to',
+                },
+                {
+                    id: 'status',
+                    type: 'select',
+                    label: 'Status',
+                    field: 'status',
+                    query_parameter: 'status',
+                    options: [
+                        { label: 'Successful', value: 'successful' },
+                        { label: 'Pending', value: 'pending' },
+                        { label: 'Failed', value: 'failed' },
+                        { label: 'Reversed', value: 'reversed' },
+                    ],
+                },
+            ],
+            table: {
+                rowKey: 'id',
+                stickyHeader: true,
+                striped: true,
+                pagination: {
+                    enabled: true,
+                    pageSize: 10,
+                    pageSizeOptions: [10, 20, 50, 100],
+                },
+                sorting: {
+                    enabled: true,
+                    defaultColumn: 'transaction_date',
+                    defaultDirection: 'desc',
+                },
+                columns: [
+                    {
+                        id: 'reference',
+                        type: 'text',
+                        header: 'Reference',
+                        accessor: 'reference',
+                        sortable: true,
+                        searchable: true,
+                    },
+                    {
+                        id: 'transaction-date',
+                        type: 'datetime',
+                        header: 'Date',
+                        accessor: 'transaction_date',
+                        sortable: true,
+                    },
+                    {
+                        id: 'transaction-type',
+                        type: 'text',
+                        header: 'Type',
+                        accessor: 'transaction_type',
+                        sortable: true,
+                    },
+                    {
+                        id: 'vehicle',
+                        type: 'text',
+                        header: 'Vehicle',
+                        accessor: 'vehicle.registration_number',
+                    },
+                    {
+                        id: 'station',
+                        type: 'text',
+                        header: 'Station',
+                        accessor: 'station.name',
+                    },
+                    {
+                        id: 'quantity',
+                        type: 'number',
+                        header: 'Quantity',
+                        accessor: 'quantity',
+                        sortable: true,
+                        format: 'decimal',
+                    },
+                    {
+                        id: 'amount',
+                        type: 'number',
+                        header: 'Amount',
+                        accessor: 'amount',
+                        sortable: true,
+                        format: 'currency',
+                        currency: 'ZMW',
+                    },
+                    {
+                        id: 'status',
+                        type: 'badge',
+                        header: 'Status',
+                        accessor: 'status',
+                        sortable: true,
+                        options: {
+                            successful: 'success',
+                            pending: 'warning',
+                            failed: 'danger',
+                            reversed: 'info',
+                        },
+                    },
+                ],
+            },
         },
     ],
 }
