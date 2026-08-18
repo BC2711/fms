@@ -228,9 +228,7 @@ const raw: PageConfig = {
     page_type: 'list',
     path: '/accounts/aggregators',
     route: '/accounts/aggregators',
-
     api,
-
     statistics: [
         {
             id: 'total',

@@ -4,6 +4,7 @@ import type { Params } from 'react-router-dom'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 
 import { FormSkeleton } from '@/components/forms/FormSkeleton'
+import { PageHeader } from '@/components/navigation/PageHeader'
 import { BreadcrumbGenerator } from '@/framework/generators/BreadcrumbGenerator'
 import { FormGenerator, type FormValues } from '@/framework/generators/FormGenerator'
 import { useDynamicMutation } from '@/hooks/useDynamicMutation'
@@ -135,5 +136,5 @@ export function FormPageGenerator({ config, mode, routeParams }: FormPageGenerat
     )
   }
 
-  return <section className="space-y-5"><BreadcrumbGenerator config={config} /><p className="text-sm capitalize text-gray-500">{mode} mode</p><h1 className="text-3xl font-bold">{config.page_title ?? config.title}</h1>{config.description && <p className="text-gray-600 dark:text-gray-300">{config.description}</p>}{id && <p>Record: {id}</p>}{content}</section>
+  return <section className="space-y-5"><BreadcrumbGenerator config={config} /><p className="text-sm capitalize text-gray-500">{mode} mode</p><PageHeader page_title={config.page_title ?? config.title} description={config.description} page_actions={config.page_actions ?? config.actions} />{id && <p>Record: {id}</p>}{content}</section>
 }
