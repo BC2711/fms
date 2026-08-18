@@ -26,6 +26,9 @@ describe('cards and POS configuration', () => {
     expect(createPaths).toContain('/cards-pos-fuel-cards/issue-card')
     expect(createPaths).toContain('/cards-pos-devices/add-pos-device')
     expect(createPaths).toContain('/cards-pos-devices/assign-device')
+    expect(cardsPosConfigs.find((page) => page.id === 'cards-pos-fuel-cards-card-stock')?.api.endpoints.create?.path).toBe('/cards-pos-fuel-cards/card-stock')
+    expect(cardsPosConfigs.find((page) => page.id === 'cards-pos-devices-pos-devices')?.api.endpoints.create?.path).toBe('/cards-pos-devices/pos-devices')
+    expect(cardsPosConfigs.find((page) => page.id === 'cards-pos-devices-pos-assignments')?.api.endpoints.create?.path).toBe('/cards-pos-devices/pos-assignments')
     for (const page of cardsPosConfigs) {
       expect(page.api.endpoints.item?.path).toBe(`${page.path}/{id}`)
       expect(page.sub_pages?.some((child) => child.type === 'details')).toBe(true)

@@ -23,6 +23,7 @@ describe('fleet configuration', () => {
   it('uses the dedicated add route and appropriate sub-pages', () => {
     const vehicles = fleetConfigs.find((page) => page.id === 'fleet-all-vehicles')
     expect(vehicles?.sub_pages?.find((page) => page.type === 'create')?.path).toBe('/fleet/add-vehicle')
+    expect(vehicles?.api.endpoints.create?.path).toBe('/fleet/all-vehicles')
     const readOnly = new Set(['customer-vehicles', 'delivery-vehicles', 'tanker-trucks', 'vehicle-transactions', 'vehicle-tracking', 'driver-performance'])
     for (const page of fleetConfigs) {
       expect(page.api.endpoints.item?.path).toBe(`${page.path}/{id}`)

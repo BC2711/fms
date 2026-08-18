@@ -67,7 +67,7 @@ def generate_crud_router(config: ResourceConfig) -> APIRouter:
             return response(f"{config.name.replace('-', ' ').title()} retrieved successfully", data)
 
     if "view" in config.allowed_operations:
-        @router.get("/{item_id}")
+        @router.get("/{item_id:int}")
         def view_resource(item_id: int, user: secured("view"), db: Annotated[Session, Depends(get_db)]):
             del user
             obj = CRUDService(db, config).get(item_id)
@@ -80,13 +80,13 @@ def generate_crud_router(config: ResourceConfig) -> APIRouter:
             return response(f"{config.name.replace('-', ' ').title()} created successfully", _serialized(config, obj, db))
 
     if "update" in config.allowed_operations:
-        @router.put("/{item_id}")
+        @router.put("/{item_id:int}")
         def update_resource(item_id: int, payload: config.update_schema, user: secured("update"), db: Annotated[Session, Depends(get_db)]):  # type: ignore[valid-type]
             obj = CRUDService(db, config).update(item_id, payload, user.id)
             return response(f"{config.name.replace('-', ' ').title()} updated successfully", _serialized(config, obj, db))
 
     if "delete" in config.allowed_operations:
-        @router.delete("/{item_id}")
+        @router.delete("/{item_id:int}")
         def delete_resource(item_id: int, user: secured("delete"), db: Annotated[Session, Depends(get_db)]):
             CRUDService(db, config).delete(item_id, user.id)
             return response(f"{config.name.replace('-', ' ').title()} deleted successfully")

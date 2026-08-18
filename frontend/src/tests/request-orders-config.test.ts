@@ -24,6 +24,8 @@ describe('requests and orders configuration', () => {
     const orders = requestOrderConfigs.find((page) => page.id === 'requests-orders-all-orders')
     expect(requests?.sub_pages?.find((page) => page.type === 'create')?.path).toBe('/requests-orders/create-fuel-request')
     expect(orders?.sub_pages?.find((page) => page.type === 'create')?.path).toBe('/requests-orders/create-order')
+    expect(requests?.api.endpoints.create?.path).toBe('/requests-orders/all-fuel-requests')
+    expect(orders?.api.endpoints.create?.path).toBe('/requests-orders/all-orders')
     for (const page of requestOrderConfigs) expect(page.api.endpoints.item?.path).toBe(`${page.path}/{id}`)
   })
 })

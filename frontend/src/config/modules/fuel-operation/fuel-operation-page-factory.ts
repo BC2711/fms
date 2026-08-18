@@ -55,7 +55,7 @@ export function createFuelOperationPage(definition: FuelOperationDefinition): Li
     data_mapping: { type: 'paginated' as const, items: 'data.items', total: 'data.total', page: 'data.page', pageSize: 'data.pageSize' },
     endpoints: {
       list: { path, method: 'GET' as const }, item: { path: `${path}/{id}`, method: 'GET' as const, responseMappingPath: 'data' },
-      create: { path: createPath, method: 'POST' as const, responseMappingPath: 'data' }, update: { path: `${path}/{id}`, method: 'PUT' as const, responseMappingPath: 'data' }, delete: { path: `${path}/{id}`, method: 'DELETE' as const },
+      create: { path, method: 'POST' as const, responseMappingPath: 'data' }, update: { path: `${path}/{id}`, method: 'PUT' as const, responseMappingPath: 'data' }, delete: { path: `${path}/{id}`, method: 'DELETE' as const },
     },
   }
   const formFields: FormFieldConfig[] = fields.map((field) => ({ name: field.name, label: field.label, type: field.type ?? 'text', required: field.required, options: field.options ?? (field.name === 'status' ? statuses : undefined) }))

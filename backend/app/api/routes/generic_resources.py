@@ -33,7 +33,8 @@ def authorize(user: User, resource: str, operation: str) -> None:
     elif resource.startswith("settings-"):
         code = f"settings.{operation}"
     else:
-        return
+        action = "edit" if operation == "update" else operation
+        code = f"{resource.replace('/', '.')}.{action}"
     if code not in user.permission_codes:
         raise AppError(f"Missing permission: {code}", 403)
 
